@@ -58,7 +58,8 @@ header h2 {
     border-radius: 5px;
     font-size: 16px;
     transition: border-color 0.3s;
-    resize: vertical;
+    resize: none;
+    min-height: 40px;
 }
 
 .form-group textarea:focus {
