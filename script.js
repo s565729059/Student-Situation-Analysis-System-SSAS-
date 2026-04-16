@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hobbies: formData.get('hobbies'),
             studyHabits: formData.get('studyHabits'),
             otherInfo: formData.get('otherInfo'),
-            model: formData.get('model'),
             grades: {}
         };
         
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: studentData.model,
+                    model: 'deepseek-chat',
                     messages: [
                         {
                             role: 'user',
@@ -198,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <p><strong>兴趣爱好：</strong>${studentData.hobbies || '无'}</p>
             <p><strong>学习习惯：</strong>${studentData.studyHabits || '无'}</p>
             <p><strong>其他补充信息：</strong>${studentData.otherInfo || '无'}</p>
-            <p><strong>使用AI模型：</strong>${studentData.model}</p>
             
             <h4>成绩情况</h4>
             <ul>
