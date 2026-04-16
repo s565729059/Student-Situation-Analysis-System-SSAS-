@@ -263,19 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <p><strong>性别：</strong>${studentData.gender}</p>
             <p><strong>年龄：</strong>${studentData.age}</p>
             <p><strong>年级：</strong>${studentData.grade}</p>
+            <p><strong>考试次数：</strong>${studentData.examCount}次</p>
             <p><strong>兴趣爱好：</strong>${studentData.hobbies || '无'}</p>
             <p><strong>学习习惯：</strong>${studentData.studyHabits || '无'}</p>
             <p><strong>其他补充信息：</strong>${studentData.otherInfo || '无'}</p>
             
-            <h4>成绩情况</h4>
-            <ul>
-                ${Object.entries(studentData.grades).map(([subject, score]) => 
-                    `<li><strong>${subject}：</strong>${score}分</li>`
-                ).join('')}
-            </ul>
-            
             <h4>分析报告</h4>
-            <div class="analysis-report">${analysisResult.replace(/\n/g, '<br>')}</div>
+            <p>详细分析报告已生成，请查看下方的详细分析部分。</p>
         `;
     }
     
@@ -360,22 +354,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const analysisSections = document.getElementById('analysisSections');
         analysisSections.innerHTML = '';
         
+        // 清理分析结果，移除Markdown格式符号
+        let cleanedResult = analysisResult.replace(/^#+/gm, '');
+        cleanedResult = cleanedResult.replace(/^\*+ /gm, '');
+        cleanedResult = cleanedResult.replace(/^-+ /gm, '');
+        
         // 分割分析结果为不同部分
         const sections = [
-            { title: '整体学习情况评估', keywords: ['整体学习情况', '学习情况评估'] },
-            { title: '存在的问题和不足', keywords: ['问题', '不足'] },
-            { title: '具体的补课推荐方案', keywords: ['补课推荐', '推荐方案'] },
-            { title: '个性化学习建议', keywords: ['学习建议', '个性化建议'] },
-            { title: '学习习惯的改进建议', keywords: ['学习习惯', '改进建议'] }
+            { title: '整体学习情况评估', keywords: ['整体学习情况', '学习情况评估', '成绩趋势'] },
+            { title: '存在的问题和不足', keywords: ['问题', '不足', '短板'] },
+            { title: '具体的补课推荐方案', keywords: ['补课推荐', '推荐方案', '课程建议'] },
+            { title: '个性化学习建议', keywords: ['学习建议', '个性化建议', '学习方法'] },
+            { title: '学习习惯的改进建议', keywords: ['学习习惯', '改进建议', '习惯养成'] }
         ];
         
         // 为每个部分创建板块
         sections.forEach(section => {
             const sectionElement = document.createElement('div');
             sectionElement.className = 'analysis-section';
+            
+            // 提取并清理内容
+            let content = extractSectionContent(cleanedResult, section.keywords);
+            if (!content || content === '该部分内容未在分析报告中找到。') {
+                // 如果没有找到对应部分，使用整个分析结果
+                if (sections.indexOf(section) === 0) {
+                    content = cleanedResult;
+                } else {
+                    return; // 跳过其他部分
+                }
+            }
+            
+            // 格式化内容
+            content = content.replace(/\n/g, '<br>');
+            
             sectionElement.innerHTML = `
                 <h4>${section.title}</h4>
-                <p>${extractSectionContent(analysisResult, section.keywords)}</p>
+                <div class="analysis-content">${content}</div>
             `;
             analysisSections.appendChild(sectionElement);
         });
@@ -389,15 +403,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const examList = document.createElement('div');
             studentData.grades.forEach((examGrades, index) => {
                 const examItem = document.createElement('div');
-                examItem.style.marginBottom = '20px';
+                examItem.className = 'exam-result';
                 examItem.innerHTML = `<h5>第${index + 1}次考试</h5>`;
                 
                 const subjectList = document.createElement('div');
                 for (const [subject, score] of Object.entries(examGrades)) {
                     const subjectItem = document.createElement('div');
-                    subjectItem.style.marginBottom = '5px';
+                    subjectItem.className = 'subject-score';
                     subjectItem.innerHTML = `
-                        <strong>${subject}：</strong>${score}分
+                        <span class="subject-name">${subject}：</span>
+                        <span class="subject-score-value">${score}分</span>
                     `;
                     subjectList.appendChild(subjectItem);
                 }
