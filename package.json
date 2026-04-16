@@ -1,0 +1,17 @@
+{
+  "name": "student-situation-analysis-system",
+  "version": "1.0.0",
+  "description": "青岛睿花苑·学生情况分析系统",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build completed successfully'",
+    "dev": "python -m http.server 8000"
+  },
+  "keywords": [
+    "student",
+    "analysis",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT"
+}
