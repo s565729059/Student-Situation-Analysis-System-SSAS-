@@ -177,6 +177,21 @@ main {
     color: #4a6fa5;
 }
 
+.exam-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #4a6fa5;
+}
+
+.exam-section h4 {
+    margin-bottom: 15px;
+    color: #4a6fa5;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
 .grade-input-group {
     display: flex;
     gap: 10px;

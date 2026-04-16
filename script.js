@@ -15,32 +15,50 @@ document.addEventListener('DOMContentLoaded', function() {
         '九年级': ['语文', '数学', '英语', '物理', '化学']
     };
     
-    // 年级切换事件
-    gradeSelect.addEventListener('change', function() {
-        const selectedGrade = this.value;
+    // 考试次数选择
+    const examCountSelect = document.getElementById('examCount');
+    
+    // 生成成绩输入框
+    function generateGradeInputs() {
+        const selectedGrade = gradeSelect.value;
+        const selectedExamCount = examCountSelect.value;
         gradesContainer.innerHTML = '<h3>成绩输入</h3>';
         
-        if (selectedGrade) {
+        if (selectedGrade && selectedExamCount) {
             const subjects = subjectsByGrade[selectedGrade];
-            subjects.forEach(subject => {
-                let maxScore;
-                if (['语文', '数学', '英语'].includes(subject)) {
-                    maxScore = 120;
-                } else if (['地理', '生物'].includes(subject)) {
-                    maxScore = 80;
-                } else {
-                    maxScore = 100;
-                }
-                const inputGroup = document.createElement('div');
-                inputGroup.className = 'grade-input-group';
-                inputGroup.innerHTML = `
-                    <label for="${subject}">${subject} (满分${maxScore}分)</label>
-                    <input type="number" id="${subject}" name="${subject}" min="0" max="${maxScore}" required>
-                `;
-                gradesContainer.appendChild(inputGroup);
-            });
+            for (let i = 1; i <= selectedExamCount; i++) {
+                const examSection = document.createElement('div');
+                examSection.className = 'exam-section';
+                examSection.innerHTML = `<h4>第${i}次考试</h4>`;
+                
+                subjects.forEach(subject => {
+                    let maxScore;
+                    if (['语文', '数学', '英语'].includes(subject)) {
+                        maxScore = 120;
+                    } else if (['地理', '生物'].includes(subject)) {
+                        maxScore = 80;
+                    } else {
+                        maxScore = 100;
+                    }
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'grade-input-group';
+                    inputGroup.innerHTML = `
+                        <label for="${subject}_${i}">${subject} (满分${maxScore}分)</label>
+                        <input type="number" id="${subject}_${i}" name="${subject}_${i}" min="0" max="${maxScore}" required>
+                    `;
+                    examSection.appendChild(inputGroup);
+                });
+                
+                gradesContainer.appendChild(examSection);
+            }
         }
-    });
+    }
+    
+    // 年级选择事件
+    gradeSelect.addEventListener('change', generateGradeInputs);
+    
+    // 考试次数选择事件
+    examCountSelect.addEventListener('change', generateGradeInputs);
     
     // 表单提交事件
     studentForm.addEventListener('submit', async function(e) {
@@ -63,23 +81,30 @@ document.addEventListener('DOMContentLoaded', function() {
             gender: formData.get('gender'),
             age: formData.get('age'),
             grade: formData.get('grade'),
+            examCount: formData.get('examCount'),
             hobbies: formData.get('hobbies'),
             studyHabits: formData.get('studyHabits'),
             otherInfo: formData.get('otherInfo'),
-            grades: {}
+            grades: []
         };
         
         // 收集成绩数据
         console.log('studentData.grade:', studentData.grade);
+        console.log('studentData.examCount:', studentData.examCount);
         console.log('subjectsByGrade:', subjectsByGrade);
         console.log('subjectsByGrade[studentData.grade]:', subjectsByGrade[studentData.grade]);
         
         const subjects = subjectsByGrade[studentData.grade];
         if (subjects) {
             console.log('找到科目:', subjects);
-            subjects.forEach(subject => {
-                studentData.grades[subject] = formData.get(subject);
-            });
+            // 收集多次考试的成绩
+            for (let i = 1; i <= studentData.examCount; i++) {
+                const examGrades = {};
+                subjects.forEach(subject => {
+                    examGrades[subject] = formData.get(`${subject}_${i}`);
+                });
+                studentData.grades.push(examGrades);
+            }
         } else {
             console.error('未找到对应年级的科目:', studentData.grade);
             throw new Error('请选择有效的年级');
@@ -149,19 +174,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
         const url = 'https://api.deepseek.com/v1/chat/completions';
         
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
         const prompt = `
         请根据以下学生信息进行详细分析：
         学生姓名：${studentData.name}
         性别：${studentData.gender}
         年龄：${studentData.age}
         年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
         兴趣爱好：${studentData.hobbies || '无'}
         学习习惯：${studentData.studyHabits || '无'}
         其他补充信息：${studentData.otherInfo || '无'}
-        成绩：${JSON.stringify(studentData.grades, null, 2)}
+        成绩：
+        ${gradesInfo}
         
         分析方向：
-        1. 学生的整体学习情况
+        1. 学生的整体学习情况，包括成绩趋势分析
         2. 各科的成绩，有没有短板
         3. 根据学生情况，推荐补课计划
         4. 整体内容要详细，给家长明确的指导
@@ -251,8 +287,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const subjects = Object.keys(studentData.grades);
-        const scores = Object.values(studentData.grades).map(Number);
+        // 计算每个科目的平均成绩
+        const subjectScores = {};
+        studentData.grades.forEach(examGrades => {
+            for (const [subject, score] of Object.entries(examGrades)) {
+                if (!subjectScores[subject]) {
+                    subjectScores[subject] = [];
+                }
+                subjectScores[subject].push(Number(score));
+            }
+        });
+        
+        // 计算平均分
+        const subjects = Object.keys(subjectScores);
+        const avgScores = subjects.map(subject => {
+            const scores = subjectScores[subject];
+            const sum = scores.reduce((a, b) => a + b, 0);
+            return Math.round(sum / scores.length);
+        });
         
         try {
             // 销毁旧图表
@@ -266,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {
                     labels: subjects,
                     datasets: [{
-                        label: '成绩分布',
-                        data: scores,
+                        label: '平均成绩分布',
+                        data: avgScores,
                         backgroundColor: 'rgba(74, 111, 165, 0.2)',
                         borderColor: 'rgba(74, 111, 165, 1)',
                         borderWidth: 2,
@@ -290,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     plugins: {
                         title: {
                             display: true,
-                            text: '学科成绩雷达图',
+                            text: '学科平均成绩雷达图',
                             font: {
                                 size: 16
                             }
@@ -329,23 +381,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // 添加各科成绩分析板块
-        const subjects = Object.keys(studentData.grades);
-        if (subjects.length > 0) {
+        if (studentData.grades && studentData.grades.length > 0) {
             const subjectAnalysisSection = document.createElement('div');
             subjectAnalysisSection.className = 'analysis-section';
             subjectAnalysisSection.innerHTML = '<h4>各科成绩分析</h4>';
             
-            const subjectList = document.createElement('div');
-            subjects.forEach(subject => {
-                const subjectItem = document.createElement('div');
-                subjectItem.style.marginBottom = '10px';
-                subjectItem.innerHTML = `
-                    <strong>${subject}：</strong>${studentData.grades[subject]}分
-                `;
-                subjectList.appendChild(subjectItem);
+            const examList = document.createElement('div');
+            studentData.grades.forEach((examGrades, index) => {
+                const examItem = document.createElement('div');
+                examItem.style.marginBottom = '20px';
+                examItem.innerHTML = `<h5>第${index + 1}次考试</h5>`;
+                
+                const subjectList = document.createElement('div');
+                for (const [subject, score] of Object.entries(examGrades)) {
+                    const subjectItem = document.createElement('div');
+                    subjectItem.style.marginBottom = '5px';
+                    subjectItem.innerHTML = `
+                        <strong>${subject}：</strong>${score}分
+                    `;
+                    subjectList.appendChild(subjectItem);
+                }
+                
+                examItem.appendChild(subjectList);
+                examList.appendChild(examItem);
             });
             
-            subjectAnalysisSection.appendChild(subjectList);
+            subjectAnalysisSection.appendChild(examList);
             analysisSections.appendChild(subjectAnalysisSection);
         }
     }
