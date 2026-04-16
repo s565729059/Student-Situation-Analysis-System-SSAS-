@@ -63,8 +63,13 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // 收集成绩数据
+        console.log('studentData.grade:', studentData.grade);
+        console.log('subjectsByGrade:', subjectsByGrade);
+        console.log('subjectsByGrade[studentData.grade]:', subjectsByGrade[studentData.grade]);
+        
         const subjects = subjectsByGrade[studentData.grade];
         if (subjects) {
+            console.log('找到科目:', subjects);
             subjects.forEach(subject => {
                 studentData.grades[subject] = formData.get(subject);
             });
