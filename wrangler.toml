@@ -1,0 +1,10 @@
+name = "student-situation-analysis-system"
+type = "static"
+
+[build]
+command = "echo 'Build completed successfully'"
+directory = "."
+
+[dev]
+command = "python -m http.server 8000"
+port = 8000
