@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 显示详细分析报告
             console.log('显示详细分析报告');
-            displayDetailedAnalysis(analysisResult);
+            displayDetailedAnalysis(analysisResult, studentData);
             const detailedAnalysisSection = document.getElementById('detailedAnalysisSection');
             detailedAnalysisSection.style.display = 'block';
             console.log('详细分析报告显示完成');
@@ -297,14 +297,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 显示详细分析报告
-    function displayDetailedAnalysis(analysisResult) {
+    function displayDetailedAnalysis(analysisResult, studentData) {
         const analysisSections = document.getElementById('analysisSections');
         analysisSections.innerHTML = '';
         
         // 分割分析结果为不同部分
         const sections = [
             { title: '整体学习情况评估', keywords: ['整体学习情况', '学习情况评估'] },
-            { title: '各科成绩分析', keywords: ['各科成绩', '成绩分析'] },
             { title: '存在的问题和不足', keywords: ['问题', '不足'] },
             { title: '具体的补课推荐方案', keywords: ['补课推荐', '推荐方案'] },
             { title: '个性化学习建议', keywords: ['学习建议', '个性化建议'] },
@@ -321,6 +320,27 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             analysisSections.appendChild(sectionElement);
         });
+        
+        // 添加各科成绩分析板块
+        const subjects = Object.keys(studentData.grades);
+        if (subjects.length > 0) {
+            const subjectAnalysisSection = document.createElement('div');
+            subjectAnalysisSection.className = 'analysis-section';
+            subjectAnalysisSection.innerHTML = '<h4>各科成绩分析</h4>';
+            
+            const subjectList = document.createElement('div');
+            subjects.forEach(subject => {
+                const subjectItem = document.createElement('div');
+                subjectItem.style.marginBottom = '10px';
+                subjectItem.innerHTML = `
+                    <strong>${subject}：</strong>${studentData.grades[subject]}分
+                `;
+                subjectList.appendChild(subjectItem);
+            });
+            
+            subjectAnalysisSection.appendChild(subjectList);
+            analysisSections.appendChild(subjectAnalysisSection);
+        }
     }
     
     // 从分析结果中提取特定部分的内容

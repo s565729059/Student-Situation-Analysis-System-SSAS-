@@ -70,8 +70,8 @@ header h2 {
 
 main {
     display: flex;
+    flex-direction: column;
     gap: 30px;
-    flex-wrap: wrap;
 }
 
 .form-section {
