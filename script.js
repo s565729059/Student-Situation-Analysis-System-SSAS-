@@ -70,26 +70,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         try {
-            // 调用DeepSeek API
+            console.log('开始分析学生数据:', studentData);
+            
+            // 调用硅基流动API
             const analysisResult = await analyzeStudent(studentData);
+            console.log('API分析结果:', analysisResult);
             
             // 显示结果
+            console.log('开始显示结果');
             displayResult(studentData, analysisResult);
+            console.log('结果显示完成');
             
             // 生成雷达图
-            generateRadarChart(studentData);
+            try {
+                console.log('开始生成雷达图');
+                generateRadarChart(studentData);
+                console.log('雷达图生成完成');
+            } catch (chartError) {
+                console.error('雷达图生成失败:', chartError);
+                // 雷达图失败不影响结果显示
+            }
             
             // 显示结果区域
+            console.log('显示结果区域');
             resultSection.style.display = 'block';
+            console.log('结果区域显示完成');
         } catch (error) {
             console.error('分析失败:', error);
-            resultContent.innerHTML = '<p style="color: red;">分析失败，请稍后重试。</p>';
-            resultSection.style.display = 'block';
+            try {
+                resultContent.innerHTML = `<p style="color: red;">分析失败，请稍后重试。错误信息：${error.message}</p>`;
+                resultSection.style.display = 'block';
+            } catch (displayError) {
+                console.error('错误信息显示失败:', displayError);
+            }
         } finally {
             // 清除超时计时器
             clearTimeout(timeoutId);
             // 隐藏等待动画
             loadingOverlay.style.display = 'none';
+            console.log('等待动画隐藏完成');
         }
     });
     
