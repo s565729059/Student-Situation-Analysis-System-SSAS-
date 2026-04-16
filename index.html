@@ -23,12 +23,12 @@
                 <form id="studentForm">
                     <div class="form-group">
                         <label for="name">姓名</label>
-                        <input type="text" id="name" required>
+                        <input type="text" id="name" name="name" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="gender">性别</label>
-                        <select id="gender" required>
+                        <select id="gender" name="gender" required>
                             <option value="">请选择</option>
                             <option value="男">男</option>
                             <option value="女">女</option>
@@ -37,12 +37,12 @@
                     
                     <div class="form-group">
                         <label for="age">年龄</label>
-                        <input type="number" id="age" required min="10" max="18">
+                        <input type="number" id="age" name="age" required min="10" max="18">
                     </div>
                     
                     <div class="form-group">
                         <label for="grade">年级</label>
-                        <select id="grade" required>
+                        <select id="grade" name="grade" required>
                             <option value="">请选择</option>
                             <option value="七年级">七年级</option>
                             <option value="八年级">八年级</option>
@@ -52,17 +52,17 @@
                     
                     <div class="form-group">
                         <label for="hobbies">兴趣爱好</label>
-                        <input type="text" id="hobbies" placeholder="例如：阅读、运动、音乐等">
+                        <input type="text" id="hobbies" name="hobbies" placeholder="例如：阅读、运动、音乐等">
                     </div>
                     
                     <div class="form-group">
                         <label for="studyHabits">学习习惯</label>
-                        <textarea id="studyHabits" rows="3" placeholder="例如：每天学习时间、学习方法、遇到的困难等"></textarea>
+                        <textarea id="studyHabits" name="studyHabits" rows="3" placeholder="例如：每天学习时间、学习方法、遇到的困难等"></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="otherInfo">其他补充信息</label>
-                        <textarea id="otherInfo" rows="2" placeholder="例如：特长、学习目标等"></textarea>
+                        <textarea id="otherInfo" name="otherInfo" rows="2" placeholder="例如：特长、学习目标等"></textarea>
                     </div>
                     
                     <div class="form-group grades-container" id="gradesContainer">
