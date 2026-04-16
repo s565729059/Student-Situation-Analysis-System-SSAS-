@@ -64,9 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 收集成绩数据
         const subjects = subjectsByGrade[studentData.grade];
-        subjects.forEach(subject => {
-            studentData.grades[subject] = formData.get(subject);
-        });
+        if (subjects) {
+            subjects.forEach(subject => {
+                studentData.grades[subject] = formData.get(subject);
+            });
+        } else {
+            console.error('未找到对应年级的科目:', studentData.grade);
+            throw new Error('请选择有效的年级');
+        }
         
         try {
             console.log('开始分析学生数据:', studentData);
