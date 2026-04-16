@@ -184,7 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         const prompt = `
-        请根据以下学生信息进行详细分析：
+        请根据以下学生信息进行详细分析，并严格按照以下五个板块结构生成分析报告：
+        
         学生姓名：${studentData.name}
         性别：${studentData.gender}
         年龄：${studentData.age}
@@ -196,21 +197,35 @@ document.addEventListener('DOMContentLoaded', function() {
         成绩：
         ${gradesInfo}
         
-        分析方向：
-        1. 学生的整体学习情况，重点分析多次考试的成绩趋势
-        2. 各科的成绩分析，包括每次考试的表现和变化趋势，找出明显的短板
-        3. 根据学生情况，推荐补课计划
-        4. 整体内容要详细，给家长明确的指导
-        5. 推荐全科班课为主，如果有明显短板，可以额外推荐一对一或者小组课（4人课）
-        6. 结合学生的兴趣爱好和学习习惯，提供个性化的学习建议
+        请按照以下结构生成详细的分析报告：
         
-        请提供详细的分析报告，包括：
-        - 整体学习情况评估，包括成绩趋势分析
-        - 各科成绩分析，包括每次考试的表现和变化趋势
-        - 存在的问题和不足
-        - 具体的补课推荐方案
-        - 结合兴趣爱好的个性化学习建议
-        - 学习习惯的改进建议
+        一、整体学习情况评估
+        - 分析学生的整体学习状况
+        - 重点分析多次考试的成绩趋势
+        - 评估学生的学习能力和潜力
+        
+        二、各学科的知识掌握情况
+        - 针对每个学科进行详细分析
+        - 分析每次考试的表现和变化趋势
+        - 找出各学科的不足之处和发展趋势
+        - 评估各学科的学习水平
+        
+        三、个性化学习建议
+        - 结合学生的兴趣爱好和学习习惯
+        - 提供个性化的学习方法和策略
+        - 给出具体的学习计划和时间安排建议
+        
+        四、具体的补课方案
+        - 推荐全科班课为主
+        - 如果有明显短板，额外推荐一对一或者小组课（4人课）
+        - 提供具体的补课内容和时间安排建议
+        
+        五、其它补充信息
+        - 针对学生的特殊情况提供额外建议
+        - 家长需要注意的事项
+        - 长期学习规划建议
+        
+        请确保分析报告详细、全面，能够给家长一个明确的指导。
         `;
         
         // 设置请求超时
@@ -357,15 +372,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // 清理分析结果，移除Markdown格式符号
         let cleanedResult = analysisResult.replace(/^#+/gm, '');
         cleanedResult = cleanedResult.replace(/^\*+ /gm, '');
-        cleanedResult = cleanedResult.replace(/^-+ /gm, '');
         
-        // 分割分析结果为不同部分
+        // 按照五个板块分割分析结果
         const sections = [
-            { title: '整体学习情况评估', keywords: ['整体学习情况', '学习情况评估', '成绩趋势'] },
-            { title: '存在的问题和不足', keywords: ['问题', '不足', '短板'] },
-            { title: '具体的补课推荐方案', keywords: ['补课推荐', '推荐方案', '课程建议'] },
-            { title: '个性化学习建议', keywords: ['学习建议', '个性化建议', '学习方法'] },
-            { title: '学习习惯的改进建议', keywords: ['学习习惯', '改进建议', '习惯养成'] }
+            { title: '整体学习情况评估', regex: /一、整体学习情况评估[\s\S]*?(?=二、|$)/ },
+            { title: '各学科的知识掌握情况', regex: /二、各学科的知识掌握情况[\s\S]*?(?=三、|$)/ },
+            { title: '个性化学习建议', regex: /三、个性化学习建议[\s\S]*?(?=四、|$)/ },
+            { title: '具体的补课方案', regex: /四、具体的补课方案[\s\S]*?(?=五、|$)/ },
+            { title: '其它补充信息', regex: /五、其它补充信息[\s\S]*/ }
         ];
         
         // 为每个部分创建板块
@@ -373,19 +387,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const sectionElement = document.createElement('div');
             sectionElement.className = 'analysis-section';
             
-            // 提取并清理内容
-            let content = extractSectionContent(cleanedResult, section.keywords);
-            if (!content || content === '该部分内容未在分析报告中找到。') {
-                // 如果没有找到对应部分，使用整个分析结果
-                if (sections.indexOf(section) === 0) {
-                    content = cleanedResult;
-                } else {
-                    return; // 跳过其他部分
-                }
-            }
+            // 提取内容
+            const match = cleanedResult.match(section.regex);
+            let content = match ? match[0].replace(`${section.title}`, '').trim() : '该部分内容未在分析报告中找到。';
             
             // 格式化内容
             content = content.replace(/\n/g, '<br>');
+            
+            // 特殊处理各学科的知识掌握情况
+            if (section.title === '各学科的知识掌握情况') {
+                // 尝试提取各个学科的分析
+                const subjectRegex = /(语文|数学|英语|地理|生物|物理|化学)[\s\S]*?(?=(语文|数学|英语|地理|生物|物理|化学|$))/g;
+                let subjectMatch;
+                let subjectsContent = '';
+                
+                while ((subjectMatch = subjectRegex.exec(content)) !== null) {
+                    const subjectName = subjectMatch[1];
+                    const subjectAnalysis = subjectMatch[0].trim();
+                    
+                    subjectsContent += `
+                        <div class="subject-card">
+                            <h5>${subjectName}</h5>
+                            <div class="subject-analysis">${subjectAnalysis.replace(subjectName, '').trim().replace(/\n/g, '<br>')}</div>
+                        </div>
+                    `;
+                }
+                
+                if (subjectsContent) {
+                    content = subjectsContent;
+                }
+            }
             
             sectionElement.innerHTML = `
                 <h4>${section.title}</h4>
@@ -393,37 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             analysisSections.appendChild(sectionElement);
         });
-        
-        // 添加各科成绩分析板块
-        if (studentData.grades && studentData.grades.length > 0) {
-            const subjectAnalysisSection = document.createElement('div');
-            subjectAnalysisSection.className = 'analysis-section';
-            subjectAnalysisSection.innerHTML = '<h4>各科成绩分析</h4>';
-            
-            const examList = document.createElement('div');
-            studentData.grades.forEach((examGrades, index) => {
-                const examItem = document.createElement('div');
-                examItem.className = 'exam-result';
-                examItem.innerHTML = `<h5>第${index + 1}次考试</h5>`;
-                
-                const subjectList = document.createElement('div');
-                for (const [subject, score] of Object.entries(examGrades)) {
-                    const subjectItem = document.createElement('div');
-                    subjectItem.className = 'subject-score';
-                    subjectItem.innerHTML = `
-                        <span class="subject-name">${subject}：</span>
-                        <span class="subject-score-value">${score}分</span>
-                    `;
-                    subjectList.appendChild(subjectItem);
-                }
-                
-                examItem.appendChild(subjectList);
-                examList.appendChild(examItem);
-            });
-            
-            subjectAnalysisSection.appendChild(examList);
-            analysisSections.appendChild(subjectAnalysisSection);
-        }
     }
     
     // 从分析结果中提取特定部分的内容
