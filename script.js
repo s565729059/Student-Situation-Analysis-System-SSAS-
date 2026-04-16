@@ -369,9 +369,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const analysisSections = document.getElementById('analysisSections');
         analysisSections.innerHTML = '';
         
-        // 清理分析结果，移除Markdown格式符号
-        let cleanedResult = analysisResult.replace(/^#+/gm, '');
-        cleanedResult = cleanedResult.replace(/^\*+ /gm, '');
+        // 替换符号为小表情，保留所有文字内容
+        let cleanedResult = analysisResult;
+        // 将星号列表替换为表情
+        cleanedResult = cleanedResult.replace(/^\*+ /gm, '⭐ ');
+        // 将减号列表替换为表情
+        cleanedResult = cleanedResult.replace(/^-+ /gm, '✨ ');
+        // 将井号标题替换为表情（如果有）
+        cleanedResult = cleanedResult.replace(/^#+/gm, '📌 ');
         
         // 按照五个板块分割分析结果
         const sections = [
@@ -389,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 提取内容
             const match = cleanedResult.match(section.regex);
-            let content = match ? match[0].replace(`${section.title}`, '').trim() : '该部分内容未在分析报告中找到。';
+            let content = match ? match[0].trim() : '该部分内容未在分析报告中找到。';
             
             // 格式化内容
             content = content.replace(/\n/g, '<br>');
@@ -402,13 +407,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 let subjectsContent = '';
                 
                 while ((subjectMatch = subjectRegex.exec(content)) !== null) {
-                    const subjectName = subjectMatch[1];
                     const subjectAnalysis = subjectMatch[0].trim();
                     
                     subjectsContent += `
                         <div class="subject-card">
-                            <h5>${subjectName}</h5>
-                            <div class="subject-analysis">${subjectAnalysis.replace(subjectName, '').trim().replace(/\n/g, '<br>')}</div>
+                            <div class="subject-analysis">${subjectAnalysis.replace(/\n/g, '<br>')}</div>
                         </div>
                     `;
                 }
