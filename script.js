@@ -221,51 +221,61 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 生成雷达图
     function generateRadarChart(studentData) {
+        // 检查Chart.js是否加载成功
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js未加载成功，无法生成雷达图');
+            return;
+        }
+        
         const subjects = Object.keys(studentData.grades);
         const scores = Object.values(studentData.grades).map(Number);
         
-        // 销毁旧图表
-        if (radarChart) {
-            radarChart.destroy();
-        }
-        
-        // 创建新图表
-        radarChart = new Chart(radarChartCanvas, {
-            type: 'radar',
-            data: {
-                labels: subjects,
-                datasets: [{
-                    label: '成绩分布',
-                    data: scores,
-                    backgroundColor: 'rgba(74, 111, 165, 0.2)',
-                    borderColor: 'rgba(74, 111, 165, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(74, 111, 165, 1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(74, 111, 165, 1)'
-                }]
-            },
-            options: {
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 120,
-                        ticks: {
-                            stepSize: 20
-                        }
-                    }
+        try {
+            // 销毁旧图表
+            if (radarChart) {
+                radarChart.destroy();
+            }
+            
+            // 创建新图表
+            radarChart = new Chart(radarChartCanvas, {
+                type: 'radar',
+                data: {
+                    labels: subjects,
+                    datasets: [{
+                        label: '成绩分布',
+                        data: scores,
+                        backgroundColor: 'rgba(74, 111, 165, 0.2)',
+                        borderColor: 'rgba(74, 111, 165, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(74, 111, 165, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(74, 111, 165, 1)'
+                    }]
                 },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '学科成绩雷达图',
-                        font: {
-                            size: 16
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 120,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '学科成绩雷达图',
+                            font: {
+                                size: 16
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error('雷达图生成失败:', error);
+        }
     }
 });
