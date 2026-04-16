@@ -23,11 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedGrade) {
             const subjects = subjectsByGrade[selectedGrade];
             subjects.forEach(subject => {
-                const maxScore = ['语文', '数学', '英语'].includes(subject) ? 120 : 100;
+                let maxScore;
+                if (['语文', '数学', '英语'].includes(subject)) {
+                    maxScore = 120;
+                } else if (['地理', '生物'].includes(subject)) {
+                    maxScore = 80;
+                } else {
+                    maxScore = 100;
+                }
                 const inputGroup = document.createElement('div');
                 inputGroup.className = 'grade-input-group';
                 inputGroup.innerHTML = `
-                    <label for="${subject}">${subject}</label>
+                    <label for="${subject}">${subject} (满分${maxScore}分)</label>
                     <input type="number" id="${subject}" name="${subject}" min="0" max="${maxScore}" required>
                 `;
                 gradesContainer.appendChild(inputGroup);
