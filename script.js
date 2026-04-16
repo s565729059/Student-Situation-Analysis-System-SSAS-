@@ -72,13 +72,20 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('开始分析学生数据:', studentData);
             
             // 调用DeepSeek API
+            console.log('开始调用DeepSeek API...');
             const analysisResult = await analyzeStudent(studentData);
-            console.log('API分析结果:', analysisResult);
+            console.log('API分析结果获取成功');
+            console.log('分析结果长度:', analysisResult.length);
             
             // 显示结果
             console.log('开始显示结果');
-            displayResult(studentData, analysisResult);
-            console.log('结果显示完成');
+            try {
+                displayResult(studentData, analysisResult);
+                console.log('结果显示完成');
+            } catch (displayError) {
+                console.error('结果显示失败:', displayError);
+                resultContent.innerHTML = `<p style="color: red;">结果显示失败，请稍后重试。</p>`;
+            }
             
             // 生成雷达图
             try {
@@ -96,6 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('结果区域显示完成');
         } catch (error) {
             console.error('分析失败:', error);
+            console.error('错误类型:', error.name);
+            console.error('错误堆栈:', error.stack);
             try {
                 resultContent.innerHTML = `<p style="color: red;">分析失败，请稍后重试。错误信息：${error.message}</p>`;
                 resultSection.style.display = 'block';
