@@ -111,6 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('显示结果区域');
             resultSection.style.display = 'block';
             console.log('结果区域显示完成');
+            
+            // 显示详细分析报告
+            console.log('显示详细分析报告');
+            displayDetailedAnalysis(analysisResult);
+            const detailedAnalysisSection = document.getElementById('detailedAnalysisSection');
+            detailedAnalysisSection.style.display = 'block';
+            console.log('详细分析报告显示完成');
         } catch (error) {
             console.error('分析失败:', error);
             console.error('错误类型:', error.name);
@@ -286,6 +293,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } catch (error) {
             console.error('雷达图生成失败:', error);
+        }
+    }
+    
+    // 显示详细分析报告
+    function displayDetailedAnalysis(analysisResult) {
+        const analysisSections = document.getElementById('analysisSections');
+        analysisSections.innerHTML = '';
+        
+        // 分割分析结果为不同部分
+        const sections = [
+            { title: '整体学习情况评估', keywords: ['整体学习情况', '学习情况评估'] },
+            { title: '各科成绩分析', keywords: ['各科成绩', '成绩分析'] },
+            { title: '存在的问题和不足', keywords: ['问题', '不足'] },
+            { title: '具体的补课推荐方案', keywords: ['补课推荐', '推荐方案'] },
+            { title: '个性化学习建议', keywords: ['学习建议', '个性化建议'] },
+            { title: '学习习惯的改进建议', keywords: ['学习习惯', '改进建议'] }
+        ];
+        
+        // 为每个部分创建板块
+        sections.forEach(section => {
+            const sectionElement = document.createElement('div');
+            sectionElement.className = 'analysis-section';
+            sectionElement.innerHTML = `
+                <h4>${section.title}</h4>
+                <p>${extractSectionContent(analysisResult, section.keywords)}</p>
+            `;
+            analysisSections.appendChild(sectionElement);
+        });
+    }
+    
+    // 从分析结果中提取特定部分的内容
+    function extractSectionContent(analysisResult, keywords) {
+        // 简单的提取逻辑，实际应用中可能需要更复杂的处理
+        const content = analysisResult.split('\n').filter(line => {
+            return keywords.some(keyword => line.includes(keyword));
+        }).join('\n');
+        
+        if (content) {
+            return content;
+        } else {
+            return '该部分内容未在分析报告中找到。';
         }
     }
 });
