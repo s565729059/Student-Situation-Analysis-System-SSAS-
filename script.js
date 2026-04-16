@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log('开始分析学生数据:', studentData);
             
-            // 调用硅基流动API
+            // 调用DeepSeek API
             const analysisResult = await analyzeStudent(studentData);
             console.log('API分析结果:', analysisResult);
             
@@ -112,10 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 调用硅基流动API
+    // 调用DeepSeek API
     async function analyzeStudent(studentData) {
-        const apiKey = 'sk-bunjyguubvlnemmsdztwxfjoazjeqlijfkdwdziukaepnfdg';
-        const url = 'https://api.siliconflow.cn/v1/chat/completions';
+        const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
+        const url = 'https://api.deepseek.com/v1/chat/completions';
         
         const prompt = `
         请根据以下学生信息进行详细分析：
