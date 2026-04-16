@@ -37,6 +37,34 @@ header h2 {
     font-size: 1.5rem;
     font-weight: normal;
     opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.version-info {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.version-info p {
+    margin: 0;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    resize: vertical;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4a6fa5;
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.1);
 }
 
 main {

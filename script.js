@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             gender: formData.get('gender'),
             age: formData.get('age'),
             grade: formData.get('grade'),
+            hobbies: formData.get('hobbies'),
+            studyHabits: formData.get('studyHabits'),
+            otherInfo: formData.get('otherInfo'),
             grades: {}
         };
         
@@ -89,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 调用DeepSeek API
+    // 调用硅基流动API
     async function analyzeStudent(studentData) {
-        const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
-        const url = 'https://api.deepseek.com/v1/chat/completions';
+        const apiKey = 'sk-bunjyguubvlnemmsdztwxfjoazjeqlijfkdwdziukaepnfdg';
+        const url = 'https://api.siliconflow.cn/v1/chat/completions';
         
         const prompt = `
         请根据以下学生信息进行详细分析：
@@ -100,6 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
         性别：${studentData.gender}
         年龄：${studentData.age}
         年级：${studentData.grade}
+        兴趣爱好：${studentData.hobbies || '无'}
+        学习习惯：${studentData.studyHabits || '无'}
+        其他补充信息：${studentData.otherInfo || '无'}
         成绩：${JSON.stringify(studentData.grades, null, 2)}
         
         分析方向：
@@ -108,13 +114,15 @@ document.addEventListener('DOMContentLoaded', function() {
         3. 根据学生情况，推荐补课计划
         4. 整体内容要详细，给家长明确的指导
         5. 推荐全科班课为主，如果有明显短板，可以额外推荐一对一或者小组课（4人课）
+        6. 结合学生的兴趣爱好和学习习惯，提供个性化的学习建议
         
         请提供详细的分析报告，包括：
         - 整体学习情况评估
         - 各科成绩分析
         - 存在的问题和不足
         - 具体的补课推荐方案
-        - 学习建议
+        - 结合兴趣爱好的个性化学习建议
+        - 学习习惯的改进建议
         `;
         
         // 设置请求超时
@@ -167,6 +175,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <p><strong>性别：</strong>${studentData.gender}</p>
             <p><strong>年龄：</strong>${studentData.age}</p>
             <p><strong>年级：</strong>${studentData.grade}</p>
+            <p><strong>兴趣爱好：</strong>${studentData.hobbies || '无'}</p>
+            <p><strong>学习习惯：</strong>${studentData.studyHabits || '无'}</p>
+            <p><strong>其他补充信息：</strong>${studentData.otherInfo || '无'}</p>
             
             <h4>成绩情况</h4>
             <ul>
