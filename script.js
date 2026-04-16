@@ -117,31 +117,46 @@ document.addEventListener('DOMContentLoaded', function() {
         - 学习建议
         `;
         
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                max_tokens: 2000,
-                temperature: 0.7
-            })
-        });
+        // 设置请求超时
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
         
-        if (!response.ok) {
-            throw new Error('API调用失败');
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-chat',
+                    messages: [
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    max_tokens: 2000,
+                    temperature: 0.7
+                }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                console.error('API响应错误:', response.status, response.statusText);
+                throw new Error(`API调用失败: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('API响应数据:', data);
+            return data.choices[0].message.content;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            console.error('API调用错误:', error);
+            throw error;
         }
-        
-        const data = await response.json();
-        return data.choices[0].message.content;
     }
     
     // 显示分析结果
