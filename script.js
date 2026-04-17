@@ -228,46 +228,75 @@ document.addEventListener('DOMContentLoaded', function() {
         请确保分析报告详细、全面，能够给家长一个明确的指导。
         `;
         
-        // 设置请求超时
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
+        // 尝试不同的模型
+        const models = ['deepseek-reasoner', 'deepseek-chat'];
+        let lastError;
         
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'deepseek-reasoner',
-                    messages: [
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    max_tokens: 2000,
-                    temperature: 0.7
-                }),
-                signal: controller.signal
-            });
+        for (const model of models) {
+            console.log(`尝试使用模型: ${model}`);
             
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                console.error('API响应错误:', response.status, response.statusText);
-                throw new Error(`API调用失败: ${response.status} ${response.statusText}`);
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                console.log(`第${attempt}次尝试`);
+                
+                try {
+                    // 创建AbortController用于超时控制
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25秒超时
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: prompt
+                                }
+                            ],
+                            max_tokens: 4000,
+                            temperature: 0.7
+                        }),
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        console.error('API响应错误:', response.status, response.statusText);
+                        throw new Error(`API调用失败: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('API响应数据:', data);
+                    
+                    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+                        throw new Error('API响应格式错误');
+                    }
+                    
+                    console.log(`使用模型${model}成功获取分析结果`);
+                    return data.choices[0].message.content;
+                } catch (error) {
+                    console.error(`API调用失败 (${model}, 尝试${attempt}):`, error);
+                    lastError = error;
+                    
+                    // 如果是超时错误，等待2秒后重试
+                    if (error.name === 'AbortError') {
+                        console.log('API请求超时，等待后重试...');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    } else {
+                        // 其他错误，切换模型
+                        break;
+                    }
+                }
             }
-            
-            const data = await response.json();
-            console.log('API响应数据:', data);
-            return data.choices[0].message.content;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            console.error('API调用错误:', error);
-            throw error;
         }
+        
+        // 所有尝试都失败
+        throw lastError || new Error('所有模型调用都失败');
     }
     
     // 显示分析结果
