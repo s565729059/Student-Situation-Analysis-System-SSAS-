@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const model of models) {
             console.log(`尝试使用模型: ${model}`);
             
-            for (let attempt = 1; attempt <= 2; attempt++) {
+            for (let attempt = 1; attempt <= 3; attempt++) { // 增加到3次尝试
                 console.log(`第${attempt}次尝试`);
                 
                 try {
@@ -243,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25秒超时
                     
+                    console.log('发起API请求:', url);
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {
@@ -264,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     clearTimeout(timeoutId);
+                    console.log('API请求成功，状态码:', response.status);
                     
                     if (!response.ok) {
                         console.error('API响应错误:', response.status, response.statusText);
@@ -283,10 +285,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error(`API调用失败 (${model}, 尝试${attempt}):`, error);
                     lastError = error;
                     
-                    // 如果是超时错误，等待2秒后重试
-                    if (error.name === 'AbortError') {
-                        console.log('API请求超时，等待后重试...');
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    // 如果是网络错误或超时错误，等待后重试
+                    if (error.name === 'AbortError' || error.message === 'Failed to fetch') {
+                        console.log('网络错误或超时，等待后重试...');
+                        await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒
                     } else {
                         // 其他错误，切换模型
                         break;
