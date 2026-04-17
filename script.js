@@ -150,28 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const detailedAnalysisSection = document.getElementById('detailedAnalysisSection');
             detailedAnalysisSection.style.display = 'block';
             console.log('详细分析报告显示完成');
-            
-            // 保存分析结果到数据库
-            console.log('保存分析结果到数据库');
-            const saveData = {
-                ...studentData,
-                analysisResult: analysisResult
-            };
-            
-            fetch('/api/save-analysis', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(saveData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('保存结果:', data);
-            })
-            .catch(error => {
-                console.error('保存失败:', error);
-            });
         } catch (error) {
             console.error('分析失败:', error);
             console.error('错误类型:', error.name);
