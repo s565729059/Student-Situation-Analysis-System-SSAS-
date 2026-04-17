@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .nav {
+            background: white;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav a {
+            color: #4a6fa5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .search-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-section h2 {
+            color: #4a6fa5;
+            margin-bottom: 20px;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .search-form button {
+            padding: 12px 20px;
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .students-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .students-section h2 {
+            color: #4a6fa5;
+            margin-bottom: 20px;
+        }
+        .student-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .student-card h3 {
+            color: #4a6fa5;
+            margin-bottom: 10px;
+        }
+        .student-info {
+            margin-bottom: 10px;
+        }
+        .student-info strong {
+            color: #555;
+        }
+        .analysis-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #4a6fa5;
+        }
+        .error {
+            color: red;
+            margin-bottom: 20px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>青岛睿花苑·学生情况分析系统 - 后台管理</h1>
+    </div>
+    <div class="nav">
+        <div>欢迎，管理员</div>
+        <a href="/admin/logout">登出</a>
+    </div>
+    <div class="container">
+        <div class="search-section">
+            <h2>搜索学生</h2>
+            <form action="/admin/search" method="post" class="search-form">
+                <input type="text" name="searchTerm" placeholder="输入学生姓名、性别或年级" required>
+                <button type="submit">搜索</button>
+            </form>
+        </div>
+        <div class="students-section">
+            <h2>学生列表</h2>
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <% if (students && students.length > 0) { %>
+                <% students.forEach(student => { %>
+                    <div class="student-card">
+                        <h3><%= student.name %></h3>
+                        <div class="student-info">
+                            <strong>性别：</strong><%= student.gender %><br>
+                            <strong>年龄：</strong><%= student.age %><br>
+                            <strong>年级：</strong><%= student.grade %><br>
+                            <strong>考试次数：</strong><%= student.examCount %>次<br>
+                            <strong>兴趣爱好：</strong><%= student.hobbies || '无' %><br>
+                            <strong>学习习惯：</strong><%= student.studyHabits || '无' %><br>
+                            <strong>其他补充信息：</strong><%= student.otherInfo || '无' %>
+                        </div>
+                        <div class="analysis-result">
+                            <h4>分析结果：</h4>
+                            <div><%= student.analysisResult.replace(/\n/g, '<br>') %></div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else if (students && students.length === 0) { %>
+                <div class="no-results">未找到匹配的学生</div>
+            <% } else { %>
+                <div class="no-results">请输入搜索条件</div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
