@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>青岛睿花苑·学生情况分析系统</title>
     <script src="chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -93,6 +94,12 @@
                 </div>
                 <div class="chart-container">
                     <canvas id="radarChart"></canvas>
+                </div>
+                
+                <div class="export-buttons" id="exportButtons" style="display: none;">
+                    <button type="button" id="exportExcel" class="export-btn">导出新Excel</button>
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
+                    <button type="button" id="appendToExcel" class="export-btn">追加到已有Excel</button>
                 </div>
             </section>
             

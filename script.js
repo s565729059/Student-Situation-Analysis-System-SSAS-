@@ -64,16 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
     studentForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // 显示等待动画
-        loadingOverlay.style.display = 'flex';
-        const loadingText = loadingOverlay.querySelector('p');
-        loadingText.textContent = '正在分析，请稍候...';
-        
-        // 设置20秒超时提示
-        const timeoutId = setTimeout(() => {
-            loadingText.textContent = 'AI正在深入分析，请耐心等待...';
-        }, 20000);
-        
         // 收集表单数据
         const formData = new FormData(this);
         const studentData = {
@@ -110,24 +100,18 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('请选择有效的年级');
         }
         
+        // 隐藏导出按钮
+        document.getElementById('exportButtons').style.display = 'none';
+        
         try {
             console.log('开始分析学生数据:', studentData);
             
-            // 调用DeepSeek API
-            console.log('开始调用DeepSeek API...');
-            const analysisResult = await analyzeStudent(studentData);
-            console.log('API分析结果获取成功');
-            console.log('分析结果长度:', analysisResult.length);
+            // 显示结果区域
+            resultSection.style.display = 'block';
+            detailedAnalysisSection.style.display = 'block';
             
-            // 显示结果
-            console.log('开始显示结果');
-            try {
-                displayResult(studentData, analysisResult);
-                console.log('结果显示完成');
-            } catch (displayError) {
-                console.error('结果显示失败:', displayError);
-                resultContent.innerHTML = `<p style="color: red;">结果显示失败，请稍后重试。</p>`;
-            }
+            // 显示学生基本信息
+            displayResult(studentData, '');
             
             // 生成雷达图
             try {
@@ -139,17 +123,82 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 雷达图失败不影响结果显示
             }
             
-            // 显示结果区域
-            console.log('显示结果区域');
-            resultSection.style.display = 'block';
-            console.log('结果区域显示完成');
+            // 分步骤分析
+            const analysisSections = document.getElementById('analysisSections');
+            analysisSections.innerHTML = '';
             
-            // 显示详细分析报告
-            console.log('显示详细分析报告');
-            displayDetailedAnalysis(analysisResult, studentData);
-            const detailedAnalysisSection = document.getElementById('detailedAnalysisSection');
-            detailedAnalysisSection.style.display = 'block';
-            console.log('详细分析报告显示完成');
+            // 存储分析结果
+            const analysisResults = {};
+            
+            // 1. 整体学习情况评估
+            console.log('开始分析整体学习情况');
+            const overallSectionId = generateSectionId('整体学习情况评估');
+            const overallSection = document.createElement('div');
+            overallSection.id = overallSectionId;
+            overallSection.className = 'analysis-section';
+            analysisSections.appendChild(overallSection);
+            showLoading(overallSectionId, '正在分析整体学习情况，请稍候...');
+            const overallAnalysis = await analyzeOverallLearning(studentData);
+            analysisResults['整体学习情况评估'] = overallAnalysis;
+            displayAnalysisSection('整体学习情况评估', overallAnalysis, 'blue');
+            
+            // 2. 各学科知识掌握情况
+            console.log('开始分析各学科知识掌握情况');
+            const subjectSectionId = generateSectionId('各学科的知识掌握情况');
+            const subjectSection = document.createElement('div');
+            subjectSection.id = subjectSectionId;
+            subjectSection.className = 'analysis-section';
+            analysisSections.appendChild(subjectSection);
+            showLoading(subjectSectionId, '正在分析各学科知识掌握情况，请稍候...');
+            const subjectAnalysis = await analyzeSubjects(studentData);
+            analysisResults['各学科的知识掌握情况'] = subjectAnalysis;
+            displaySubjectAnalysis(subjectAnalysis, studentData);
+            
+            // 3. 个性化学习建议
+            console.log('开始分析个性化学习建议');
+            const adviceSectionId = generateSectionId('个性化学习建议');
+            const adviceSection = document.createElement('div');
+            adviceSection.id = adviceSectionId;
+            adviceSection.className = 'analysis-section';
+            analysisSections.appendChild(adviceSection);
+            showLoading(adviceSectionId, '正在生成个性化学习建议，请稍候...');
+            const learningAdvice = await analyzeLearningAdvice(studentData);
+            analysisResults['个性化学习建议'] = learningAdvice;
+            displayAnalysisSection('个性化学习建议', learningAdvice, 'green');
+            
+            // 4. 补课方案
+            console.log('开始分析补课方案');
+            const tutoringSectionId = generateSectionId('具体的补课方案');
+            const tutoringSection = document.createElement('div');
+            tutoringSection.id = tutoringSectionId;
+            tutoringSection.className = 'analysis-section';
+            analysisSections.appendChild(tutoringSection);
+            showLoading(tutoringSectionId, '正在生成补课方案，请稍候...');
+            const tutoringPlan = await analyzeTutoringPlan(studentData);
+            analysisResults['具体的补课方案'] = tutoringPlan;
+            displayAnalysisSection('具体的补课方案', tutoringPlan, 'orange');
+            
+            // 5. 其他补充信息
+            console.log('开始分析其他补充信息');
+            const additionalSectionId = generateSectionId('其它补充信息');
+            const additionalSection = document.createElement('div');
+            additionalSection.id = additionalSectionId;
+            additionalSection.className = 'analysis-section';
+            analysisSections.appendChild(additionalSection);
+            showLoading(additionalSectionId, '正在生成其他补充信息，请稍候...');
+            const additionalInfo = await analyzeAdditionalInfo(studentData);
+            analysisResults['其它补充信息'] = additionalInfo;
+            displayAnalysisSection('其它补充信息', additionalInfo, 'purple');
+            
+            // 显示导出按钮
+            document.getElementById('exportButtons').style.display = 'flex';
+            
+            // 保存分析结果到全局变量，供导出使用
+            window.studentAnalysisData = {
+                studentData: studentData,
+                analysisResults: analysisResults
+            };
+            
         } catch (error) {
             console.error('分析失败:', error);
             console.error('错误类型:', error.name);
@@ -160,73 +209,39 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (displayError) {
                 console.error('错误信息显示失败:', displayError);
             }
-        } finally {
-            // 清除超时计时器
-            clearTimeout(timeoutId);
-            // 隐藏等待动画
-            loadingOverlay.style.display = 'none';
-            console.log('等待动画隐藏完成');
         }
     });
     
-    // 调用DeepSeek API
-    async function analyzeStudent(studentData) {
+    // 显示局部等待动画
+    function showLoading(sectionId, text) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>${text}</p>
+                </div>
+            `;
+        }
+    }
+    
+    // 隐藏等待动画
+    function hideLoading() {
+        // 局部加载不需要全局隐藏
+    }
+    
+    // 生成唯一的section ID
+    function generateSectionId(title) {
+        return title.toLowerCase().replace(/\s+/g, '-') + '-section';
+    }
+    
+    // 通用API调用函数
+    async function callDeepSeekAPI(prompt) {
+        // 添加字数限制
+        const limitedPrompt = prompt + '\n\n注意：请控制回答字数在500字以内，保持内容凝练、重点突出。';
+        
         const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
         const url = 'https://api.deepseek.com/v1/chat/completions';
-        
-        // 构建成绩信息
-        let gradesInfo = '';
-        studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
-            for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
-            }
-        });
-        
-        const prompt = `
-        请根据以下学生信息进行详细分析，并严格按照以下五个板块结构生成分析报告：
-        
-        学生姓名：${studentData.name}
-        性别：${studentData.gender}
-        年龄：${studentData.age}
-        年级：${studentData.grade}
-        考试次数：${studentData.examCount}次
-        兴趣爱好：${studentData.hobbies || '无'}
-        学习习惯：${studentData.studyHabits || '无'}
-        其他补充信息：${studentData.otherInfo || '无'}
-        成绩：
-        ${gradesInfo}
-        
-        请按照以下结构生成详细的分析报告：
-        
-        一、整体学习情况评估
-        - 分析学生的整体学习状况
-        - 重点分析多次考试的成绩趋势
-        - 评估学生的学习能力和潜力
-        
-        二、各学科的知识掌握情况
-        - 针对每个学科进行详细分析
-        - 分析每次考试的表现和变化趋势
-        - 找出各学科的不足之处和发展趋势
-        - 评估各学科的学习水平
-        
-        三、个性化学习建议
-        - 结合学生的兴趣爱好和学习习惯
-        - 提供个性化的学习方法和策略
-        - 给出具体的学习计划和时间安排建议
-        
-        四、具体的补课方案
-        - 推荐全科班课为主
-        - 如果有明显短板，额外推荐一对一或者小组课（4人课）
-        - 提供具体的补课内容和时间安排建议
-        
-        五、其它补充信息
-        - 针对学生的特殊情况提供额外建议
-        - 家长需要注意的事项
-        - 长期学习规划建议
-        
-        请确保分析报告详细、全面，能够给家长一个明确的指导。
-        `;
         
         // 尝试不同的模型
         const models = ['deepseek-reasoner', 'deepseek-chat'];
@@ -255,10 +270,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             messages: [
                                 {
                                     role: 'user',
-                                    content: prompt
+                                    content: limitedPrompt
                                 }
                             ],
-                            max_tokens: 4000,
+                            max_tokens: 1000, // 限制输出令牌数
                             temperature: 0.7
                         }),
                         signal: controller.signal
@@ -301,22 +316,371 @@ document.addEventListener('DOMContentLoaded', function() {
         throw lastError || new Error('所有模型调用都失败');
     }
     
+    // 1. 分析整体学习情况
+    async function analyzeOverallLearning(studentData) {
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
+        const prompt = `
+        请根据以下学生信息，分析学生的整体学习情况：
+        
+        学生姓名：${studentData.name}
+        性别：${studentData.gender}
+        年龄：${studentData.age}
+        年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
+        兴趣爱好：${studentData.hobbies || '无'}
+        学习习惯：${studentData.studyHabits || '无'}
+        其他补充信息：${studentData.otherInfo || '无'}
+        成绩：
+        ${gradesInfo}
+        
+        请按照以下格式输出分析结果：
+        
+        # 整体学习状况分析
+        [整体学习状况的详细分析]
+        
+        # 成绩趋势分析
+        [成绩趋势的详细分析]
+        
+        # 学习能力与潜力评估
+        [学习能力与潜力的详细分析]
+        
+        注意：
+        1. 请控制回答字数在500字以内，保持内容凝练、重点突出
+        2. 不要使用星号(*)或其他特殊符号作为列表标记
+        3. 使用自然的段落结构，不要使用Markdown格式
+        4. 确保分析全面、详细，能够给家长一个明确的指导
+        `;
+        
+        return await callDeepSeekAPI(prompt);
+    }
+    
+    // 2. 分析各学科知识掌握情况
+    async function analyzeSubjects(studentData) {
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
+        // 获取学科列表
+        const subjects = subjectsByGrade[studentData.grade];
+        const subjectsList = subjects.join('、');
+        
+        const prompt = `
+        请根据以下学生信息，分析学生的各学科知识掌握情况：
+        
+        学生姓名：${studentData.name}
+        性别：${studentData.gender}
+        年龄：${studentData.age}
+        年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
+        成绩：
+        ${gradesInfo}
+        
+        请严格按照以下格式输出每个学科的分析结果：
+        
+        学科：[学科名称]
+        [该学科的详细分析，包括每次考试的表现和变化趋势、不足之处和发展趋势、学习水平评估]
+        
+        请对以下学科进行分析：${subjectsList}
+        
+        注意：
+        1. 每个学科必须单独分析，格式必须严格按照"学科：[学科名称]"开头
+        2. 请控制每个学科的分析字数在200字以内，保持内容凝练、重点突出
+        3. 不要使用星号(*)或其他特殊符号作为列表标记
+        4. 使用自然的段落结构，不要使用Markdown格式
+        5. 确保分析全面、详细，能够给家长一个明确的指导
+        `;
+        
+        return await callDeepSeekAPI(prompt);
+    }
+    
+    // 3. 分析个性化学习建议
+    async function analyzeLearningAdvice(studentData) {
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
+        const prompt = `
+        请根据以下学生信息，提出个性化的学习建议：
+        
+        学生姓名：${studentData.name}
+        性别：${studentData.gender}
+        年龄：${studentData.age}
+        年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
+        兴趣爱好：${studentData.hobbies || '无'}
+        学习习惯：${studentData.studyHabits || '无'}
+        其他补充信息：${studentData.otherInfo || '无'}
+        成绩：
+        ${gradesInfo}
+        
+        请按照以下格式输出建议：
+        
+        # 个性化学习方法和策略
+        [结合学生的兴趣爱好和学习习惯的个性化学习方法和策略]
+        
+        # 学习计划和时间安排
+        [具体的学习计划和时间安排建议]
+        
+        # 各学科学习技巧
+        [针对各学科的学习技巧]
+        
+        注意：
+        1. 请控制回答字数在500字以内，保持内容凝练、重点突出
+        2. 不要使用星号(*)或其他特殊符号作为列表标记
+        3. 使用自然的段落结构，不要使用Markdown格式
+        4. 确保建议具体、实用，能够给家长和学生一个明确的指导
+        `;
+        
+        return await callDeepSeekAPI(prompt);
+    }
+    
+    // 4. 分析补课方案
+    async function analyzeTutoringPlan(studentData) {
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
+        const prompt = `
+        请根据以下学生信息，提出具体的补课方案：
+        
+        学生姓名：${studentData.name}
+        性别：${studentData.gender}
+        年龄：${studentData.age}
+        年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
+        兴趣爱好：${studentData.hobbies || '无'}
+        学习习惯：${studentData.studyHabits || '无'}
+        其他补充信息：${studentData.otherInfo || '无'}
+        成绩：
+        ${gradesInfo}
+        
+        我们有以下班型：
+        - 全科班课（12人小班课）
+        - 小组课（4人）
+        - 一对一
+        - 晚辅导（辅导作业，周一到周五晚上）
+        
+        请按照以下格式输出补课方案：
+        
+        # 推荐班型
+        [分析学生最适合的班型并推荐，优先推荐全科班课，如有明显短板可额外推荐一对一或小组课]
+        
+        # 补课内容
+        [具体的补课内容建议]
+        
+        # 时间安排
+        [具体的时间安排建议]
+        
+        注意：
+        1. 请控制回答字数在500字以内，保持内容凝练、重点突出
+        2. 不要使用星号(*)或其他特殊符号作为列表标记
+        3. 使用自然的段落结构，不要使用Markdown格式
+        4. 确保方案具体、实用，能够给家长一个明确的指导
+        `;
+        
+        return await callDeepSeekAPI(prompt);
+    }
+    
+    // 5. 分析其他补充信息
+    async function analyzeAdditionalInfo(studentData) {
+        // 构建成绩信息
+        let gradesInfo = '';
+        studentData.grades.forEach((examGrades, index) => {
+            gradesInfo += `第${index + 1}次考试：\n`;
+            for (const [subject, score] of Object.entries(examGrades)) {
+                gradesInfo += `  ${subject}：${score}分\n`;
+            }
+        });
+        
+        const prompt = `
+        请根据以下学生信息，提供其他补充信息：
+        
+        学生姓名：${studentData.name}
+        性别：${studentData.gender}
+        年龄：${studentData.age}
+        年级：${studentData.grade}
+        考试次数：${studentData.examCount}次
+        兴趣爱好：${studentData.hobbies || '无'}
+        学习习惯：${studentData.studyHabits || '无'}
+        其他补充信息：${studentData.otherInfo || '无'}
+        成绩：
+        ${gradesInfo}
+        
+        请按照以下格式输出补充信息：
+        
+        # 特殊情况建议
+        [针对学生的特殊情况提供额外建议]
+        
+        # 家长注意事项
+        [家长需要注意的事项]
+        
+        # 长期学习规划
+        [长期学习规划建议]
+        
+        注意：
+        1. 请控制回答字数在500字以内，保持内容凝练、重点突出
+        2. 不要使用星号(*)或其他特殊符号作为列表标记
+        3. 使用自然的段落结构，不要使用Markdown格式
+        4. 确保信息全面、实用，能够给家长一个明确的指导
+        `;
+        
+        return await callDeepSeekAPI(prompt);
+    }
+    
     // 显示分析结果
     function displayResult(studentData, analysisResult) {
         resultContent.innerHTML = `
-            <h4>学生信息</h4>
-            <p><strong>姓名：</strong>${studentData.name}</p>
-            <p><strong>性别：</strong>${studentData.gender}</p>
-            <p><strong>年龄：</strong>${studentData.age}</p>
-            <p><strong>年级：</strong>${studentData.grade}</p>
-            <p><strong>考试次数：</strong>${studentData.examCount}次</p>
-            <p><strong>兴趣爱好：</strong>${studentData.hobbies || '无'}</p>
-            <p><strong>学习习惯：</strong>${studentData.studyHabits || '无'}</p>
-            <p><strong>其他补充信息：</strong>${studentData.otherInfo || '无'}</p>
+            <div class="student-info-card">
+                <h4>学生信息</h4>
+                <div class="info-grid">
+                    <div class="info-item"><strong>姓名：</strong>${studentData.name}</div>
+                    <div class="info-item"><strong>性别：</strong>${studentData.gender}</div>
+                    <div class="info-item"><strong>年龄：</strong>${studentData.age}</div>
+                    <div class="info-item"><strong>年级：</strong>${studentData.grade}</div>
+                    <div class="info-item"><strong>考试次数：</strong>${studentData.examCount}次</div>
+                    <div class="info-item"><strong>兴趣爱好：</strong>${studentData.hobbies || '无'}</div>
+                    <div class="info-item"><strong>学习习惯：</strong>${studentData.studyHabits || '无'}</div>
+                    <div class="info-item"><strong>其他补充信息：</strong>${studentData.otherInfo || '无'}</div>
+                </div>
+            </div>
             
-            <h4>分析报告</h4>
-            <p>详细分析报告已生成，请查看下方的详细分析部分。</p>
+            <div class="analysis-intro">
+                <h4>分析报告</h4>
+                <p>详细分析报告已生成，请查看下方的详细分析部分。</p>
+            </div>
         `;
+    }
+    
+    // 显示分析板块
+    function displayAnalysisSection(title, content, color) {
+        // 查找对应的section元素
+        const sectionId = generateSectionId(title);
+        const sectionElement = document.getElementById(sectionId);
+        
+        if (sectionElement) {
+            // 替换符号为小表情，保留所有文字内容
+            let cleanedContent = content;
+            // 移除星号和其他特殊符号
+            cleanedContent = cleanedContent.replace(/^\*+ /gm, '');
+            cleanedContent = cleanedContent.replace(/^-+ /gm, '');
+            
+            // 处理标题
+            cleanedContent = cleanedContent.replace(/^# (.*?)$/gm, '<h5 class="section-subtitle">$1</h5>');
+            
+            // 格式化内容
+            cleanedContent = cleanedContent.replace(/\n/g, '<br>');
+            
+            // 分条显示（如果有列表）
+            cleanedContent = cleanedContent.replace(/(\d+\. )/g, '</p><p class="advice-item">$1');
+            
+            sectionElement.className = 'analysis-section';
+            sectionElement.style.borderLeftColor = getColorByType(color);
+            
+            sectionElement.innerHTML = `
+                <h4>${title}</h4>
+                <div class="analysis-content">
+                    <p>${cleanedContent}</p>
+                </div>
+            `;
+        }
+    }
+    
+    // 显示学科分析
+    function displaySubjectAnalysis(content, studentData) {
+        // 查找对应的section元素
+        const sectionId = generateSectionId('各学科的知识掌握情况');
+        const sectionElement = document.getElementById(sectionId);
+        
+        if (sectionElement) {
+            // 替换符号为小表情，保留所有文字内容
+            let cleanedContent = content;
+            // 移除星号和其他特殊符号
+            cleanedContent = cleanedContent.replace(/^\*+ /gm, '');
+            cleanedContent = cleanedContent.replace(/^-+ /gm, '');
+            
+            // 尝试提取各个学科的分析
+            const subjects = subjectsByGrade[studentData.grade];
+            let subjectsContent = '';
+            
+            // 按学科分割内容
+            const subjectRegex = /学科：([^\n]+)\n([\s\S]*?)(?=学科：|$)/g;
+            let subjectMatch;
+            
+            while ((subjectMatch = subjectRegex.exec(cleanedContent)) !== null) {
+                const subject = subjectMatch[1].trim();
+                const subjectAnalysis = subjectMatch[2].trim();
+                
+                subjectsContent += `
+                    <div class="subject-card" style="border-left-color: ${getSubjectColor(subject)}">
+                        <h5 class="subject-title">${subject}</h5>
+                        <div class="subject-analysis">${subjectAnalysis.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+            
+            if (!subjectsContent) {
+                subjectsContent = `<p>${cleanedContent}</p>`;
+            }
+            
+            sectionElement.className = 'analysis-section';
+            sectionElement.style.borderLeftColor = getColorByType('blue');
+            
+            sectionElement.innerHTML = `
+                <h4>各学科的知识掌握情况</h4>
+                <div class="subjects-container">
+                    ${subjectsContent}
+                </div>
+            `;
+        }
+    }
+    
+    // 根据类型获取颜色
+    function getColorByType(type) {
+        const colorMap = {
+            blue: '#4a6fa5',
+            green: '#4a6f55',
+            orange: '#e67e22',
+            purple: '#8e44ad',
+            red: '#e74c3c'
+        };
+        return colorMap[type] || '#4a6fa5';
+    }
+    
+    // 根据学科获取颜色
+    function getSubjectColor(subject) {
+        const colorMap = {
+            '语文': '#e74c3c',
+            '数学': '#3498db',
+            '英语': '#2ecc71',
+            '物理': '#9b59b6',
+            '化学': '#f39c12',
+            '生物': '#1abc9c',
+            '地理': '#34495e'
+        };
+        return colorMap[subject] || '#4a6fa5';
     }
     
     // 生成雷达图
@@ -472,5 +836,228 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             return '该部分内容未在分析报告中找到。';
         }
+    }
+    
+    // 导出Excel功能
+    function exportToExcel() {
+        // 获取存储的分析数据
+        const analysisData = window.studentAnalysisData;
+        if (!analysisData) {
+            alert('请先完成分析，再进行导出');
+            return;
+        }
+        
+        const { studentData, analysisResults } = analysisData;
+        
+        // 创建工作簿
+        const wb = XLSX.utils.book_new();
+        
+        // 创建学生信息工作表
+        const studentInfoData = [
+            ['学生信息'],
+            ['姓名', studentData.name],
+            ['性别', studentData.gender],
+            ['年龄', studentData.age],
+            ['年级', studentData.grade],
+            ['考试次数', studentData.examCount],
+            ['兴趣爱好', studentData.hobbies || '无'],
+            ['学习习惯', studentData.studyHabits || '无'],
+            ['其他补充信息', studentData.otherInfo || '无']
+        ];
+        const studentInfoWs = XLSX.utils.aoa_to_sheet(studentInfoData);
+        XLSX.utils.book_append_sheet(wb, studentInfoWs, '学生信息');
+        
+        // 创建成绩工作表
+        if (studentData.grades.length > 0) {
+            const subjects = Object.keys(studentData.grades[0]);
+            const gradesData = [['考试次数', ...subjects]];
+            
+            studentData.grades.forEach((examGrades, index) => {
+                const row = [index + 1];
+                subjects.forEach(subject => {
+                    row.push(examGrades[subject] || '');
+                });
+                gradesData.push(row);
+            });
+            
+            const gradesWs = XLSX.utils.aoa_to_sheet(gradesData);
+            XLSX.utils.book_append_sheet(wb, gradesWs, '成绩');
+        }
+        
+        // 创建分析结果工作表
+        const analysisDataArray = [['分析板块', '分析结果']];
+        Object.entries(analysisResults).forEach(([section, content]) => {
+            // 清理内容，移除HTML标签和特殊字符
+            const cleanedContent = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').substring(0, 32767); // Excel单元格最大字符数
+            analysisDataArray.push([section, cleanedContent]);
+        });
+        const analysisWs = XLSX.utils.aoa_to_sheet(analysisDataArray);
+        XLSX.utils.book_append_sheet(wb, analysisWs, '分析结果');
+        
+        // 生成Excel文件并下载
+        const fileName = `${studentData.name || '学生'}_${studentData.grade || '未知年级'}_分析数据.xlsx`;
+        XLSX.writeFile(wb, fileName);
+    }
+    
+    // 为导出按钮添加点击事件监听器
+    const exportExcelBtn = document.getElementById('exportExcel');
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', exportToExcel);
+    }
+    
+    // 为追加到已有Excel按钮添加点击事件监听器
+    const appendToExcelBtn = document.getElementById('appendToExcel');
+    const excelFileInput = document.getElementById('excelFile');
+    
+    if (appendToExcelBtn && excelFileInput) {
+        appendToExcelBtn.addEventListener('click', function() {
+            excelFileInput.click();
+        });
+        
+        excelFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                appendDataToExcel(file);
+            }
+        });
+    }
+    
+    // 追加数据到已有Excel文件
+    function appendDataToExcel(file) {
+        // 获取存储的分析数据
+        const analysisData = window.studentAnalysisData;
+        if (!analysisData) {
+            alert('请先完成分析，再进行导出');
+            return;
+        }
+        
+        const { studentData, analysisResults } = analysisData;
+        
+        // 读取Excel文件
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, { type: 'array' });
+                
+                // 检查是否存在学生信息工作表
+                let studentInfoWs = wb.Sheets['学生信息'];
+                if (!studentInfoWs) {
+                    // 如果不存在，创建新的学生信息工作表
+                    const studentInfoData = [
+                        ['学生信息'],
+                        ['姓名', studentData.name],
+                        ['性别', studentData.gender],
+                        ['年龄', studentData.age],
+                        ['年级', studentData.grade],
+                        ['考试次数', studentData.examCount],
+                        ['兴趣爱好', studentData.hobbies || '无'],
+                        ['学习习惯', studentData.studyHabits || '无'],
+                        ['其他补充信息', studentData.otherInfo || '无']
+                    ];
+                    studentInfoWs = XLSX.utils.aoa_to_sheet(studentInfoData);
+                    XLSX.utils.book_append_sheet(wb, studentInfoWs, '学生信息');
+                }
+                
+                // 检查是否存在成绩工作表
+                let gradesWs = wb.Sheets['成绩'];
+                if (!gradesWs) {
+                    // 如果不存在，创建新的成绩工作表
+                    if (studentData.grades.length > 0) {
+                        const subjects = Object.keys(studentData.grades[0]);
+                        const gradesData = [['考试次数', ...subjects]];
+                        
+                        studentData.grades.forEach((examGrades, index) => {
+                            const row = [index + 1];
+                            subjects.forEach(subject => {
+                                row.push(examGrades[subject] || '');
+                            });
+                            gradesData.push(row);
+                        });
+                        
+                        gradesWs = XLSX.utils.aoa_to_sheet(gradesData);
+                        XLSX.utils.book_append_sheet(wb, gradesWs, '成绩');
+                    }
+                } else {
+                    // 如果存在，追加新数据
+                    const existingData = XLSX.utils.sheet_to_json(gradesWs, { header: 1 });
+                    if (existingData.length > 0) {
+                        // 获取现有数据的最后一行，确定新的考试次数
+                        const lastRow = existingData[existingData.length - 1];
+                        let lastExamNumber = 0;
+                        if (typeof lastRow[0] === 'number') {
+                            lastExamNumber = lastRow[0];
+                        } else if (!isNaN(parseInt(lastRow[0]))) {
+                            lastExamNumber = parseInt(lastRow[0]);
+                        }
+                        
+                        // 追加新的成绩数据
+                        if (studentData.grades.length > 0) {
+                            const subjects = Object.keys(studentData.grades[0]);
+                            
+                            // 确保表头存在
+                            if (existingData[0].length === 1 + subjects.length) {
+                                studentData.grades.forEach((examGrades, index) => {
+                                    const row = [lastExamNumber + index + 1];
+                                    subjects.forEach(subject => {
+                                        row.push(examGrades[subject] || '');
+                                    });
+                                    existingData.push(row);
+                                });
+                                
+                                // 更新工作表
+                                gradesWs = XLSX.utils.aoa_to_sheet(existingData);
+                                wb.Sheets['成绩'] = gradesWs;
+                            }
+                        }
+                    }
+                }
+                
+                // 检查是否存在分析结果工作表
+                let analysisWs = wb.Sheets['分析结果'];
+                if (!analysisWs) {
+                    // 如果不存在，创建新的分析结果工作表
+                    const analysisDataArray = [['分析板块', '分析结果']];
+                    Object.entries(analysisResults).forEach(([section, content]) => {
+                        const cleanedContent = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').substring(0, 32767);
+                        analysisDataArray.push([section, cleanedContent]);
+                    });
+                    analysisWs = XLSX.utils.aoa_to_sheet(analysisDataArray);
+                    XLSX.utils.book_append_sheet(wb, analysisWs, '分析结果');
+                } else {
+                    // 如果存在，追加新的分析结果
+                    const existingAnalysisData = XLSX.utils.sheet_to_json(analysisWs, { header: 1 });
+                    if (existingAnalysisData.length > 0) {
+                        // 添加分隔行
+                        existingAnalysisData.push(['', '']);
+                        existingAnalysisData.push(['--- 新的分析结果 ---', '']);
+                        existingAnalysisData.push(['', '']);
+                        
+                        // 追加新的分析结果
+                        Object.entries(analysisResults).forEach(([section, content]) => {
+                            const cleanedContent = content.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').substring(0, 32767);
+                            existingAnalysisData.push([section, cleanedContent]);
+                        });
+                        
+                        // 更新工作表
+                        analysisWs = XLSX.utils.aoa_to_sheet(existingAnalysisData);
+                        wb.Sheets['分析结果'] = analysisWs;
+                    }
+                }
+                
+                // 生成更新后的Excel文件并下载
+                const fileName = `${studentData.name || '学生'}_${studentData.grade || '未知年级'}_分析数据.xlsx`;
+                XLSX.writeFile(wb, fileName);
+            } catch (error) {
+                console.error('处理Excel文件时出错:', error);
+                alert('处理Excel文件时出错，请确保选择的是有效的Excel文件。');
+            }
+        };
+        
+        reader.onerror = function() {
+            alert('读取Excel文件时出错，请重试。');
+        };
+        
+        reader.readAsArrayBuffer(file);
     }
 });
