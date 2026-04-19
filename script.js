@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 年级对应的科目
     const subjectsByGrade = {
+        '六年级': ['语文', '数学', '英语'],
         '七年级': ['语文', '数学', '英语', '地理', '生物'],
         '八年级': ['语文', '数学', '英语', '地理', '生物', '物理'],
         '九年级': ['语文', '数学', '英语', '物理', '化学']
@@ -33,7 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 subjects.forEach(subject => {
                     let maxScore;
-                    if (['语文', '数学', '英语'].includes(subject)) {
+                    if (selectedGrade === '六年级') {
+                        // 六年级语数英满分100分
+                        maxScore = 100;
+                    } else if (['语文', '数学', '英语'].includes(subject)) {
                         maxScore = 120;
                     } else if (['地理', '生物'].includes(subject)) {
                         maxScore = 80;
@@ -327,6 +331,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // 添加年级特殊说明
+        let gradeSpecialNote = '';
+        if (studentData.grade === '六年级') {
+            gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点分析小学阶段的学习特点和过渡到初中的准备。';
+        }
+        
         const prompt = `
         请根据以下学生信息，分析学生的整体学习情况：
         
@@ -340,6 +350,8 @@ document.addEventListener('DOMContentLoaded', function() {
         其他补充信息：${studentData.otherInfo || '无'}
         成绩：
         ${gradesInfo}
+        
+        ${gradeSpecialNote}
         
         请按照以下格式输出分析结果：
         
@@ -377,6 +389,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const subjects = subjectsByGrade[studentData.grade];
         const subjectsList = subjects.join('、');
         
+        // 添加年级特殊说明
+        let gradeSpecialNote = '';
+        if (studentData.grade === '六年级') {
+            gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点分析小学阶段的学科特点和过渡到初中的准备。';
+        }
+        
         const prompt = `
         请根据以下学生信息，分析学生的各学科知识掌握情况：
         
@@ -387,6 +405,8 @@ document.addEventListener('DOMContentLoaded', function() {
         考试次数：${studentData.examCount}次
         成绩：
         ${gradesInfo}
+        
+        ${gradeSpecialNote}
         
         请严格按照以下格式输出每个学科的分析结果：
         
@@ -417,6 +437,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // 添加年级特殊说明
+        let gradeSpecialNote = '';
+        if (studentData.grade === '六年级') {
+            gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点关注小学阶段的学习特点和过渡到初中的准备。';
+        }
+        
         const prompt = `
         请根据以下学生信息，提出个性化的学习建议：
         
@@ -430,6 +456,8 @@ document.addEventListener('DOMContentLoaded', function() {
         其他补充信息：${studentData.otherInfo || '无'}
         成绩：
         ${gradesInfo}
+        
+        ${gradeSpecialNote}
         
         请按照以下格式输出建议：
         
@@ -463,6 +491,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // 添加年级特殊说明
+        let gradeSpecialNote = '';
+        if (studentData.grade === '六年级') {
+            gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科的班课。请重点考虑小学阶段的补课特点和过渡到初中的准备。';
+        }
+        
         const prompt = `
         请根据以下学生信息，提出具体的补课方案：
         
@@ -482,6 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
         - 小组课（4人）
         - 一对一
         - 晚辅导（辅导作业，周一到周五晚上）
+        
+        ${gradeSpecialNote}
         
         请按照以下格式输出补课方案：
         
@@ -515,6 +551,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // 添加年级特殊说明
+        let gradeSpecialNote = '';
+        if (studentData.grade === '六年级') {
+            gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点关注小学到初中的过渡准备和长期学习规划。';
+        }
+        
         const prompt = `
         请根据以下学生信息，提供其他补充信息：
         
@@ -528,6 +570,8 @@ document.addEventListener('DOMContentLoaded', function() {
         其他补充信息：${studentData.otherInfo || '无'}
         成绩：
         ${gradesInfo}
+        
+        ${gradeSpecialNote}
         
         请按照以下格式输出补充信息：
         
