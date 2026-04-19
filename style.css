@@ -244,11 +244,30 @@ main {
     border-left: 4px solid #4a6fa5;
 }
 
-.exam-section h4 {
+.exam-section .exam-name-input {
     margin-bottom: 15px;
-    color: #4a6fa5;
-    font-size: 1.1rem;
+}
+
+.exam-section .exam-name-input label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: bold;
+    color: #555;
+}
+
+.exam-section .exam-name-input input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.exam-section .exam-name-input input:focus {
+    outline: none;
+    border-color: #4a6fa5;
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.1);
 }
 
 .grade-input-group {

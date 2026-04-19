@@ -30,7 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let i = 1; i <= selectedExamCount; i++) {
                 const examSection = document.createElement('div');
                 examSection.className = 'exam-section';
-                examSection.innerHTML = `<h4>第${i}次考试</h4>`;
+                examSection.innerHTML = `
+                    <div class="exam-name-input">
+                        <label for="exam_name_${i}">考试名称</label>
+                        <input type="text" id="exam_name_${i}" name="exam_name_${i}" placeholder="例如：七年级期中考试" required>
+                    </div>
+                `;
                 
                 subjects.forEach(subject => {
                     let maxScore;
@@ -93,7 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('找到科目:', subjects);
             // 收集多次考试的成绩
             for (let i = 1; i <= studentData.examCount; i++) {
-                const examGrades = {};
+                const examName = formData.get(`exam_name_${i}`);
+                const examGrades = {
+                    examName: examName
+                };
                 subjects.forEach(subject => {
                     examGrades[subject] = formData.get(`${subject}_${i}`);
                 });
@@ -156,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading(subjectSectionId, '正在分析各学科知识掌握情况，请稍候...');
             const subjectAnalysis = await analyzeSubjects(studentData);
             analysisResults['各学科的知识掌握情况'] = subjectAnalysis;
-            displaySubjectAnalysis(subjectAnalysis, studentData);
+            await displaySubjectAnalysis(subjectAnalysis, studentData);
             
             // 3. 个性化学习建议
             console.log('开始分析个性化学习建议');
@@ -325,9 +333,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 构建成绩信息
         let gradesInfo = '';
         studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
+            const examName = examGrades.examName || `第${index + 1}次考试`;
+            gradesInfo += `${examName}：\n`;
             for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
+                if (subject !== 'examName') {
+                    gradesInfo += `  ${subject}：${score}分\n`;
+                }
             }
         });
         
@@ -379,9 +390,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 构建成绩信息
         let gradesInfo = '';
         studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
+            const examName = examGrades.examName || `第${index + 1}次考试`;
+            gradesInfo += `${examName}：\n`;
             for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
+                if (subject !== 'examName') {
+                    gradesInfo += `  ${subject}：${score}分\n`;
+                }
             }
         });
         
@@ -431,9 +445,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 构建成绩信息
         let gradesInfo = '';
         studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
+            const examName = examGrades.examName || `第${index + 1}次考试`;
+            gradesInfo += `${examName}：\n`;
             for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
+                if (subject !== 'examName') {
+                    gradesInfo += `  ${subject}：${score}分\n`;
+                }
             }
         });
         
@@ -485,9 +502,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 构建成绩信息
         let gradesInfo = '';
         studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
+            const examName = examGrades.examName || `第${index + 1}次考试`;
+            gradesInfo += `${examName}：\n`;
             for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
+                if (subject !== 'examName') {
+                    gradesInfo += `  ${subject}：${score}分\n`;
+                }
             }
         });
         
@@ -545,9 +565,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // 构建成绩信息
         let gradesInfo = '';
         studentData.grades.forEach((examGrades, index) => {
-            gradesInfo += `第${index + 1}次考试：\n`;
+            const examName = examGrades.examName || `第${index + 1}次考试`;
+            gradesInfo += `${examName}：\n`;
             for (const [subject, score] of Object.entries(examGrades)) {
-                gradesInfo += `  ${subject}：${score}分\n`;
+                if (subject !== 'examName') {
+                    gradesInfo += `  ${subject}：${score}分\n`;
+                }
             }
         });
         
@@ -653,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 显示学科分析
-    function displaySubjectAnalysis(content, studentData) {
+    async function displaySubjectAnalysis(content, studentData) {
         // 查找对应的section元素
         const sectionId = generateSectionId('各学科的知识掌握情况');
         const sectionElement = document.getElementById(sectionId);
@@ -666,8 +689,9 @@ document.addEventListener('DOMContentLoaded', function() {
             cleanedContent = cleanedContent.replace(/^-+ /gm, '');
             
             // 尝试提取各个学科的分析
-            const subjects = subjectsByGrade[studentData.grade];
+            const expectedSubjects = subjectsByGrade[studentData.grade];
             let subjectsContent = '';
+            const foundSubjects = [];
             
             // 按学科分割内容
             const subjectRegex = /学科：([^\n]+)\n([\s\S]*?)(?=学科：|$)/g;
@@ -676,6 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
             while ((subjectMatch = subjectRegex.exec(cleanedContent)) !== null) {
                 const subject = subjectMatch[1].trim();
                 const subjectAnalysis = subjectMatch[2].trim();
+                foundSubjects.push(subject);
                 
                 subjectsContent += `
                     <div class="subject-card" style="border-left-color: ${getSubjectColor(subject)}">
@@ -683,6 +708,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="subject-analysis">${subjectAnalysis.replace(/\n/g, '<br>')}</div>
                     </div>
                 `;
+            }
+            
+            // 检查是否所有学科都有分析
+            const missingSubjects = expectedSubjects.filter(subject => !foundSubjects.includes(subject));
+            
+            if (missingSubjects.length > 0) {
+                // 如果有缺失的学科，重新调用AI生成
+                console.log('发现缺失的学科分析:', missingSubjects);
+                sectionElement.innerHTML = `
+                    <h4>各学科的知识掌握情况</h4>
+                    <div class="loading-container">
+                        <div class="loading-spinner"></div>
+                        <p>发现学科分析不完整，正在重新生成...</p>
+                    </div>
+                `;
+                
+                try {
+                    // 重新生成学科分析
+                    const newSubjectAnalysis = await analyzeSubjects(studentData);
+                    // 递归调用显示函数
+                    await displaySubjectAnalysis(newSubjectAnalysis, studentData);
+                } catch (error) {
+                    console.error('重新生成学科分析失败:', error);
+                    sectionElement.innerHTML = `
+                        <h4>各学科的知识掌握情况</h4>
+                        <p style="color: red;">学科分析生成失败，请稍后重试。</p>
+                    `;
+                }
+                return;
             }
             
             if (!subjectsContent) {
@@ -913,11 +967,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 创建成绩工作表
         if (studentData.grades.length > 0) {
-            const subjects = Object.keys(studentData.grades[0]);
-            const gradesData = [['考试次数', ...subjects]];
+            const subjects = Object.keys(studentData.grades[0]).filter(subject => subject !== 'examName');
+            const gradesData = [['考试名称', ...subjects]];
             
             studentData.grades.forEach((examGrades, index) => {
-                const row = [index + 1];
+                const examName = examGrades.examName || `第${index + 1}次考试`;
+                const row = [examName];
                 subjects.forEach(subject => {
                     row.push(examGrades[subject] || '');
                 });
@@ -1008,11 +1063,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!gradesWs) {
                     // 如果不存在，创建新的成绩工作表
                     if (studentData.grades.length > 0) {
-                        const subjects = Object.keys(studentData.grades[0]);
-                        const gradesData = [['考试次数', ...subjects]];
+                        const subjects = Object.keys(studentData.grades[0]).filter(subject => subject !== 'examName');
+                        const gradesData = [['考试名称', ...subjects]];
                         
                         studentData.grades.forEach((examGrades, index) => {
-                            const row = [index + 1];
+                            const examName = examGrades.examName || `第${index + 1}次考试`;
+                            const row = [examName];
                             subjects.forEach(subject => {
                                 row.push(examGrades[subject] || '');
                             });
@@ -1026,23 +1082,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 如果存在，追加新数据
                     const existingData = XLSX.utils.sheet_to_json(gradesWs, { header: 1 });
                     if (existingData.length > 0) {
-                        // 获取现有数据的最后一行，确定新的考试次数
-                        const lastRow = existingData[existingData.length - 1];
-                        let lastExamNumber = 0;
-                        if (typeof lastRow[0] === 'number') {
-                            lastExamNumber = lastRow[0];
-                        } else if (!isNaN(parseInt(lastRow[0]))) {
-                            lastExamNumber = parseInt(lastRow[0]);
-                        }
-                        
                         // 追加新的成绩数据
                         if (studentData.grades.length > 0) {
-                            const subjects = Object.keys(studentData.grades[0]);
+                            const subjects = Object.keys(studentData.grades[0]).filter(subject => subject !== 'examName');
                             
                             // 确保表头存在
                             if (existingData[0].length === 1 + subjects.length) {
                                 studentData.grades.forEach((examGrades, index) => {
-                                    const row = [lastExamNumber + index + 1];
+                                    const examName = examGrades.examName || `第${index + 1}次考试`;
+                                    const row = [examName];
                                     subjects.forEach(subject => {
                                         row.push(examGrades[subject] || '');
                                     });
