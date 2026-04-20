@@ -344,8 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             role: 'user',
                             content: prompt
                         }
-                    ],
-                    temperature: 0.7
+                    ]
                 }),
                 signal: controller.signal
             });
