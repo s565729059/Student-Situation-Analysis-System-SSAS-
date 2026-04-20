@@ -319,15 +319,15 @@ document.addEventListener('DOMContentLoaded', function() {
         throw lastError || new Error('所有DeepSeek模型调用都失败');
     }
     
-    // Kimi API调用函数
+    // Kimi API调用函数 - 使用v2.5模型
     async function callKimiAPI(prompt) {
         const apiKey = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
         const url = 'https://api.moonshot.cn/v1/chat/completions';
         
-        const model = 'moonshot-v1-128k';
+        const model = 'moonshot-v2.5-128k';
         
         try {
-            console.log(`尝试使用Kimi模型: ${model} (思考模式)`);
+            console.log(`尝试使用Kimi v2.5模型: ${model}`);
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 120000); // 120秒超时
             
@@ -345,14 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             content: prompt
                         }
                     ],
-                    temperature: 0.6,
-                    top_p: 0.9,
-                    presence_penalty: 0.1,
-                    frequency_penalty: 0.1,
-                    thinking: {
-                        type: 'default',
-                        budget_tokens: 30000
-                    }
+                    temperature: 0.7
                 }),
                 signal: controller.signal
             });
@@ -360,56 +353,18 @@ document.addEventListener('DOMContentLoaded', function() {
             clearTimeout(timeoutId);
             
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API错误详情:', response.status, errorText);
                 throw new Error(`Kimi API调用失败: ${response.status}`);
             }
             
             const data = await response.json();
             if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-                console.log(`使用Kimi模型${model}成功获取结果`);
+                console.log(`使用Kimi v2.5模型成功获取结果`);
                 return data.choices[0].message.content;
             }
         } catch (error) {
-            console.error(`Kimi思考模式调用失败:`, error);
-            // 如果思考模式失败，尝试普通模式
-            console.log(`尝试普通模式...`);
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 120000);
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: [
-                            {
-                                role: 'user',
-                                content: prompt
-                            }
-                        ],
-                        temperature: 0.7
-                    }),
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`Kimi普通模式调用失败: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-                    console.log(`使用Kimi普通模式成功获取结果`);
-                    return data.choices[0].message.content;
-                }
-            } catch (fallbackError) {
-                console.error(`Kimi普通模式也失败:`, fallbackError);
-                throw fallbackError;
-            }
+            console.error(`Kimi v2.5调用失败:`, error);
             throw error;
         }
     }
