@@ -199,16 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             break;
                     }
                     
-                    // 美化和清理输出
-                    analysisResult = beautifyOutput(analysisResult);
-                    
                     // 存储结果
                     analysisResults[section.title] = analysisResult;
                     
                     // 立即显示这部分结果
                     if (section.id === 2) {
+                        // 各学科分析不应用beautifyOutput，直接传原始内容
                         await displaySubjectAnalysis(analysisResult, studentData, sectionId, section.title);
                     } else {
+                        // 其他部分应用美化
+                        analysisResult = beautifyOutput(analysisResult);
                         displayAnalysisSection(section.title, analysisResult, section.color, sectionId);
                     }
                     
@@ -823,32 +823,61 @@ document.addEventListener('DOMContentLoaded', function() {
         const sectionElement = document.getElementById(sectionId);
         
         if (sectionElement) {
-            // 替换符号为小表情，保留所有文字内容
-            let cleanedContent = content;
-            // 移除星号和其他特殊符号
-            cleanedContent = cleanedContent.replace(/^\*+ /gm, '');
-            cleanedContent = cleanedContent.replace(/^-+ /gm, '');
-            
             // 尝试提取各个学科的分析
             const expectedSubjects = subjectsByGrade[studentData.grade];
             let subjectsContent = '';
             const foundSubjects = [];
             
-            // 按学科分割内容
-            const subjectRegex = /学科：([^\n]+)\n([\s\S]*?)(?=学科：|$)/g;
+            // 按学科分割内容 - 支持多种格式
+            const subjectRegexPatterns = [
+                /学科：([^\n]+)\n([\s\S]*?)(?=\n学科：|$)/g,
+                /^([^\n：]+：[^\n]*)$/gm
+            ];
+            
             let subjectMatch;
             
-            while ((subjectMatch = subjectRegex.exec(cleanedContent)) !== null) {
+            // 先尝试标准格式 "学科：语文\n..."
+            const subjectRegex1 = /学科：([^\n]+)\n([\s\S]*?)(?=\n学科：|$)/g;
+            while ((subjectMatch = subjectRegex1.exec(content)) !== null) {
                 const subject = subjectMatch[1].trim();
                 const subjectAnalysis = subjectMatch[2].trim();
                 foundSubjects.push(subject);
                 
-                subjectsContent += `
-                    <div class="subject-card" style="border-left-color: ${getSubjectColor(subject)}">
-                        <h5 class="subject-title">${subject}</h5>
-                        <div class="subject-analysis">${subjectAnalysis.replace(/\n/g, '<br>')}</div>
-                    </div>
-                `;
+                subjectsContent += createSubjectCard(subject, subjectAnalysis);
+            }
+            
+            // 如果没有找到，尝试按行逐个找
+            if (subjectsContent === '') {
+                let currentSubject = null;
+                let currentContent = '';
+                const lines = content.split('\n');
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    if (line === '') continue;
+                    
+                    // 检查是否是学科标题
+                    const subjectMatch = line.match(/^([^\n：]+)[:：]/);
+                    if (subjectMatch && line.length < 15) {
+                        // 结束上一个
+                        if (currentSubject) {
+                            subjectsContent += createSubjectCard(currentSubject, currentContent);
+                        }
+                        currentSubject = subjectMatch[1].trim();
+                        foundSubjects.push(currentSubject);
+                        currentContent = line;
+                    } else if (currentSubject) {
+                        currentContent += '\n' + line;
+                    } else {
+                        // 还没有找到第一个学科，尝试其他方式
+                        subjectsContent += `<p>${line}</p>`;
+                    }
+                }
+                
+                // 处理最后一个
+                if (currentSubject) {
+                    subjectsContent += createSubjectCard(currentSubject, currentContent);
+                }
             }
             
             // 检查是否所有学科都有分析
@@ -859,7 +888,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (!subjectsContent) {
-                subjectsContent = `<p>${cleanedContent}</p>`;
+                subjectsContent = `<div class="subject-card" style="border-left-color: ${getColorByType('blue')}">
+                    <h5 class="subject-title">分析内容</h5>
+                    <div class="subject-analysis">${content.replace(/\n/g, '<br>')}</div>
+                </div>`;
             }
             
             sectionElement.className = 'analysis-section';
@@ -877,6 +909,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
         }
+    }
+    
+    // 创建学科卡片HTML
+    function createSubjectCard(subject, content) {
+        let processedContent = content.trim();
+        
+        // 去掉学科自身标题（如果有）
+        if (processedContent.startsWith(subject)) {
+            processedContent = processedContent.replace(new RegExp('^' + subject + '[:：]?\\s*'), '');
+        }
+        
+        // 处理换行
+        processedContent = processedContent.replace(/\n/g, '<br>');
+        
+        return `
+            <div class="subject-card" style="border-left: 5px solid ${getSubjectColor(subject)}; background: ${getSubjectColor(subject)}10">
+                <h5 class="subject-title">${subject}</h5>
+                <div class="subject-analysis">${processedContent}</div>
+            </div>
+        `;
     }
     
     // 根据类型获取颜色
@@ -1749,7 +1801,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 case '各学科的知识掌握情况':
                     analysisResult = await analyzeSubjectsWithAI(currentStudentData, aiType);
-                    analysisResult = beautifyOutput(analysisResult);
+                    // 各学科分析不应用beautifyOutput
                     await displaySubjectAnalysis(analysisResult, currentStudentData, sectionId, title);
                     break;
                 case '个性化学习建议':
