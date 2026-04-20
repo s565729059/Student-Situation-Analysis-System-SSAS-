@@ -319,12 +319,12 @@ document.addEventListener('DOMContentLoaded', function() {
         throw lastError || new Error('所有DeepSeek模型调用都失败');
     }
     
-    // Kimi API调用函数 - 使用v2.5模型
+    // Kimi API调用函数 - 使用k2.5模型
     async function callKimiAPI(prompt) {
         const apiKey = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
         const url = 'https://api.moonshot.cn/v1/chat/completions';
         
-        const model = 'moonshot-v2.5-128k';
+        const model = 'kimi-k2.5';
         
         try {
             console.log(`尝试使用Kimi v2.5模型: ${model}`);
