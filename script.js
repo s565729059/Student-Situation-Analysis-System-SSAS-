@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 确定应该使用哪个AI重新生成
             let aiType = 'kimi';
             if (title === '各学科的知识掌握情况' || title === '具体的补课方案') {
-                aiType = 'deepseek';
+                aiType = 'kimi';
             }
             
             sectionElement.innerHTML = `
@@ -788,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sectionElement) {
             let aiType = 'kimi';
             if (title === '各学科的知识掌握情况' || title === '具体的补课方案') {
-                aiType = 'deepseek';
+                aiType = 'kimi';
             }
             
             sectionElement.className = 'analysis-section';
@@ -1780,20 +1780,50 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let result = text;
         
-        // 移除多余的空行
-        result = result.replace(/\n{3,}/g, '\n\n');
+        // 第一步：彻底清理所有空行
+        result = result.replace(/\r\n/g, '\n');
+        result = result.replace(/\n\s*\n/g, '\n');
+        result = result.replace(/\n{2,}/g, '\n');
         
-        // 处理星号小标题
-        result = result.replace(/\*\*\*(.*?)\*\*\*/g, '<strong>$1</strong>');
-        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        result = result.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+        // 第二步：处理各级标题，添加表情
+        // 处理#标题（一级标题）
+        result = result.replace(/^# (.*?)$/gm, (match, title) => {
+            return '<div class="beauty-title-1">📌 ' + title.trim() + '</div>';
+        });
         
-        // 处理#小标题
-        result = result.replace(/^## (.*?)$/gm, '<h5 class="section-subtitle">$1</h5>');
-        result = result.replace(/^# (.*?)$/gm, '<h4 class="section-subtitle">$1</h4>');
+        // 处理##标题（二级标题）
+        result = result.replace(/^## (.*?)$/gm, (match, title) => {
+            return '<div class="beauty-title-2">✨ ' + title.trim() + '</div>';
+        });
         
-        // 处理列表
-        result = result.replace(/^\- (.*?)$/gm, '<div class="list-item">• $1</div>');
+        // 处理星号标题（三级）
+        result = result.replace(/\*\*\*(.*?)\*\*\*/g, (match, content) => {
+            return '<span class="beauty-highlight-1">💡 ' + content.trim() + '</span>';
+        });
+        result = result.replace(/\*\*(.*?)\*\*/g, (match, content) => {
+            return '<span class="beauty-highlight-2">🔹 ' + content.trim() + '</span>';
+        });
+        
+        // 处理列表项
+        result = result.replace(/^\- (.*?)$/gm, (match, item) => {
+            return '<div class="beauty-list-item">• ' + item.trim() + '</div>';
+        });
+        result = result.replace(/^\d+\. (.*?)$/gm, (match, item) => {
+            return '<div class="beauty-list-item-2">' + match + '</div>';
+        });
+        
+        // 第三步：处理段落换行和格式化
+        // 把单个换行变成段落
+        result = result.replace(/([^\n])\n([^\n])/g, '$1</p><p>$2');
+        result = result.replace(/^([^\n]+)$/gm, function(match, line) {
+            if (line.includes('<div') || line.includes('<span') || line.includes('<h')) {
+                return line;
+            }
+            if (line.trim().length > 0) {
+                return '<p class="beauty-paragraph">' + line + '</p>';
+            }
+            return '';
+        });
         
         return result;
     }

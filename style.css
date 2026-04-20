@@ -666,6 +666,62 @@ main {
     margin-bottom: 1em;
 }
 
+/* === 新的美化样式 === */
+.beauty-title-1 {
+    color: #2c3e50;
+    font-size: 1.3em;
+    font-weight: 800;
+    margin: 1.2em 0 0.8em;
+    padding: 0.6em 0;
+    border-bottom: 3px solid #4a6fa5;
+    display: flex;
+    align-items: center;
+}
+
+.beauty-title-2 {
+    color: #34495e;
+    font-size: 1.15em;
+    font-weight: 700;
+    margin: 1em 0 0.6em;
+    padding: 0.4em 0;
+    border-left: 4px solid #e67e22;
+    padding-left: 0.8em;
+    display: flex;
+    align-items: center;
+}
+
+.beauty-highlight-1 {
+    color: #e74c3c;
+    font-weight: 700;
+    font-size: 1.05em;
+}
+
+.beauty-highlight-2 {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.beauty-list-item {
+    padding: 0.4em 0;
+    padding-left: 1.5em;
+    margin: 0.3em 0;
+    position: relative;
+}
+
+.beauty-list-item-2 {
+    padding: 0.5em 0;
+    padding-left: 1.8em;
+    margin: 0.4em 0;
+    font-weight: 500;
+}
+
+.beauty-paragraph {
+    line-height: 1.9;
+    margin-bottom: 1em;
+    color: #333;
+    font-size: 1.02em;
+}
+
 .loading-overlay {
     position: fixed;
     top: 0;
