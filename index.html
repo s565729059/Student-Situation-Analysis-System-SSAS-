@@ -3,121 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>青岛睿花苑·学生情况分析系统</title>
-    <script src="chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>睿花苑AI促进组·AI技术提效</title>
+    <link rel="stylesheet" href="home.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>青岛睿花苑·学生情况分析系统</h1>
-            <h2>新生入学检测</h2>
-            <div class="version-info">
-                <p>版本号：v2.6</p>
-                <p>修改时间：2026-04-19</p>
-            </div>
+            <h1>睿花苑AI促进组·AI技术提效</h1>
+            <p class="subtitle">智慧教育，高效赋能</p>
         </header>
         
         <main>
-            <section class="form-section">
-                <form id="studentForm">
-                    <div class="form-group">
-                        <label for="name">姓名</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="gender">性别</label>
-                        <select id="gender" name="gender" required>
-                            <option value="">请选择</option>
-                            <option value="男">男</option>
-                            <option value="女">女</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="age">年龄</label>
-                        <input type="number" id="age" name="age" required min="10" max="18">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="grade">年级</label>
-                        <select id="grade" name="grade" required>
-                            <option value="">请选择</option>
-                            <option value="六年级">六年级</option>
-                            <option value="七年级">七年级</option>
-                            <option value="八年级">八年级</option>
-                            <option value="九年级">九年级</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="examCount">考试次数</label>
-                        <select id="examCount" name="examCount" required>
-                            <option value="">请选择</option>
-                            <option value="1">1次</option>
-                            <option value="2">2次</option>
-                            <option value="3">3次</option>
-                            <option value="4">4次</option>
-                            <option value="5">5次</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="hobbies">兴趣爱好</label>
-                        <input type="text" id="hobbies" name="hobbies" placeholder="例如：阅读、运动、音乐等">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="studyHabits">学习习惯</label>
-                        <input type="text" id="studyHabits" name="studyHabits" placeholder="例如：每天学习时间、学习方法、遇到的困难等">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="otherInfo">其他补充信息</label>
-                        <input type="text" id="otherInfo" name="otherInfo" placeholder="例如：特长、学习目标等">
-                    </div>
-                    
-                    <div class="form-group grades-container" id="gradesContainer">
-                        <h3>成绩输入</h3>
-                        <!-- 成绩输入框将通过JavaScript动态生成 -->
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">开始分析</button>
-                </form>
-            </section>
-            
-            <section class="result-section" id="resultSection">
-                <h3>分析结果</h3>
-                <div class="result-content" id="resultContent">
-                    <!-- 分析结果将在这里显示 -->
-                </div>
-                <div class="chart-container">
-                    <canvas id="radarChart"></canvas>
+            <div class="tabs-container">
+                <div class="department-title">
+                    <h2>教学部</h2>
+                    <p>试卷分析与反馈生成</p>
                 </div>
                 
-                <div class="export-buttons" id="exportButtons" style="display: none;">
-                    <button type="button" id="exportExcel" class="export-btn">导出新Excel</button>
-                    <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
-                    <button type="button" id="appendToExcel" class="export-btn">追加到已有Excel</button>
+                <div class="function-cards">
+                    <div class="function-card" onclick="window.location.href='#'">
+                        <div class="card-icon">📝</div>
+                        <h3>试卷分析</h3>
+                        <p class="card-desc">智能分析试卷数据，生成详细的考试报告</p>
+                        <div class="coming-soon">即将上线</div>
+                    </div>
+                    
+                    <div class="function-card" onclick="window.location.href='#'">
+                        <div class="card-icon">💬</div>
+                        <h3>反馈生成</h3>
+                        <p class="card-desc">AI辅助生成学生学习反馈和个性化建议</p>
+                        <div class="coming-soon">即将上线</div>
+                    </div>
                 </div>
-            </section>
-            
-            <section class="detailed-analysis-section" id="detailedAnalysisSection">
-                <h3>详细分析报告</h3>
-                <div class="analysis-sections" id="analysisSections">
-                    <!-- 详细分析报告将在这里显示 -->
+                
+                <div class="department-title">
+                    <h2>学管部</h2>
+                    <p>学生情况分析</p>
                 </div>
-            </section>
+                
+                <div class="function-cards">
+                    <div class="function-card active" onclick="window.location.href='student-analysis.html'">
+                        <div class="card-icon">📊</div>
+                        <h3>学生情况分析</h3>
+                        <p class="card-desc">全面分析学生学习情况，生成个性化报告</p>
+                        <div class="enter-btn">进入系统</div>
+                    </div>
+                </div>
+            </div>
         </main>
         
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="loading-spinner"></div>
-            <p>正在分析，请稍候...</p>
-        </div>
+        <footer>
+            <p>&copy; 2026 青岛睿花苑·AI促进组</p>
+            <p class="version-info">版本号：v1.0</p>
+        </footer>
     </div>
-    
-    <script src="script.js"></script>
 </body>
 </html>

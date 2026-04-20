@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青岛睿花苑·学生情况分析系统</title>
+    <script src="chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <button class="back-btn" onclick="window.location.href='index.html'">← 返回首页</button>
+            </div>
+            <h1>青岛睿花苑·学生情况分析系统</h1>
+            <h2>新生入学检测</h2>
+            <div class="version-info">
+                <p>版本号：v2.8</p>
+                <p>修改时间：2026-04-20</p>
+            </div>
+        </header>
+        
+        <main>
+            <section class="form-section">
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">性别</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">年龄</label>
+                        <input type="number" id="age" name="age" required min="10" max="18">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="grade">年级</label>
+                        <select id="grade" name="grade" required>
+                            <option value="">请选择</option>
+                            <option value="六年级">六年级</option>
+                            <option value="七年级">七年级</option>
+                            <option value="八年级">八年级</option>
+                            <option value="九年级">九年级</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="examCount">考试次数</label>
+                        <select id="examCount" name="examCount" required>
+                            <option value="">请选择</option>
+                            <option value="1">1次</option>
+                            <option value="2">2次</option>
+                            <option value="3">3次</option>
+                            <option value="4">4次</option>
+                            <option value="5">5次</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hobbies">兴趣爱好</label>
+                        <input type="text" id="hobbies" name="hobbies" placeholder="例如：阅读、运动、音乐等">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="studyHabits">学习习惯</label>
+                        <input type="text" id="studyHabits" name="studyHabits" placeholder="例如：每天学习时间、学习方法、遇到的困难等">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="otherInfo">其他补充信息</label>
+                        <input type="text" id="otherInfo" name="otherInfo" placeholder="例如：特长、学习目标等">
+                    </div>
+                    
+                    <div class="form-group grades-container" id="gradesContainer">
+                        <h3>成绩输入</h3>
+                        <!-- 成绩输入框将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">开始分析</button>
+                </form>
+            </section>
+            
+            <section class="result-section" id="resultSection">
+                <h3>分析结果</h3>
+                <div class="result-content" id="resultContent">
+                    <!-- 分析结果将在这里显示 -->
+                </div>
+                <div class="charts-wrapper">
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="charts-wrapper" id="trendCharts" style="display: none;">
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="export-buttons" id="exportButtons" style="display: none;">
+                    <button type="button" id="exportExcel" class="export-btn">导出新Excel</button>
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
+                    <button type="button" id="appendToExcel" class="export-btn">追加到已有Excel</button>
+                </div>
+            </section>
+            
+            <section class="detailed-analysis-section" id="detailedAnalysisSection">
+                <h3>详细分析报告</h3>
+                <div class="analysis-sections" id="analysisSections">
+                    <!-- 详细分析报告将在这里显示 -->
+                </div>
+            </section>
+        </main>
+        
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <p>正在分析，请稍候...</p>
+        </div>
+        
+        <!-- 问题反馈悬浮窗 -->
+        <div class="feedback-float">
+            <button class="feedback-btn" onclick="toggleFeedback()">💬</button>
+            <div class="feedback-popup" id="feedbackPopup">
+                <span class="close-popup" onclick="toggleFeedback()">&times;</span>
+                <h4>问题反馈</h4>
+                <p>如有任何问题或建议，请添加微信咨询！</p>
+                <p style="text-align: center; margin: 20px 0; font-size: 20px;">微信：<strong style="color: #4a6fa5; font-size: 24px;">swsw823</strong></p>
+                <p>工作时间：每天 8:00-20:00</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
