@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         maxScore = 100;
                     } else if (['语文', '数学', '英语'].includes(subject)) {
                         maxScore = 120;
-                    } else if (['地理', '生物'].includes(subject)) {
+                    } else if (['地理', '生物', '化学'].includes(subject)) {
                         maxScore = 80;
                     } else {
                         maxScore = 100;
@@ -346,6 +346,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let gradeSpecialNote = '';
         if (studentData.grade === '六年级') {
             gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点分析小学阶段的学习特点和过渡到初中的准备。';
+        } else if (studentData.grade === '九年级') {
+            gradeSpecialNote = '注意：九年级化学满分是80分，其他科目满分与其他年级相同。请根据实际满分情况进行分析。';
         }
         
         const prompt = `
@@ -407,6 +409,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let gradeSpecialNote = '';
         if (studentData.grade === '六年级') {
             gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点分析小学阶段的学科特点和过渡到初中的准备。';
+        } else if (studentData.grade === '九年级') {
+            gradeSpecialNote = '注意：九年级化学满分是80分，其他科目满分与其他年级相同。请根据实际满分情况进行分析。';
         }
         
         const prompt = `
@@ -458,6 +462,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let gradeSpecialNote = '';
         if (studentData.grade === '六年级') {
             gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点关注小学阶段的学习特点和过渡到初中的准备。';
+        } else if (studentData.grade === '九年级') {
+            gradeSpecialNote = '注意：九年级化学满分是80分，其他科目满分与其他年级相同。请根据实际满分情况进行分析和建议。';
         }
         
         const prompt = `
@@ -515,6 +521,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let gradeSpecialNote = '';
         if (studentData.grade === '六年级') {
             gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科的班课。请重点考虑小学阶段的补课特点和过渡到初中的准备。';
+        } else if (studentData.grade === '九年级') {
+            gradeSpecialNote = '注意：九年级化学满分是80分，其他科目满分与其他年级相同。请根据实际满分情况进行分析和补课方案推荐。';
         }
         
         const prompt = `
@@ -578,6 +586,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let gradeSpecialNote = '';
         if (studentData.grade === '六年级') {
             gradeSpecialNote = '注意：这是小学阶段的学生，只有语文、数学、英语三科。请重点关注小学到初中的过渡准备和长期学习规划。';
+        } else if (studentData.grade === '九年级') {
+            gradeSpecialNote = '注意：九年级化学满分是80分，其他科目满分与其他年级相同。请根据实际满分情况进行分析和建议。';
         }
         
         const prompt = `
