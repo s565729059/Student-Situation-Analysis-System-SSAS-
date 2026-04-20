@@ -625,6 +625,47 @@ main {
     color: #4a6fa5;
 }
 
+/* 美化输出样式 */
+.section-subtitle {
+    color: #4a6fa5;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+    padding-left: 0.5em;
+    border-left: 3px solid #4a6fa5;
+}
+
+.section-content p {
+    line-height: 1.8;
+    margin-bottom: 1em;
+    text-indent: 2em;
+}
+
+.list-item {
+    padding: 0.5em 0;
+    padding-left: 1.5em;
+    margin-left: 0.5em;
+}
+
+.analysis-section {
+    line-height: 1.8;
+}
+
+.analysis-content {
+    padding: 1em;
+}
+
+.analysis-content p {
+    line-height: 1.8;
+    margin-bottom: 0.8em;
+    text-indent: 0;
+}
+
+.section-header {
+    margin-bottom: 1em;
+}
+
 .loading-overlay {
     position: fixed;
     top: 0;

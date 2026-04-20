@@ -150,9 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // 定义五个分析部分
             const sections = [
                 { id: 1, title: '整体学习情况评估', color: 'blue', ai: 'kimi' },
-                { id: 2, title: '各学科的知识掌握情况', color: 'blue', ai: 'deepseek' },
+                { id: 2, title: '各学科的知识掌握情况', color: 'blue', ai: 'kimi' },
                 { id: 3, title: '个性化学习建议', color: 'green', ai: 'kimi' },
-                { id: 4, title: '具体的补课方案', color: 'orange', ai: 'deepseek' },
+                { id: 4, title: '具体的补课方案', color: 'orange', ai: 'kimi' },
                 { id: 5, title: '其它补充信息', color: 'purple', ai: 'kimi' }
             ];
             
@@ -174,31 +174,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     let analysisResult;
                     
-                    // 根据配置选择AI
-                    if (section.ai === 'kimi') {
-                        console.log(`使用Kimi处理第${section.id}部分：${section.title}`);
-                        switch(section.id) {
-                            case 1:
-                                analysisResult = await analyzeOverallLearningWithAI(studentData, 'kimi');
-                                break;
-                            case 3:
-                                analysisResult = await analyzeLearningAdviceWithAI(studentData, 'kimi');
-                                break;
-                            case 5:
-                                analysisResult = await analyzeAdditionalInfoWithAI(studentData, 'kimi');
-                                break;
-                        }
-                    } else {
-                        console.log(`使用DeepSeek处理第${section.id}部分：${section.title}`);
-                        switch(section.id) {
-                            case 2:
-                                analysisResult = await analyzeSubjectsWithAI(studentData, 'deepseek');
-                                break;
-                            case 4:
-                                analysisResult = await analyzeTutoringPlanWithAI(studentData, 'deepseek');
-                                break;
-                        }
+                    // 全部使用Kimi处理
+                    console.log(`使用Kimi处理第${section.id}部分：${section.title}`);
+                    switch(section.id) {
+                        case 1:
+                            analysisResult = await analyzeOverallLearningWithAI(studentData, 'kimi');
+                            break;
+                        case 2:
+                            analysisResult = await analyzeSubjectsWithAI(studentData, 'kimi');
+                            break;
+                        case 3:
+                            analysisResult = await analyzeLearningAdviceWithAI(studentData, 'kimi');
+                            break;
+                        case 4:
+                            analysisResult = await analyzeTutoringPlanWithAI(studentData, 'kimi');
+                            break;
+                        case 5:
+                            analysisResult = await analyzeAdditionalInfoWithAI(studentData, 'kimi');
+                            break;
                     }
+                    
+                    // 美化和清理输出
+                    analysisResult = beautifyOutput(analysisResult);
                     
                     // 存储结果
                     analysisResults[section.title] = analysisResult;
@@ -349,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     frequency_penalty: 0.1,
                     thinking: {
                         type: 'default',
-                        budget_tokens: 10000
+                        budget_tokens: 30000
                     }
                 }),
                 signal: controller.signal
@@ -1452,9 +1449,11 @@ document.addEventListener('DOMContentLoaded', function() {
             # 学习能力与潜力评估
             [学习能力与潜力的详细分析]
             
-            注意：
+            重要要求：
             - 使用自然的段落结构，不要使用Markdown格式
             - 确保分析全面、详细，能够给家长一个明确的指导
+            - 全部使用第三人称，称呼学生名字或"该生"
+            - 严格使用中文输出，禁止出现任何英语单词或句子
         `;
         
         if (aiType === 'kimi') {
@@ -1506,11 +1505,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             请对以下学科进行分析：${subjectsList}
             
-            注意：
+            重要要求：
             - 每个学科必须单独分析，格式必须严格按照"学科：[学科名称]"开头
             - 请对每个学科进行详细、完整的分析
             - 使用自然的段落结构，不要使用Markdown格式
             - 确保分析全面、详细，能够给家长一个明确的指导
+            - 全部使用第三人称，称呼学生名字或"该生"
+            - 严格使用中文输出，禁止出现任何英语单词或句子
         `;
         
         if (aiType === 'kimi') {
@@ -1541,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const prompt = `
-            请根据以下学生信息，提出个性化的学习建议：
+            请根据以下学生信息，提出个性化的学习建议（给家长看的版本）：
             
             学生姓名：${studentData.name}
             性别：${studentData.gender}
@@ -1566,10 +1567,12 @@ document.addEventListener('DOMContentLoaded', function() {
             # 各学科学习技巧
             [针对各学科的学习技巧]
             
-            注意：
+            重要要求：
             - 请提供详细、完整的建议内容
             - 使用自然的段落结构，不要使用Markdown格式
             - 确保建议具体、实用，能够给家长和学生一个明确的指导
+            - 全部使用第三人称，称呼学生名字或"该生"
+            - 严格使用中文输出，禁止出现任何英语单词或句子
         `;
         
         if (aiType === 'kimi') {
@@ -1631,10 +1634,12 @@ document.addEventListener('DOMContentLoaded', function() {
             # 时间安排
             [具体的时间安排建议]
             
-            注意：
+            重要要求：
             - 请提供详细、完整的补课方案
             - 使用自然的段落结构，不要使用Markdown格式
             - 确保方案具体、实用，能够给家长一个明确的指导
+            - 全部使用第三人称，称呼学生名字或"该生"
+            - 严格使用中文输出，禁止出现任何英语单词或句子
         `;
         
         if (aiType === 'kimi') {
@@ -1690,10 +1695,12 @@ document.addEventListener('DOMContentLoaded', function() {
             # 长期学习规划
             [长期学习规划建议]
             
-            注意：
+            重要要求：
             - 请提供详细、完整的补充信息
             - 使用自然的段落结构，不要使用Markdown格式
             - 确保信息全面、实用，能够给家长一个明确的指导
+            - 全部使用第三人称，称呼学生名字或"该生"
+            - 严格使用中文输出，禁止出现任何英语单词或句子
         `;
         
         if (aiType === 'kimi') {
@@ -1722,25 +1729,33 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             let analysisResult;
             
+            // 统一使用Kimi
+            aiType = 'kimi';
+            
             switch(title) {
                 case '整体学习情况评估':
                     analysisResult = await analyzeOverallLearningWithAI(currentStudentData, aiType);
+                    analysisResult = beautifyOutput(analysisResult);
                     displayAnalysisSection(title, analysisResult, color, sectionId);
                     break;
                 case '各学科的知识掌握情况':
                     analysisResult = await analyzeSubjectsWithAI(currentStudentData, aiType);
+                    analysisResult = beautifyOutput(analysisResult);
                     await displaySubjectAnalysis(analysisResult, currentStudentData, sectionId, title);
                     break;
                 case '个性化学习建议':
                     analysisResult = await analyzeLearningAdviceWithAI(currentStudentData, aiType);
+                    analysisResult = beautifyOutput(analysisResult);
                     displayAnalysisSection(title, analysisResult, color, sectionId);
                     break;
                 case '具体的补课方案':
                     analysisResult = await analyzeTutoringPlanWithAI(currentStudentData, aiType);
+                    analysisResult = beautifyOutput(analysisResult);
                     displayAnalysisSection(title, analysisResult, color, sectionId);
                     break;
                 case '其它补充信息':
                     analysisResult = await analyzeAdditionalInfoWithAI(currentStudentData, aiType);
+                    analysisResult = beautifyOutput(analysisResult);
                     displayAnalysisSection(title, analysisResult, color, sectionId);
                     break;
             }
@@ -1758,6 +1773,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 使regenerateSection全局可用
     window.regenerateSection = regenerateSection;
+    
+    // 美化输出的函数
+    function beautifyOutput(text) {
+        if (!text) return text;
+        
+        let result = text;
+        
+        // 移除多余的空行
+        result = result.replace(/\n{3,}/g, '\n\n');
+        
+        // 处理星号小标题
+        result = result.replace(/\*\*\*(.*?)\*\*\*/g, '<strong>$1</strong>');
+        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        result = result.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+        
+        // 处理#小标题
+        result = result.replace(/^## (.*?)$/gm, '<h5 class="section-subtitle">$1</h5>');
+        result = result.replace(/^# (.*?)$/gm, '<h4 class="section-subtitle">$1</h4>');
+        
+        // 处理列表
+        result = result.replace(/^\- (.*?)$/gm, '<div class="list-item">• $1</div>');
+        
+        return result;
+    }
     
     // 问题反馈悬浮窗切换
     function toggleFeedback() {
