@@ -823,76 +823,79 @@ document.addEventListener('DOMContentLoaded', function() {
         const sectionElement = document.getElementById(sectionId);
         
         if (sectionElement) {
-            // 尝试提取各个学科的分析
             const expectedSubjects = subjectsByGrade[studentData.grade];
             let subjectsContent = '';
-            const foundSubjects = [];
             
-            // 按学科分割内容 - 支持多种格式
-            const subjectRegexPatterns = [
-                /学科：([^\n]+)\n([\s\S]*?)(?=\n学科：|$)/g,
-                /^([^\n：]+：[^\n]*)$/gm
-            ];
+            console.log('开始解析各学科分析，原始内容长度:', content.length);
+            console.log('前200字符:', content.substring(0, 200));
             
-            let subjectMatch;
+            // 方法1: 直接用 "学科：" 分割
+            if (content.indexOf('学科：') !== -1) {
+                let parts = content.split('学科：');
+                for (let i = 1; i < parts.length; i++) {
+                    let part = parts[i].trim();
+                    let newlineIdx = part.indexOf('\n');
+                    let subjectName = '';
+                    let subjectContent = '';
+                    
+                    if (newlineIdx !== -1) {
+                        subjectName = part.substring(0, newlineIdx).trim();
+                        subjectContent = part.substring(newlineIdx).trim();
+                    } else {
+                        subjectName = part;
+                        subjectContent = '';
+                    }
+                    
+                    if (subjectName) {
+                        subjectsContent += createSubjectCard(subjectName, subjectContent);
+                    }
+                }
+            } 
             
-            // 先尝试标准格式 "学科：语文\n..."
-            const subjectRegex1 = /学科：([^\n]+)\n([\s\S]*?)(?=\n学科：|$)/g;
-            while ((subjectMatch = subjectRegex1.exec(content)) !== null) {
-                const subject = subjectMatch[1].trim();
-                const subjectAnalysis = subjectMatch[2].trim();
-                foundSubjects.push(subject);
-                
-                subjectsContent += createSubjectCard(subject, subjectAnalysis);
-            }
-            
-            // 如果没有找到，尝试按行逐个找
+            // 方法2: 如果没有找到，尝试按行找学科标题
             if (subjectsContent === '') {
+                console.log('方法1失败，尝试方法2');
+                let lines = content.split('\n');
                 let currentSubject = null;
                 let currentContent = '';
-                const lines = content.split('\n');
                 
                 for (let line of lines) {
                     line = line.trim();
-                    if (line === '') continue;
+                    if (!line) continue;
                     
-                    // 检查是否是学科标题
-                    const subjectMatch = line.match(/^([^\n：]+)[:：]/);
-                    if (subjectMatch && line.length < 15) {
-                        // 结束上一个
+                    let subjectMatch = null;
+                    // 查找 "语文："
+                    for (let subject of expectedSubjects) {
+                        if (line.indexOf(subject + '：') === 0 || line.indexOf(subject + ':') === 0) {
+                            subjectMatch = subject;
+                            break;
+                        }
+                    }
+                    
+                    if (subjectMatch) {
                         if (currentSubject) {
                             subjectsContent += createSubjectCard(currentSubject, currentContent);
                         }
-                        currentSubject = subjectMatch[1].trim();
-                        foundSubjects.push(currentSubject);
-                        currentContent = line;
+                        currentSubject = subjectMatch;
+                        let cleanedLine = line.replace(currentSubject + '：', '').replace(currentSubject + ':', '');
+                        currentContent = cleanedLine;
                     } else if (currentSubject) {
                         currentContent += '\n' + line;
-                    } else {
-                        // 还没有找到第一个学科，尝试其他方式
-                        subjectsContent += `<p>${line}</p>`;
                     }
                 }
                 
-                // 处理最后一个
                 if (currentSubject) {
                     subjectsContent += createSubjectCard(currentSubject, currentContent);
                 }
             }
             
-            // 检查是否所有学科都有分析
-            const missingSubjects = expectedSubjects.filter(subject => !foundSubjects.includes(subject));
-            
-            if (missingSubjects.length > 0) {
-                console.log('发现缺失的学科分析:', missingSubjects);
+            // 方法3: 都失败了，直接用一个大卡片
+            if (subjectsContent === '') {
+                console.log('方法2也失败，使用方法3');
+                subjectsContent = createSubjectCard('各学科分析', content);
             }
             
-            if (!subjectsContent) {
-                subjectsContent = `<div class="subject-card" style="border-left-color: ${getColorByType('blue')}">
-                    <h5 class="subject-title">分析内容</h5>
-                    <div class="subject-analysis">${content.replace(/\n/g, '<br>')}</div>
-                </div>`;
-            }
+            console.log('最终生成的subjectsContent长度:', subjectsContent.length);
             
             sectionElement.className = 'analysis-section';
             sectionElement.style.borderLeftColor = getColorByType('blue');
@@ -911,20 +914,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 创建学科卡片HTML
+    // 创建学科卡片HTML - 简化版
     function createSubjectCard(subject, content) {
         let processedContent = content.trim();
-        
-        // 去掉学科自身标题（如果有）
-        if (processedContent.startsWith(subject)) {
-            processedContent = processedContent.replace(new RegExp('^' + subject + '[:：]?\\s*'), '');
-        }
         
         // 处理换行
         processedContent = processedContent.replace(/\n/g, '<br>');
         
+        // 获取颜色
+        let subjectColor = getSubjectColor(subject);
+        
         return `
-            <div class="subject-card" style="border-left: 5px solid ${getSubjectColor(subject)}; background: ${getSubjectColor(subject)}10">
+            <div class="subject-card" style="border-left: 5px solid ${subjectColor}; background-color: ${subjectColor}10;">
                 <h5 class="subject-title">${subject}</h5>
                 <div class="subject-analysis">${processedContent}</div>
             </div>
