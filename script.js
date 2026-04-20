@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 定义五个分析部分
             const sections = [
                 { id: 1, title: '整体学习情况评估', color: 'blue', ai: 'kimi' },
-                { id: 2, title: '各学科的知识掌握情况', color: 'blue', ai: 'kimi' },
+                { id: 2, title: '各学科的知识掌握情况', color: 'blue', ai: 'deepseek' },
                 { id: 3, title: '个性化学习建议', color: 'green', ai: 'kimi' },
                 { id: 4, title: '具体的补课方案', color: 'orange', ai: 'kimi' },
                 { id: 5, title: '其它补充信息', color: 'purple', ai: 'kimi' }
@@ -174,23 +174,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     let analysisResult;
                     
-                    // 全部使用Kimi处理
-                    console.log(`使用Kimi处理第${section.id}部分：${section.title}`);
+                    // 根据section.ai选择处理方式
+                    if (section.ai === 'kimi') {
+                        console.log(`使用Kimi处理第${section.id}部分：${section.title}`);
+                    } else {
+                        console.log(`使用DeepSeek处理第${section.id}部分：${section.title}`);
+                    }
+                    
                     switch(section.id) {
                         case 1:
-                            analysisResult = await analyzeOverallLearningWithAI(studentData, 'kimi');
+                            analysisResult = await analyzeOverallLearningWithAI(studentData, section.ai);
                             break;
                         case 2:
-                            analysisResult = await analyzeSubjectsWithAI(studentData, 'kimi');
+                            analysisResult = await analyzeSubjectsWithAI(studentData, section.ai);
                             break;
                         case 3:
-                            analysisResult = await analyzeLearningAdviceWithAI(studentData, 'kimi');
+                            analysisResult = await analyzeLearningAdviceWithAI(studentData, section.ai);
                             break;
                         case 4:
-                            analysisResult = await analyzeTutoringPlanWithAI(studentData, 'kimi');
+                            analysisResult = await analyzeTutoringPlanWithAI(studentData, section.ai);
                             break;
                         case 5:
-                            analysisResult = await analyzeAdditionalInfoWithAI(studentData, 'kimi');
+                            analysisResult = await analyzeAdditionalInfoWithAI(studentData, section.ai);
                             break;
                     }
                     
@@ -1729,8 +1734,12 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             let analysisResult;
             
-            // 统一使用Kimi
-            aiType = 'kimi';
+            // 根据title选择AI类型
+            if (title === '各学科的知识掌握情况') {
+                aiType = 'deepseek';
+            } else {
+                aiType = 'kimi';
+            }
             
             switch(title) {
                 case '整体学习情况评估':
