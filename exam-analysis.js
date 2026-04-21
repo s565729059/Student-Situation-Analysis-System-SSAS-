@@ -261,22 +261,69 @@ function extractFileContent(file) {
 }
 
 async function extractPDFContent(file) {
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    elements.previewContent.textContent = '小睿同学正在解析PDF，请稍候...';
+    elements.filePreview.style.display = 'block';
 
-        let text = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            text += textContent.items.map(item => item.str).join(' ') + '\n';
+    try {
+        const formData = new FormData();
+        formData.append('purpose', 'file-extract');
+        formData.append('file', file);
+
+        const uploadResponse = await fetch('https://api.moonshot.cn/v1/files', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${KIMI_API_KEY}`
+            },
+            body: formData
+        });
+
+        if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `文件上传失败 (HTTP ${uploadResponse.status})`);
+        }
+
+        const uploadData = await uploadResponse.json();
+        const fileId = uploadData.id;
+
+        const contentResponse = await fetch(`https://api.moonshot.cn/v1/files/${fileId}/content`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${KIMI_API_KEY}`
+            }
+        });
+
+        if (!contentResponse.ok) {
+            throw new Error(`文件内容获取失败 (HTTP ${contentResponse.status})`);
+        }
+
+        const contentData = await contentResponse.json();
+        const text = contentData.content || '';
+
+        if (!text.trim()) {
+            throw new Error('Kimi 文件解析返回内容为空');
         }
 
         state.fileContent = text;
         showPreview(text);
     } catch (error) {
-        console.error('PDF extraction error:', error);
-        alert('PDF 内容提取失败，请确保文件格式正确');
+        console.error('Kimi PDF extraction error, falling back to pdf.js:', error);
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                text += textContent.items.map(item => item.str).join(' ') + '\n';
+            }
+
+            state.fileContent = text;
+            showPreview(text);
+        } catch (fallbackError) {
+            console.error('PDF.js fallback extraction error:', fallbackError);
+            alert('PDF 内容提取失败，请确保文件格式正确');
+        }
     }
 }
 

@@ -90,18 +90,61 @@ async function seaExtractFileContent(file) {
 
     if (fileExtension === '.pdf') {
         try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let text = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                text += textContent.items.map(item => item.str).join(' ') + '\n';
+            const formData = new FormData();
+            formData.append('purpose', 'file-extract');
+            formData.append('file', file);
+
+            const uploadResponse = await fetch('https://api.moonshot.cn/v1/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
+                },
+                body: formData
+            });
+
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `文件上传失败 (HTTP ${uploadResponse.status})`);
             }
+
+            const uploadData = await uploadResponse.json();
+            const fileId = uploadData.id;
+
+            const contentResponse = await fetch(`https://api.moonshot.cn/v1/files/${fileId}/content`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
+                }
+            });
+
+            if (!contentResponse.ok) {
+                throw new Error(`文件内容获取失败 (HTTP ${contentResponse.status})`);
+            }
+
+            const contentData = await contentResponse.json();
+            const text = contentData.content || '';
+
+            if (!text.trim()) {
+                throw new Error('Kimi 文件解析返回内容为空');
+            }
+
             seaState.fileContent = text;
         } catch (error) {
-            console.error('PDF extraction error:', error);
-            seaState.fileContent = '[PDF文件内容提取失败，将根据您提供的错题情况描述进行分析]';
+            console.error('Kimi PDF extraction error, falling back to pdf.js:', error);
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let text = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    text += textContent.items.map(item => item.str).join(' ') + '\n';
+                }
+                seaState.fileContent = text;
+            } catch (fallbackError) {
+                console.error('PDF.js fallback extraction error:', fallbackError);
+                seaState.fileContent = '[PDF文件内容提取失败，将根据您提供的错题情况描述进行分析]';
+            }
         }
     } else {
         try {
