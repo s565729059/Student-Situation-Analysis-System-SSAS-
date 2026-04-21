@@ -11,8 +11,8 @@ const state = {
     htmlReport: ''
 };
 
-const KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
-const KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
+const DEEPSEEK_API_KEY = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 let analysisCarouselTimer = null;
 let reportCarouselTimer = null;
@@ -330,13 +330,13 @@ async function startAnalysis() {
     let typeDone = false;
 
     try {
-        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt(), false).then(result => {
+        const overallPromise = callDeepSeekAPI(generateOverallAnalysisPrompt(), false).then(result => {
             state.analysisResults.overall = cleanContent(result);
             overallDone = true;
             showPartialResults();
         });
 
-        const typePromise = callKimiAPI(generateTypeAnalysisPrompt(), false).then(result => {
+        const typePromise = callDeepSeekAPI(generateTypeAnalysisPrompt(), false).then(result => {
             state.analysisResults.typeAnalysis = cleanContent(result);
             typeDone = true;
             showPartialResults();
@@ -496,73 +496,98 @@ function getSubjectName() {
     return subjects[state.subject] || '学科';
 }
 
-async function callKimiAPI(prompt, isHtmlReport = false, continueFrom = '') {
-    const maxTokens = isHtmlReport ? 65536 : 8192;
+async function callDeepSeekAPI(prompt, isHtmlReport = false, continueFrom = '') {
+    const models = ['deepseek-reasoner', 'deepseek-chat'];
+    let lastError;
 
-    const messages = [
-        {
-            role: 'system',
-            content: isHtmlReport
-                ? '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。你的输出没有长度限制，必须完整输出所有内容。'
-                : '你是一位资深的试卷分析专家，拥有20年教学与命题研究经验。你的分析必须全面、深入、细致，覆盖试卷中的每一道题目和每一个考点。你的输出没有长度限制，必须完整输出所有内容。'
-        }
-    ];
-
-    if (continueFrom) {
-        messages.push({
-            role: 'assistant',
-            content: continueFrom
-        });
-        messages.push({
-            role: 'user',
-            content: '请继续输出，从你上次停止的地方继续，不要重复已输出的内容：'
-        });
-    } else {
-        messages.push({
-            role: 'user',
-            content: prompt
-        });
-    }
-
-    const response = await fetch(KIMI_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${KIMI_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: 'kimi-k2.5',
-            messages: messages,
-            temperature: 1,
-            max_tokens: maxTokens
-        })
-    });
-
-    if (!response.ok) {
-        let errorDetail = '';
+    for (const model of models) {
         try {
-            const errorData = await response.json();
-            errorDetail = errorData.error?.message || JSON.stringify(errorData);
-        } catch (e) {
-            errorDetail = await response.text().catch(() => '');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+            const messages = [];
+
+            if (isHtmlReport) {
+                messages.push({
+                    role: 'system',
+                    content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。你的输出没有长度限制，必须完整输出所有内容。'
+                });
+            } else {
+                messages.push({
+                    role: 'system',
+                    content: '你是一位资深的试卷分析专家，拥有20年教学与命题研究经验。你的分析必须全面、深入、细致，覆盖试卷中的每一道题目和每一个考点。你的输出没有长度限制，必须完整输出所有内容。'
+                });
+            }
+
+            if (continueFrom) {
+                messages.push({
+                    role: 'assistant',
+                    content: continueFrom
+                });
+                messages.push({
+                    role: 'user',
+                    content: '请继续输出，从你上次停止的地方继续，不要重复已输出的内容：'
+                });
+            } else {
+                messages.push({
+                    role: 'user',
+                    content: prompt
+                });
+            }
+
+            const response = await fetch(DEEPSEEK_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: isHtmlReport ? 65536 : 8192
+                }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                let errorDetail = '';
+                try {
+                    const errorData = await response.json();
+                    errorDetail = errorData.error?.message || JSON.stringify(errorData);
+                } catch (e) {
+                    errorDetail = await response.text().catch(() => '');
+                }
+                const statusMessages = {
+                    401: 'API Key 无效或已过期，请检查密钥配置',
+                    403: '权限不足或余额不足，请检查账户状态',
+                    404: 'API 端点不存在，请检查接口地址',
+                    429: '请求过于频繁，请稍后重试',
+                    500: '服务器内部错误，请稍后重试'
+                };
+                const msg = statusMessages[response.status] || `请求失败 (HTTP ${response.status})`;
+                throw new Error(`${msg}${errorDetail ? '：' + errorDetail : ''}`);
+            }
+
+            const data = await response.json();
+            if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+                return data.choices[0].message.content;
+            }
+
+        } catch (error) {
+            console.error(`DeepSeek API调用失败 (${model}):`, error);
+            lastError = error;
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
-        const statusMessages = {
-            401: 'API Key 无效或已过期，请检查密钥配置',
-            403: '权限不足或余额不足，请检查账户状态',
-            404: 'API 端点不存在，请检查接口地址',
-            429: '请求过于频繁，请稍后重试',
-            500: '服务器内部错误，请稍后重试'
-        };
-        const msg = statusMessages[response.status] || `请求失败 (HTTP ${response.status})`;
-        throw new Error(`${msg}${errorDetail ? '：' + errorDetail : ''}`);
     }
 
-    const data = await response.json();
-    return data.choices[0].message.content;
+    throw lastError || new Error('所有DeepSeek模型调用都失败');
 }
 
-async function callKimiAPIWithContinuation(prompt, isHtmlReport = false) {
-    let result = await callKimiAPI(prompt, isHtmlReport);
+async function callDeepSeekAPIWithContinuation(prompt, isHtmlReport = false) {
+    let result = await callDeepSeekAPI(prompt, isHtmlReport);
     let continuationCount = 0;
     const maxContinuations = 3;
 
@@ -578,7 +603,7 @@ async function callKimiAPIWithContinuation(prompt, isHtmlReport = false) {
         }
 
         continuationCount++;
-        const continued = await callKimiAPI(prompt, isHtmlReport, result);
+        const continued = await callDeepSeekAPI(prompt, isHtmlReport, result);
         result += '\n' + continued;
     }
 
@@ -632,7 +657,7 @@ async function generateReport() {
 
     try {
         const reportPrompt = generateReportPrompt();
-        const htmlContent = await callKimiAPIWithContinuation(reportPrompt, true);
+        const htmlContent = await callDeepSeekAPIWithContinuation(reportPrompt, true);
 
         reportCarouselTimer = stopCarousel(reportCarouselTimer);
 
