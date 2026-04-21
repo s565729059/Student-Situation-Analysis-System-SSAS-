@@ -1236,6 +1236,12 @@ main {
     margin-bottom: 8px;
 }
 
+.exam-loading-note {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
 .exam-loading-status {
     color: #888;
     font-size: 0.95rem;
