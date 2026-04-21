@@ -354,20 +354,32 @@ async function startAnalysis() {
     analysisCarouselTimer = startCarousel(analysisCarouselMessages, elements.analysisCarousel, 3000);
 
     try {
-        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt());
-        const typePromise = callKimiAPI(generateTypeAnalysisPrompt());
+        let completedCount = 0;
+        const totalTasks = 2;
 
-        const [overallResult, typeResult] = await Promise.all([overallPromise, typePromise]);
+        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt()).then(result => {
+            state.analysisResults.overall = cleanContent(result);
+            completedCount++;
+            showPartialResults();
+            if (completedCount === totalTasks) {
+                analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
+                checkAndShowIncompleteWarning();
+            }
+            return result;
+        });
 
-        state.analysisResults.overall = cleanContent(overallResult);
-        state.analysisResults.typeAnalysis = cleanContent(typeResult);
+        const typePromise = callKimiAPI(generateTypeAnalysisPrompt()).then(result => {
+            state.analysisResults.typeAnalysis = cleanContent(result);
+            completedCount++;
+            showPartialResults();
+            if (completedCount === totalTasks) {
+                analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
+                checkAndShowIncompleteWarning();
+            }
+            return result;
+        });
 
-        analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
-
-        displayAnalysisResults();
-
-        // 检查内容完整性，如果不完整显示提示
-        checkAndShowIncompleteWarning();
+        await Promise.all([overallPromise, typePromise]);
 
     } catch (error) {
         console.error('Analysis error:', error);
