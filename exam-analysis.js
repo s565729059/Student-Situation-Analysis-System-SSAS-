@@ -80,8 +80,6 @@ const elements = {
     reportCarousel: document.getElementById('reportCarousel'),
     reportPreview: document.getElementById('reportPreview'),
     reportFrame: document.getElementById('reportFrame'),
-    htmlCode: document.getElementById('htmlCode'),
-    previewReport: document.getElementById('previewReport'),
     downloadReport: document.getElementById('downloadReport'),
     backToStep3: document.getElementById('backToStep3'),
     startNew: document.getElementById('startNew'),
@@ -123,7 +121,6 @@ function initializeEventListeners() {
         card.addEventListener('click', () => selectVersion(card.dataset.version));
     });
 
-    elements.previewReport.addEventListener('click', openReportModal);
     elements.downloadReport.addEventListener('click', downloadReport);
     elements.closeModal.addEventListener('click', closeReportModal);
     elements.reportModal.addEventListener('click', (e) => {
@@ -832,6 +829,11 @@ ${state.analysisResults.typeAnalysis}
 2. 包含<!DOCTYPE html>到</html>
 3. 所有题型必须完整展示，不得遗漏
 4. 语言专业严谨，适合教研使用
+5. ⚠️ 【自查要求】生成完成后必须检查：
+   - 所有板块都有实际内容，禁止出现空白板块或只有标题的板块
+   - 每种题型的考点列表必须具体充实，不能空洞
+   - 图表必须有真实数据支撑，不能是占位符
+   - 如果检查发现空白或内容不足，必须补充完整后再输出
 
 请立即生成精美报告：`;
     } else {
@@ -883,6 +885,11 @@ ${state.analysisResults.typeAnalysis}
 1. 直接输出完整HTML代码，不要\`\`\`html包裹
 2. 包含<!DOCTYPE html>到</html>
 3. 语言通俗易懂，多用emoji，适合家长阅读
+4. ⚠️ 【自查要求】生成完成后必须检查：
+   - 所有板块都有实际内容，禁止出现空白板块或只有标题的板块
+   - 给家长的核心解读必须具体实用，不能空洞
+   - 图表必须有真实数据支撑，不能是占位符
+   - 如果检查发现空白或内容不足，必须补充完整后再输出
 
 请立即生成精美报告：`;
     }
@@ -895,8 +902,6 @@ function displayReport(htmlContent) {
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     elements.reportFrame.src = url;
-
-    elements.htmlCode.value = htmlContent;
 }
 
 function openReportModal() {

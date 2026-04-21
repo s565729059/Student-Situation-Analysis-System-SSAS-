@@ -228,28 +228,18 @@
                 </div>
 
                 <div id="reportPreview" style="display:none">
-                    <div class="exam-results-header">
+                    <div class="exam-results-header" style="justify-content:space-between">
                         <h3 class="exam-section-title" style="margin-bottom:0">
                             <i class="fas fa-file-code"></i>
                             HTML 分析报告
                         </h3>
-                        <div class="exam-report-actions">
-                            <button id="previewReport" class="exam-btn-secondary">
-                                <i class="fas fa-eye" style="margin-right:6px"></i>预览
-                            </button>
-                            <button id="downloadReport" class="exam-btn-primary">
-                                <i class="fas fa-download" style="margin-right:6px"></i>下载 HTML
-                            </button>
-                        </div>
+                        <button id="downloadReport" class="exam-btn-primary">
+                            <i class="fas fa-download" style="margin-right:6px"></i>下载 HTML
+                        </button>
                     </div>
 
-                    <div class="exam-report-frame-wrapper">
+                    <div class="exam-report-frame-wrapper" style="height:600px;margin:20px 0">
                         <iframe id="reportFrame" class="exam-report-frame"></iframe>
-                    </div>
-
-                    <div class="form-group" style="margin-top:20px">
-                        <label>HTML 源代码</label>
-                        <textarea id="htmlCode" class="exam-html-code" readonly></textarea>
                     </div>
 
                     <div class="exam-nav-between" style="margin-top:20px">
