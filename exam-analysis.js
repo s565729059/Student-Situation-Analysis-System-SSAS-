@@ -354,23 +354,17 @@ async function startAnalysis() {
     analysisCarouselTimer = startCarousel(analysisCarouselMessages, elements.analysisCarousel, 3000);
 
     try {
-        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt()).then(result => {
-            state.analysisResults.overall = cleanContent(result);
-            showPartialResults();
-        });
+        const overallPromise = callKimiAPIWithRetry(generateOverallAnalysisPrompt(), 'overall');
+        const typePromise = callKimiAPIWithRetry(generateTypeAnalysisPrompt(), 'type');
 
-        const typePromise = callKimiAPI(generateTypeAnalysisPrompt()).then(result => {
-            state.analysisResults.typeAnalysis = cleanContent(result);
-            showPartialResults();
-        });
+        const [overallResult, typeResult] = await Promise.all([overallPromise, typePromise]);
 
-        await Promise.all([overallPromise, typePromise]);
+        state.analysisResults.overall = cleanContent(overallResult);
+        state.analysisResults.typeAnalysis = cleanContent(typeResult);
 
         analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
 
-        setTimeout(() => {
-            displayAnalysisResults();
-        }, 300);
+        displayAnalysisResults();
 
     } catch (error) {
         console.error('Analysis error:', error);
@@ -408,9 +402,9 @@ function showPartialResults() {
 
 function cleanContent(content) {
     return content
-        .replace(/\n{3,}/g, '\n\n')
+        .replace(/\n\s*\n/g, '\n')
         .replace(/^\s*\n/gm, '')
-        .replace(/\n\s*\n/g, '\n\n')
+        .replace(/\n+/g, '\n')
         .trim();
 }
 
@@ -546,7 +540,6 @@ async function callKimiAPI(prompt) {
                     }
                 ],
                 temperature: 1,
-                max_tokens: 8192,
                 stream: true
             }),
             signal: controller.signal
@@ -610,6 +603,72 @@ async function callKimiAPI(prompt) {
         }
         throw error;
     }
+}
+
+async function callKimiAPIWithRetry(prompt, type) {
+    const maxRetries = 2;
+    let lastResult = '';
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            if (attempt > 0) {
+                console.log(`${type} 分析第 ${attempt + 1} 次重试...`);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            const result = await callKimiAPI(prompt);
+            lastResult = cleanContent(result);
+
+            if (isContentComplete(lastResult, type)) {
+                return lastResult;
+            }
+
+            console.warn(`${type} 分析内容不完整，准备重试...`);
+        } catch (error) {
+            if (attempt === maxRetries) {
+                throw error;
+            }
+            console.error(`${type} 分析第 ${attempt + 1} 次尝试失败:`, error);
+        }
+    }
+
+    return lastResult;
+}
+
+function isContentComplete(content, type) {
+    if (!content || content.length < 100) {
+        return false;
+    }
+
+    const hasQuestionTypes = content.includes('题型') || content.includes('选择题') || content.includes('填空题') || content.includes('解答题');
+
+    if (type === 'type') {
+        if (!hasQuestionTypes) {
+            return false;
+        }
+
+        const sectionMatches = content.match(/[一二三四五六七八九十][、.．]/g);
+        if (!sectionMatches || sectionMatches.length < 2) {
+            return false;
+        }
+
+        const lines = content.split('\n').filter(line => line.trim().length > 0);
+        if (lines.length < 10) {
+            return false;
+        }
+    }
+
+    if (type === 'overall') {
+        const keyElements = ['试卷', '难度', '知识点', '考查'].filter(keyword => content.includes(keyword));
+        if (keyElements.length < 2) {
+            return false;
+        }
+    }
+
+    const endPatterns = ['教学建议', '复习策略', '总结', '家长', '建议'];
+    const hasEnding = endPatterns.some(pattern => content.includes(pattern));
+
+    return hasEnding || content.length > 500;
 }
 
 async function callZhipuAPI(prompt) {
