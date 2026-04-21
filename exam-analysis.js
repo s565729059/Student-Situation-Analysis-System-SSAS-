@@ -14,8 +14,8 @@ const state = {
 const KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
 const KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 
-const DEEPSEEK_API_KEY = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const ZHIPU_API_KEY = 'c460138604724e6590549fc11287ec74.4ZQY2YnR9LzyC01U';
+const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
 let analysisCarouselTimer = null;
 let reportCarouselTimer = null;
@@ -615,24 +615,24 @@ async function callKimiAPI(prompt) {
     }
 }
 
-async function callDeepSeekAPI(prompt) {
+async function callZhipuAPI(prompt) {
     const controller = new AbortController();
-    let timeoutId = setTimeout(() => controller.abort(), 180000);
+    let timeoutId = setTimeout(() => controller.abort(), 300000);
 
     function resetTimeout() {
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => controller.abort(), 180000);
+        timeoutId = setTimeout(() => controller.abort(), 300000);
     }
 
     try {
-        const response = await fetch(DEEPSEEK_API_URL, {
+        const response = await fetch(ZHIPU_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                'Authorization': `Bearer ${ZHIPU_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: 'glm-4.5',
                 messages: [
                     {
                         role: 'system',
@@ -644,7 +644,7 @@ async function callDeepSeekAPI(prompt) {
                     }
                 ],
                 temperature: 0.7,
-                max_tokens: 8192,
+                max_tokens: 16384,
                 stream: true
             }),
             signal: controller.signal
@@ -659,7 +659,7 @@ async function callDeepSeekAPI(prompt) {
             } catch (e) {
                 errorDetail = await response.text().catch(() => '');
             }
-            throw new Error(`DeepSeek API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
+            throw new Error(`智谱API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
         }
 
         const reader = response.body.getReader();
@@ -699,12 +699,12 @@ async function callDeepSeekAPI(prompt) {
         if (fullContent) {
             return fullContent;
         }
-        throw new Error('DeepSeek API返回数据格式异常');
+        throw new Error('智谱API返回数据格式异常');
 
     } catch (error) {
         clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
-            throw new Error('DeepSeek API请求超时，报告生成失败');
+            throw new Error('智谱API请求超时，报告生成失败');
         }
         throw error;
     }
@@ -757,7 +757,7 @@ async function generateReport() {
 
     try {
         const reportPrompt = generateReportPrompt();
-        let htmlContent = await callDeepSeekAPI(reportPrompt);
+        let htmlContent = await callZhipuAPI(reportPrompt);
 
         reportCarouselTimer = stopCarousel(reportCarouselTimer);
 
