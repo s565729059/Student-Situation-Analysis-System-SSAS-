@@ -644,6 +644,10 @@ async function callKimiAPI(prompt) {
         if (error.name === 'AbortError') {
             throw new Error('Kimi API请求超时，请稍后重试');
         }
+        // 检查是否为服务器超载错误
+        if (error.message && error.message.toLowerCase().includes('currently overloaded')) {
+            throw new Error('小睿同学使用火爆，该功能当前超载中，请稍后重试~');
+        }
         throw error;
     }
 }
