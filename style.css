@@ -1053,48 +1053,89 @@ main {
 }
 
 .exam-nav-center {
-    text-align: center;
+    display: flex;
+    justify-content: center;
     margin-top: 25px;
+}
+
+.exam-nav-center button {
+    min-width: 180px;
+    text-align: center;
 }
 
 .exam-nav-between {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 15px;
     margin-top: 25px;
 }
 
+.exam-nav-between button {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+}
+
+/* 统一按钮系统 */
+.exam-btn-primary {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #4a6fa5, #3a5a85);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(74, 111, 165, 0.2);
+}
+
+.exam-btn-primary:hover {
+    background: linear-gradient(135deg, #3a5a85, #2a4a75);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 111, 165, 0.3);
+}
+
+.exam-btn-primary:active {
+    transform: translateY(0);
+}
+
+.exam-btn-secondary {
+    padding: 14px 28px;
+    background: #f0f4f8;
+    color: #4a6fa5;
+    border: 2px solid #d0d8e8;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.exam-btn-secondary:hover {
+    background: #e4eaf2;
+    border-color: #b0c0d8;
+    transform: translateY(-2px);
+}
+
 .exam-btn-outline {
-    padding: 15px 30px;
+    padding: 14px 28px;
     border: 2px solid #b0b8c4;
     color: #666;
-    background: #f5f5f5;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: bold;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 
 .exam-btn-outline:hover {
-    background: #e8e8e8;
+    background: #f5f5f5;
     border-color: #999;
     color: #333;
-}
-
-.exam-btn-green {
-    padding: 12px 24px;
-    background: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.exam-btn-green:hover {
-    background: #219a52;
+    transform: translateY(-2px);
 }
 
 .exam-version-grid {
