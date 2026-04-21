@@ -475,39 +475,123 @@ function checkAndShowIncompleteWarning() {
     const overallComplete = isContentComplete(state.analysisResults.overall, 'overall');
     const typeComplete = isContentComplete(state.analysisResults.typeAnalysis, 'type');
 
-    if (!overallComplete || !typeComplete) {
-        let warningMsg = '检测到分析内容可能不完整（';
-        if (!overallComplete) warningMsg += '整体特征';
-        if (!overallComplete && !typeComplete) warningMsg += '、';
-        if (!typeComplete) warningMsg += '题型板块';
-        warningMsg += '），建议重新分析以获得更完整的结果。';
+    // 移除已存在的警告
+    const existingWarning = document.getElementById('incompleteWarning');
+    if (existingWarning) existingWarning.remove();
 
-        const warningHtml = `
+    if (!overallComplete || !typeComplete) {
+        let warningHtml = `
             <div id="incompleteWarning" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:15px;margin:15px 0;">
-                <p style="color:#856404;margin-bottom:10px;"><i class="fas fa-exclamation-triangle"></i> ${warningMsg}</p>
-                <button id="retryAnalysisBtn" class="exam-btn-primary" style="padding:8px 16px;font-size:14px;">
-                    <i class="fas fa-redo"></i> 重新分析
-                </button>
-            </div>
+                <p style="color:#856404;margin-bottom:10px;"><i class="fas fa-exclamation-triangle"></i> 检测到以下内容可能不完整，建议重新生成：</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
         `;
+
+        // 为每个不完整的问题添加单独的重新生成按钮
+        if (!overallComplete) {
+            warningHtml += `
+                <button id="retryOverallBtn" class="exam-btn-primary" style="padding:8px 16px;font-size:14px;background:linear-gradient(135deg, #e67e22, #f39c12);">
+                    <i class="fas fa-redo"></i> 重新生成：整体特征分析
+                </button>
+            `;
+        }
+
+        if (!typeComplete) {
+            warningHtml += `
+                <button id="retryTypeBtn" class="exam-btn-primary" style="padding:8px 16px;font-size:14px;background:linear-gradient(135deg, #9b59b6, #8e44ad);">
+                    <i class="fas fa-redo"></i> 重新生成：题型板块分析
+                </button>
+            `;
+        }
+
+        warningHtml += `</div></div>`;
 
         // 插入到结果区域顶部
         const resultsHeader = document.querySelector('.exam-results-header');
         if (resultsHeader) {
             resultsHeader.insertAdjacentHTML('afterend', warningHtml);
 
-            // 绑定重新分析按钮事件
-            document.getElementById('retryAnalysisBtn').addEventListener('click', () => {
-                // 移除警告
-                const warning = document.getElementById('incompleteWarning');
-                if (warning) warning.remove();
+            // 绑定整体特征分析重新生成按钮事件
+            const retryOverallBtn = document.getElementById('retryOverallBtn');
+            if (retryOverallBtn) {
+                retryOverallBtn.addEventListener('click', () => {
+                    retrySingleAnalysis('overall');
+                });
+            }
 
-                // 清空结果并重新分析
-                state.analysisResults.overall = '';
-                state.analysisResults.typeAnalysis = '';
-                startAnalysis();
-            });
+            // 绑定题型板块分析重新生成按钮事件
+            const retryTypeBtn = document.getElementById('retryTypeBtn');
+            if (retryTypeBtn) {
+                retryTypeBtn.addEventListener('click', () => {
+                    retrySingleAnalysis('type');
+                });
+            }
         }
+    }
+}
+
+async function retrySingleAnalysis(type) {
+    // 移除警告
+    const warning = document.getElementById('incompleteWarning');
+    if (warning) warning.remove();
+
+    // 根据类型显示对应的等待动画
+    if (type === 'overall') {
+        elements.overallAnalysis.innerHTML = `
+            <div style="text-align:center;padding:30px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#4a6fa5;margin-bottom:15px;"></i>
+                <p style="color:#666;">小睿同学正在重新生成整体特征分析...</p>
+                <p style="color:#999;font-size:0.9rem;margin-top:10px;">预计完成时间约3分钟，请耐心等待</p>
+            </div>
+        `;
+    } else if (type === 'type') {
+        elements.typeAnalysis.innerHTML = `
+            <div style="text-align:center;padding:30px;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:#9b59b6;margin-bottom:15px;"></i>
+                <p style="color:#666;">小睿同学正在重新生成题型板块分析...</p>
+                <p style="color:#999;font-size:0.9rem;margin-top:10px;">预计完成时间约3分钟，请耐心等待</p>
+            </div>
+        `;
+    }
+
+    try {
+        let result;
+        if (type === 'overall') {
+            result = await callKimiAPI(generateOverallAnalysisPrompt());
+            state.analysisResults.overall = cleanContent(result);
+            elements.overallAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.overall);
+        } else if (type === 'type') {
+            result = await callKimiAPI(generateTypeAnalysisPrompt());
+            state.analysisResults.typeAnalysis = cleanContent(result);
+            elements.typeAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.typeAnalysis);
+        }
+
+        // 重新检查是否还有不完整的内容
+        checkAndShowIncompleteWarning();
+
+        // 显示成功提示
+        showNotification(`${type === 'overall' ? '整体特征分析' : '题型板块分析'}重新生成成功！`, 'success');
+
+    } catch (error) {
+        console.error(`重新生成${type === 'overall' ? '整体特征' : '题型板块'}分析错误:`, error);
+
+        // 显示错误信息在对应板块
+        const errorHtml = `
+            <div style="background:#fee;border:1px solid #fcc;border-radius:8px;padding:20px;text-align:center;">
+                <i class="fas fa-exclamation-circle" style="color:#e74c3c;font-size:2rem;margin-bottom:10px;"></i>
+                <p style="color:#c33;margin-bottom:15px;">重新生成失败：${error.message}</p>
+                <button onclick="retrySingleAnalysis('${type}')" class="exam-btn-primary" style="padding:8px 16px;font-size:14px;">
+                    <i class="fas fa-redo"></i> 再次尝试
+                </button>
+            </div>
+        `;
+
+        if (type === 'overall') {
+            elements.overallAnalysis.innerHTML = errorHtml;
+        } else if (type === 'type') {
+            elements.typeAnalysis.innerHTML = errorHtml;
+        }
+
+        showNotification(`重新生成失败：${error.message}`, 'error');
     }
 }
 
