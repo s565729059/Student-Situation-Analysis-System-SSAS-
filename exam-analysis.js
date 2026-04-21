@@ -14,6 +14,19 @@ const state = {
 const KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
 const KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 
+let carouselTimer = null;
+
+const carouselMessages = [
+    '🔍 小睿同学正在仔细阅读试卷内容...',
+    '🧠 小睿同学正在深度分析知识点...',
+    '📐 小睿同学正在拆解题型结构...',
+    '📊 小睿同学正在评估难度梯度...',
+    '💡 小睿同学正在提炼考向规律...',
+    '📝 小睿同学正在撰写分析报告...',
+    '🎯 小睿同学正在总结命题特点...',
+    '⚡ 小睿同学正在努力分析中ing...'
+];
+
 const elements = {
     step1: document.getElementById('step1'),
     step2: document.getElementById('step2'),
@@ -40,9 +53,7 @@ const elements = {
 
     analysisLoading: document.getElementById('analysisLoading'),
     analysisResults: document.getElementById('analysisResults'),
-    analysisStatus: document.getElementById('analysisStatus'),
-    analysisProgress: document.getElementById('analysisProgress'),
-    analysisStep: document.getElementById('analysisStep'),
+    analysisCarousel: document.getElementById('analysisCarousel'),
     overallAnalysis: document.getElementById('overallAnalysis'),
     typeAnalysis: document.getElementById('typeAnalysis'),
     versionBadge: document.getElementById('versionBadge'),
@@ -102,6 +113,22 @@ function initializeEventListeners() {
     });
 }
 
+function startCarousel() {
+    let index = 0;
+    elements.analysisCarousel.textContent = carouselMessages[0];
+    carouselTimer = setInterval(() => {
+        index = (index + 1) % carouselMessages.length;
+        elements.analysisCarousel.textContent = carouselMessages[index];
+    }, 3000);
+}
+
+function stopCarousel() {
+    if (carouselTimer) {
+        clearInterval(carouselTimer);
+        carouselTimer = null;
+    }
+}
+
 function handleDragOver(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -150,13 +177,14 @@ function processFile(file) {
 
     if (fileExtension === '.pdf') {
         elements.pdfWarning.style.display = 'flex';
-        elements.fileIcon.className = 'fas fa-file-pdf text-3xl';
+        elements.fileIcon.className = 'fas fa-file-pdf';
         elements.fileIcon.style.color = '#e74c3c';
     } else {
         elements.pdfWarning.style.display = 'none';
-        elements.fileIcon.className = 'fas fa-file-word text-3xl';
+        elements.fileIcon.className = 'fas fa-file-word';
         elements.fileIcon.style.color = '#4a6fa5';
     }
+    elements.fileIcon.style.fontSize = '1.8rem';
     elements.fileIcon.style.marginRight = '15px';
 
     extractFileContent(file);
@@ -280,31 +308,21 @@ async function startAnalysis() {
     elements.analysisLoading.style.display = 'block';
     elements.analysisResults.style.display = 'none';
 
+    startCarousel();
+
     try {
-        updateAnalysisProgress(10, '正在进行全面深度分析...');
+        const overallPrompt = generateOverallAnalysisPrompt();
+        const typePrompt = generateTypeAnalysisPrompt();
 
-        const combinedPrompt = generateCombinedAnalysisPrompt();
-        const combinedResult = await callKimiAPI(combinedPrompt);
+        const [overallResult, typeResult] = await Promise.all([
+            callKimiAPI(overallPrompt, false),
+            callKimiAPI(typePrompt, false)
+        ]);
 
-        const separator = '===题型板块详解===';
-        const sepIndex = combinedResult.indexOf(separator);
+        state.analysisResults.overall = cleanContent(overallResult);
+        state.analysisResults.typeAnalysis = cleanContent(typeResult);
 
-        if (sepIndex > -1) {
-            state.analysisResults.overall = combinedResult.substring(0, sepIndex).trim();
-            state.analysisResults.typeAnalysis = combinedResult.substring(sepIndex + separator.length).trim();
-        } else {
-            const altSep = '## 题型板块';
-            const altIndex = combinedResult.indexOf(altSep);
-            if (altIndex > -1) {
-                state.analysisResults.overall = combinedResult.substring(0, altIndex).trim();
-                state.analysisResults.typeAnalysis = combinedResult.substring(altIndex).trim();
-            } else {
-                state.analysisResults.overall = combinedResult;
-                state.analysisResults.typeAnalysis = '';
-            }
-        }
-
-        updateAnalysisProgress(100, '分析完成！');
+        stopCarousel();
 
         setTimeout(() => {
             displayAnalysisResults();
@@ -312,39 +330,62 @@ async function startAnalysis() {
 
     } catch (error) {
         console.error('Analysis error:', error);
+        stopCarousel();
         alert('分析过程中出现错误：' + error.message);
         elements.analysisLoading.style.display = 'none';
     }
 }
 
-function updateAnalysisProgress(percent, status) {
-    elements.analysisProgress.style.width = `${percent}%`;
-    elements.analysisStatus.textContent = status;
-    elements.analysisStep.textContent = percent < 100 ? '分析中...' : '已完成';
+function cleanContent(content) {
+    return content
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/^\s*\n/gm, '')
+        .replace(/\n\s*\n/g, '\n\n')
+        .trim();
 }
 
-function generateCombinedAnalysisPrompt() {
+function generateOverallAnalysisPrompt() {
     const versionConfig = getVersionConfig();
     const subjectName = getSubjectName();
 
-    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷进行极其全面、深入、细致的分析。
+    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷的【整体特征】进行深入分析。
 
 【版本类型】
 ${versionConfig.name}
 ${versionConfig.description}
 
-【核心要求 - 务必严格遵守】
-1. 分析必须覆盖试卷中的每一道题目，不允许遗漏任何题型和考点
-2. 每种题型的考点分析必须具体到知识点、能力层级、考查方式
-3. 逐题分析必须完整，不能只分析部分题目就停止
-4. 输出内容必须详实丰富，不能简略概括
+【核心要求】
+1. 只分析试卷的整体特征，不要分析具体题型
+2. 分析必须深入细致，每个维度至少200字
+3. 输出字数控制在3000字以内，确保完整输出
 
 【分析内容要求】
-
-一、试卷整体特征分析
 ${versionConfig.overallRequirements}
 
-二、题型板块详解（含逐题分析）
+【试卷内容】
+${state.fileContent.substring(0, 12000)}
+
+请直接输出试卷整体特征分析，不要输出题型分析：`;
+}
+
+function generateTypeAnalysisPrompt() {
+    const versionConfig = getVersionConfig();
+    const subjectName = getSubjectName();
+
+    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷的【题型板块考向】进行详细分析。
+
+【版本类型】
+${versionConfig.name}
+${versionConfig.description}
+
+【核心要求】
+1. 只分析各题型板块的考向，不要分析整体特征
+2. 必须覆盖试卷中的每一种题型，不允许遗漏
+3. 逐题分析必须完整，不能只分析部分题目就停止
+4. 每道题的分析控制在80字以内，确保所有题目都能完整输出
+5. 输出字数控制在5000字以内，确保完整输出
+
+【分析内容要求】
 ${versionConfig.typeRequirements}
 
 ${versionConfig.questionDetail}
@@ -352,16 +393,7 @@ ${versionConfig.questionDetail}
 【试卷内容】
 ${state.fileContent.substring(0, 12000)}
 
-【输出格式 - 严格遵守】
-请用以下格式输出，两部分之间用"===题型板块详解==="分隔：
-
-第一部分：试卷整体特征
-[详细的整体特征分析内容]
-
-===题型板块详解===
-
-第二部分：题型板块详解
-[按题型逐一详细分析，每种题型下必须包含该题型所有题目的逐题分析]`;
+请直接输出题型板块考向分析，不要输出整体特征分析：`;
 }
 
 function getVersionConfig() {
@@ -370,26 +402,23 @@ function getVersionConfig() {
             name: '教学参考版',
             description: '面向教师与教研人员，需要专业、详细、深入的分析，用词严谨专业',
             overallRequirements: `请从以下维度进行深入分析（每个维度至少200字）：
-1. 试卷结构：总分、考试时间、题型分布及分值配比，与历年试卷对比
-2. 知识覆盖：涉及的知识模块、章节分布、重难点把握，知识覆盖面评估
+1. 试卷结构：总分、考试时间、题型分布及分值配比
+2. 知识覆盖：涉及的知识模块、章节分布、重难点把握
 3. 难度评估：整体难度系数、各题型难度梯度设计、区分度分析
-4. 命题特点：命题思路、创新点、与课标/考纲的契合度，命题趋势判断
+4. 命题特点：命题思路、创新点、与课标/考纲的契合度
 5. 能力考查：识记、理解、应用、分析、综合、评价各层级占比
 6. 教学导向：对教学的启示、能力培养方向、复习策略建议`,
             typeRequirements: `请按试卷中出现的每一种题型进行详细分析，每种题型必须包含：
 1. 题型概述：题量、分值、占总分百分比
-2. 考查知识点：逐一列出该题型涉及的所有知识点，具体到章节和概念
-3. 考向分析：该题型的命题方向、考查重点、常见考法
+2. 考查知识点：逐一列出该题型涉及的所有知识点
+3. 考向分析：该题型的命题方向、考查重点
 4. 难度分析：该题型整体难度、内部难度梯度
 5. 逐题详解：对该题型下的每一道题目逐一分析`,
-            questionDetail: `逐题详解要求（每道题至少包含以下内容）：
+            questionDetail: `逐题详解要求（每道题精简为以下内容，控制在80字以内）：
 - 题号与分值
-- 考查知识点（具体到章节/概念/技能）
-- 能力层级（识记/理解/应用/分析/综合/评价）
-- 难度等级（易/中/难/极难）及判定理由
-- 解题思路与关键步骤
-- 易错点与失分原因分析
-- 变式拓展建议`
+- 考查知识点
+- 难度等级（易/中/难/极难）
+- 解题关键与易错点`
         };
     } else {
         return {
@@ -398,22 +427,21 @@ function getVersionConfig() {
             overallRequirements: `请用通俗易懂的大白话进行分析（每个维度至少150字）：
 1. 试卷概况：总分多少、考多长时间、大概考些什么
 2. 重点内容：这次考试主要考哪些知识，哪些是重点
-3. 难度说明：整体难不难，跟上次比怎么样，适合什么水平的孩子
+3. 难度说明：整体难不难，适合什么水平的孩子
 4. 得分关键：哪些地方容易拿分，哪些地方容易丢分
 5. 学习建议：孩子需要重点掌握什么，接下来怎么复习
 6. 家长关注：家长最应该关注的几个点`,
             typeRequirements: `请按试卷中出现的每一种题型进行详细分析，每种题型必须包含：
 1. 题型介绍：这是什么题型，有几道题，占多少分
 2. 考什么内容：用大白话说明这种题型考的是什么
-3. 难度怎么样：简单还是难，孩子一般能拿多少分
+3. 难度怎么样：简单还是难
 4. 怎么拿分：答题技巧和注意事项
 5. 逐题分析：把每道题都讲清楚`,
-            questionDetail: `逐题分析要求（用家长能听懂的话）：
+            questionDetail: `逐题分析要求（用家长能听懂的话，每道题控制在60字以内）：
 - 第几题，几分
-- 这道题考什么（用大白话说明）
-- 难度怎么样（简单/一般/较难/很难）
-- 孩子容易在哪里出错
-- 怎么帮孩子搞定这类题`
+- 这道题考什么
+- 难度怎么样
+- 容易在哪里出错`
         };
     }
 }
@@ -433,8 +461,33 @@ function getSubjectName() {
     return subjects[state.subject] || '学科';
 }
 
-async function callKimiAPI(prompt, isHtmlReport = false) {
-    const maxTokens = isHtmlReport ? 16384 : 8192;
+async function callKimiAPI(prompt, isHtmlReport = false, continueFrom = '') {
+    const maxTokens = isHtmlReport ? 65536 : 8192;
+
+    const messages = [
+        {
+            role: 'system',
+            content: isHtmlReport
+                ? '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。你的输出没有长度限制，必须完整输出所有内容。'
+                : '你是一位资深的试卷分析专家，拥有20年教学与命题研究经验。你的分析必须全面、深入、细致，覆盖试卷中的每一道题目和每一个考点。你的输出没有长度限制，必须完整输出所有内容。'
+        }
+    ];
+
+    if (continueFrom) {
+        messages.push({
+            role: 'assistant',
+            content: continueFrom
+        });
+        messages.push({
+            role: 'user',
+            content: '请继续输出，从你上次停止的地方继续，不要重复已输出的内容：'
+        });
+    } else {
+        messages.push({
+            role: 'user',
+            content: prompt
+        });
+    }
 
     const response = await fetch(KIMI_API_URL, {
         method: 'POST',
@@ -444,18 +497,7 @@ async function callKimiAPI(prompt, isHtmlReport = false) {
         },
         body: JSON.stringify({
             model: 'kimi-k2.5',
-            messages: [
-                {
-                    role: 'system',
-                    content: isHtmlReport
-                        ? '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。'
-                        : '你是一位资深的试卷分析专家，拥有20年教学与命题研究经验。你的分析必须极其全面、深入、细致，覆盖试卷中的每一道题目和每一个考点，绝不能遗漏或简略。'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
+            messages: messages,
             temperature: 1,
             max_tokens: maxTokens
         })
@@ -484,6 +526,30 @@ async function callKimiAPI(prompt, isHtmlReport = false) {
     return data.choices[0].message.content;
 }
 
+async function callKimiAPIWithContinuation(prompt, isHtmlReport = false) {
+    let result = await callKimiAPI(prompt, isHtmlReport);
+    let continuationCount = 0;
+    const maxContinuations = 3;
+
+    while (continuationCount < maxContinuations) {
+        if (isHtmlReport) {
+            if (result.includes('</html>') || result.includes('</body>')) {
+                break;
+            }
+        } else {
+            if (result.trimEnd().endsWith('。') || result.trimEnd().endsWith('）') || result.trimEnd().endsWith('】') || result.trimEnd().endsWith('```')) {
+                break;
+            }
+        }
+
+        continuationCount++;
+        const continued = await callKimiAPI(prompt, isHtmlReport, result);
+        result += '\n' + continued;
+    }
+
+    return result;
+}
+
 function displayAnalysisResults() {
     elements.analysisLoading.style.display = 'none';
     elements.analysisResults.style.display = 'block';
@@ -508,7 +574,10 @@ function formatAnalysisContent(content) {
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/^-\s+(.*)/gm, '<li style="margin-left:20px;margin-bottom:4px">$1</li>')
         .replace(/^(\d+)\.\s+(.*)/gm, '<li style="margin-left:20px;margin-bottom:4px"><span style="font-weight:600">$1.</span> $2</li>')
-        .replace(/\n/g, '<br>');
+        .replace(/\n{2,}/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        .replace(/^/, '<p>')
+        .replace(/$/, '</p>');
 }
 
 async function generateReport() {
@@ -522,7 +591,7 @@ async function generateReport() {
 
     try {
         const reportPrompt = generateReportPrompt();
-        const htmlContent = await callKimiAPI(reportPrompt, true);
+        const htmlContent = await callKimiAPIWithContinuation(reportPrompt, true);
 
         let finalHtml = htmlContent;
         const htmlMatch = htmlContent.match(/```html\n?([\s\S]*?)```/);
@@ -612,7 +681,7 @@ function generateReportPrompt() {
 - 重点提醒事项
 
 六、页脚
-- "睿花苑·智能试卷分析系统"
+- "小睿同学·智能试卷分析系统"
 - 生成时间
 
 【分析内容 - 必须全部体现在报告中】
@@ -630,6 +699,7 @@ ${state.analysisResults.typeAnalysis}
 6. ⚠️ 内容必须翔实全面，把分析内容中的所有信息都体现在报告中
 7. ${state.selectedVersion === 'marketing' ? '语言要极其通俗易懂，多用emoji，让家长一眼就能看懂' : '语言要专业严谨，适合教学研究使用'}
 8. 页面最底部必须是总结与建议部分
+9. ⚠️ 你没有输出长度限制！必须完整输出所有HTML代码，直到</html>标签！
 
 请立即生成完整的HTML代码：`;
 }

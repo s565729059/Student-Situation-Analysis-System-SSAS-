@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>睿花苑·智能试卷分析系统</title>
+    <title>小睿同学·智能试卷分析系统</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -15,10 +15,10 @@
             <div class="header-top">
                 <button class="back-btn" onclick="window.location.href='index.html'">← 返回首页</button>
             </div>
-            <h1>睿花苑·智能试卷分析系统</h1>
-            <h2>AI驱动的试卷深度解析与报告生成</h2>
+            <h1>小睿同学·智能试卷分析系统</h1>
+            <h2>小睿同学驱动的试卷深度解析与报告生成</h2>
             <div class="version-info">
-                <p>版本号：v1.2</p>
+                <p>版本号：v1.3</p>
             </div>
         </header>
 
@@ -36,7 +36,7 @@
                 <div class="exam-step-line"></div>
                 <div class="exam-step" data-step="3">
                     <div class="exam-step-circle">3</div>
-                    <span>AI分析与报告</span>
+                    <span>小睿同学分析与报告</span>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
                         <span><i class="fas fa-check-circle" style="color:#27ae60"></i> Word 文档</span>
                         <span><i class="fas fa-exclamation-circle" style="color:#f39c12"></i> PDF 需 A4 单页模式</span>
                     </div>
-                    <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx">
+                    <input type="file" id="fileInput" style="display:none" accept=".pdf,.doc,.docx">
                 </div>
 
                 <div id="pdfWarning" class="exam-warning" style="display:none">
@@ -68,7 +68,7 @@
                 <div id="fileInfo" class="exam-file-info" style="display:none">
                     <div class="exam-file-row">
                         <div class="exam-file-detail">
-                            <i id="fileIcon" class="fas fa-file text-3xl" style="color:#4a6fa5;margin-right:15px"></i>
+                            <i id="fileIcon" class="fas fa-file" style="font-size:1.8rem;color:#4a6fa5;margin-right:15px"></i>
                             <div>
                                 <p id="fileName" class="exam-file-name"></p>
                                 <p id="fileSize" class="exam-file-size"></p>
@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="exam-nav-between">
-                    <button id="backToStep1" class="exam-btn-outline">
+                    <button id="backToStep1" class="submit-btn" style="background:#999;padding:12px 24px;font-size:16px">
                         <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回
                     </button>
                     <button id="toStep3" class="submit-btn" disabled>
@@ -168,21 +168,15 @@
             <section id="step3" class="form-section exam-fade-in" style="display:none">
                 <div id="analysisLoading" class="exam-loading-section">
                     <div class="loading-spinner"></div>
-                    <h3 class="exam-loading-title">AI 正在分析试卷...</h3>
-                    <p id="analysisStatus" class="exam-loading-status">正在提取试卷内容...</p>
-                    <div class="exam-progress-wrapper">
-                        <div class="exam-progress-track">
-                            <div id="analysisProgress" class="exam-progress-fill" style="width:0%"></div>
-                        </div>
-                        <p id="analysisStep" class="exam-progress-label">分析中...</p>
-                    </div>
+                    <h3 class="exam-loading-title">小睿同学正在努力分析中...</h3>
+                    <p id="analysisCarousel" class="exam-carousel-text">🔍 小睿同学正在仔细阅读试卷内容...</p>
                 </div>
 
                 <div id="analysisResults" style="display:none">
                     <div class="exam-results-header">
                         <h3 class="exam-section-title" style="margin-bottom:0">
                             <i class="fas fa-clipboard-check"></i>
-                            AI 分析结果
+                            小睿同学分析结果
                         </h3>
                         <span id="versionBadge" class="exam-version-badge"></span>
                     </div>
@@ -204,7 +198,7 @@
                     </div>
 
                     <div class="exam-nav-between">
-                        <button id="backToStep2" class="exam-btn-outline">
+                        <button id="backToStep2" class="submit-btn" style="background:#999;padding:12px 24px;font-size:16px">
                             <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回
                         </button>
                         <button id="toStep4" class="submit-btn">
@@ -217,8 +211,8 @@
             <section id="step4" class="form-section exam-fade-in" style="display:none">
                 <div id="reportLoading" class="exam-loading-section">
                     <div class="loading-spinner"></div>
-                    <h3 class="exam-loading-title">正在生成 HTML 报告...</h3>
-                    <p class="exam-loading-status">Kimi K2.5 正在美化排版、生成图表...</p>
+                    <h3 class="exam-loading-title">小睿同学正在生成 HTML 报告...</h3>
+                    <p class="exam-loading-status">小睿同学正在美化排版、生成图表...</p>
                 </div>
 
                 <div id="reportPreview" style="display:none">
@@ -228,7 +222,7 @@
                             HTML 分析报告
                         </h3>
                         <div class="exam-report-actions">
-                            <button id="previewReport" class="exam-btn-outline">
+                            <button id="previewReport" class="submit-btn" style="padding:10px 20px;font-size:14px;background:#999">
                                 <i class="fas fa-eye" style="margin-right:6px"></i>预览
                             </button>
                             <button id="downloadReport" class="submit-btn" style="padding:10px 20px;font-size:14px">
@@ -247,7 +241,7 @@
                     </div>
 
                     <div class="exam-nav-between" style="margin-top:20px">
-                        <button id="backToStep3" class="exam-btn-outline">
+                        <button id="backToStep3" class="submit-btn" style="background:#999;padding:12px 24px;font-size:16px">
                             <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
                         </button>
                         <button id="startNew" class="exam-btn-green">
