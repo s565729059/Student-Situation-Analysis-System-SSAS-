@@ -354,8 +354,8 @@ async function startAnalysis() {
     analysisCarouselTimer = startCarousel(analysisCarouselMessages, elements.analysisCarousel, 3000);
 
     try {
-        const overallPromise = callKimiAPIWithRetry(generateOverallAnalysisPrompt(), 'overall');
-        const typePromise = callKimiAPIWithRetry(generateTypeAnalysisPrompt(), 'type');
+        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt());
+        const typePromise = callKimiAPI(generateTypeAnalysisPrompt());
 
         const [overallResult, typeResult] = await Promise.all([overallPromise, typePromise]);
 
@@ -366,11 +366,54 @@ async function startAnalysis() {
 
         displayAnalysisResults();
 
+        // 检查内容完整性，如果不完整显示提示
+        checkAndShowIncompleteWarning();
+
     } catch (error) {
         console.error('Analysis error:', error);
         analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
         alert('分析过程中出现错误：' + error.message);
         elements.analysisLoading.style.display = 'none';
+    }
+}
+
+function checkAndShowIncompleteWarning() {
+    const overallComplete = isContentComplete(state.analysisResults.overall, 'overall');
+    const typeComplete = isContentComplete(state.analysisResults.typeAnalysis, 'type');
+
+    if (!overallComplete || !typeComplete) {
+        let warningMsg = '检测到分析内容可能不完整（';
+        if (!overallComplete) warningMsg += '整体特征';
+        if (!overallComplete && !typeComplete) warningMsg += '、';
+        if (!typeComplete) warningMsg += '题型板块';
+        warningMsg += '），建议重新分析以获得更完整的结果。';
+
+        const warningHtml = `
+            <div id="incompleteWarning" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:15px;margin:15px 0;">
+                <p style="color:#856404;margin-bottom:10px;"><i class="fas fa-exclamation-triangle"></i> ${warningMsg}</p>
+                <button id="retryAnalysisBtn" class="exam-btn-primary" style="padding:8px 16px;font-size:14px;">
+                    <i class="fas fa-redo"></i> 重新分析
+                </button>
+            </div>
+        `;
+
+        // 插入到结果区域顶部
+        const resultsHeader = document.querySelector('.exam-results-header');
+        if (resultsHeader) {
+            resultsHeader.insertAdjacentHTML('afterend', warningHtml);
+
+            // 绑定重新分析按钮事件
+            document.getElementById('retryAnalysisBtn').addEventListener('click', () => {
+                // 移除警告
+                const warning = document.getElementById('incompleteWarning');
+                if (warning) warning.remove();
+
+                // 清空结果并重新分析
+                state.analysisResults.overall = '';
+                state.analysisResults.typeAnalysis = '';
+                startAnalysis();
+            });
+        }
     }
 }
 
@@ -603,36 +646,6 @@ async function callKimiAPI(prompt) {
         }
         throw error;
     }
-}
-
-async function callKimiAPIWithRetry(prompt, type) {
-    const maxRetries = 2;
-    let lastResult = '';
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-            if (attempt > 0) {
-                console.log(`${type} 分析第 ${attempt + 1} 次重试...`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-
-            const result = await callKimiAPI(prompt);
-            lastResult = cleanContent(result);
-
-            if (isContentComplete(lastResult, type)) {
-                return lastResult;
-            }
-
-            console.warn(`${type} 分析内容不完整，准备重试...`);
-        } catch (error) {
-            if (attempt === maxRetries) {
-                throw error;
-            }
-            console.error(`${type} 分析第 ${attempt + 1} 次尝试失败:`, error);
-        }
-    }
-
-    return lastResult;
 }
 
 function isContentComplete(content, type) {
