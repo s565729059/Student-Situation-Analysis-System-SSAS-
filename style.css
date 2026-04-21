@@ -1064,20 +1064,21 @@ main {
 }
 
 .exam-btn-outline {
-    padding: 12px 24px;
-    border: 2px solid #4a6fa5;
-    color: #4a6fa5;
-    background: white;
+    padding: 15px 30px;
+    border: 2px solid #b0b8c4;
+    color: #666;
+    background: #f5f5f5;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .exam-btn-outline:hover {
-    background: #4a6fa5;
-    color: white;
+    background: #e8e8e8;
+    border-color: #999;
+    color: #333;
 }
 
 .exam-btn-green {
