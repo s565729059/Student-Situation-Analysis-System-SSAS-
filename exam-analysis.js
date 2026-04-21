@@ -985,7 +985,7 @@ async function callZhipuAPI(prompt) {
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能试卷分析系统"、版权信息"©️版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。'
                     },
                     {
                         role: 'user',
@@ -1096,6 +1096,42 @@ function formatAnalysisContent(content) {
         .replace(/$/, '</p>');
 }
 
+function injectBranding(html) {
+    const subjectName = getSubjectName();
+    const brandTitle = '青岛睿花苑';
+    const footerHTML = `
+<div style="text-align:center;padding:30px 20px 20px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin-top:40px;border-radius:0 0 12px 12px;">
+    <p style="font-size:16px;font-weight:bold;margin-bottom:8px;">小睿同学·智能试卷分析系统</p>
+    <p style="font-size:13px;margin-bottom:6px;">©️版权所有·青岛睿花苑教育科技有限公司</p>
+    <p style="font-size:12px;opacity:0.9;">打造最适合人才发展的教育平台，为所到地区带去最优质的教育</p>
+</div>`;
+
+    if (!html.includes(brandTitle)) {
+        html = html.replace(/(<h1[^>]*>)([\s\S]*?)(<\/h1>)/i, function(match, open, content, close) {
+            return open + brandTitle + '·' + content + close;
+        });
+        if (!html.includes(brandTitle)) {
+            html = html.replace(/(<title[^>]*>)([\s\S]*?)(<\/title>)/i, function(match, open, content, close) {
+                return open + brandTitle + '·' + content + close;
+            });
+        }
+    }
+
+    const footerKeywords = ['青岛睿花苑教育科技', '版权所有'];
+    const hasFooter = footerKeywords.some(kw => html.includes(kw));
+    if (!hasFooter) {
+        if (html.includes('</body>')) {
+            html = html.replace('</body>', footerHTML + '\n</body>');
+        } else if (html.includes('</html>')) {
+            html = html.replace('</html>', footerHTML + '\n</html>');
+        } else {
+            html += footerHTML;
+        }
+    }
+
+    return html;
+}
+
 async function generateReport() {
     state.analysisResults.overall = elements.overallAnalysis.innerText;
     state.analysisResults.typeAnalysis = elements.typeAnalysis.innerText;
@@ -1119,6 +1155,8 @@ async function generateReport() {
         }
 
         htmlContent = htmlContent.replace(/^```\w*\n?/, '').replace(/\n?```$/,'');
+
+        htmlContent = injectBranding(htmlContent);
 
         state.htmlReport = htmlContent;
         displayReport(htmlContent);
@@ -1169,7 +1207,7 @@ function generateReportPrompt() {
 8. ⚠️ 【禁止外部字体】严禁引用Google Fonts或其他外部字体服务，必须使用系统字体！
 
 【内容结构】
-一、封面：学科名称+试卷分析报告（大标题居中，简约大气，无版本标识）
+一、封面：青岛睿花苑·学科名称+试卷分析报告（大标题居中，简约大气，必须包含"青岛睿花苑"字样，无版本标识）
 二、试卷概览：总分/时长/题量（一行卡片展示）
 三、整体特征（简明1-2段）：知识覆盖+难度总评
 四、📚 题型板块深度分析（重点展开）：
@@ -1177,7 +1215,10 @@ function generateReportPrompt() {
     - 含该题型的教学建议
 五、📊 数据可视化：分值分布图+难度饼图+能力雷达图
 六、📝 教学策略总结：复习重点+能力培养方向
-七、页脚："小睿同学·智能试卷分析系统"（无年份）
+七、页脚：必须包含以下内容（无年份）：
+    - 主文字："小睿同学·智能试卷分析系统"
+    - 版权信息："©️版权所有·青岛睿花苑教育科技有限公司"
+    - 企业标语："打造最适合人才发展的教育平台，为所到地区带去最优质的教育"
 
 【整体特征分析】
 ${state.analysisResults.overall}
@@ -1231,7 +1272,7 @@ ${state.analysisResults.typeAnalysis}
 8. ⚠️ 【禁止外部字体】严禁引用Google Fonts或其他外部字体服务，必须使用系统字体！
 
 【内容结构】
-一、封面：学科名称+学习分析报告（大标题，温馨风格，无版本标识）
+一、封面：青岛睿花苑·学科名称+学习分析报告（大标题，温馨风格，必须包含"青岛睿花苑"字样，无版本标识）
 二、📋 试卷速览：总分/时长/题型数量（卡片展示）
 三、💡 给家长的核心解读（重点展开）：
     - 这次考试考什么（重点知识）
@@ -1243,7 +1284,10 @@ ${state.analysisResults.typeAnalysis}
     - 孩子需要重点学什么
     - 家长怎么帮助孩子
     - 接下来怎么复习
-七、页脚："小睿同学·智能试卷分析系统"（无年份）
+七、页脚：必须包含以下内容（无年份）：
+    - 主文字："小睿同学·智能试卷分析系统"
+    - 版权信息："©️版权所有·青岛睿花苑教育科技有限公司"
+    - 企业标语："打造最适合人才发展的教育平台，为所到地区带去最优质的教育"
 
 【整体特征分析 - 重点关注】
 ${state.analysisResults.overall}
