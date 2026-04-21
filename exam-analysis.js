@@ -17,6 +17,9 @@ const KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 const ZHIPU_API_KEY = 'c460138604724e6590549fc11287ec74.4ZQY2YnR9LzyC01U';
 const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
+const DEEPSEEK_API_KEY = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
 let analysisCarouselTimer = null;
 let reportCarouselTimer = null;
 
@@ -126,6 +129,47 @@ function initializeEventListeners() {
     elements.reportModal.addEventListener('click', (e) => {
         if (e.target === elements.reportModal) closeReportModal();
     });
+}
+
+function showNotification(message, type = 'info') {
+    // 创建通知元素
+    const notification = document.createElement('div');
+    notification.className = `exam-notification exam-notification-${type}`;
+    notification.innerHTML = `
+        <div class="exam-notification-content">
+            <i class="fas ${type === 'info' ? 'fa-info-circle' : type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="exam-notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // 添加到页面
+    document.body.appendChild(notification);
+    
+    // 添加关闭按钮事件
+    const closeBtn = notification.querySelector('.exam-notification-close');
+    closeBtn.addEventListener('click', () => {
+        notification.classList.add('fade-out');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+    
+    // 自动消失
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
 }
 
 function startCarousel(messages, element, interval) {
@@ -356,6 +400,7 @@ async function startAnalysis() {
     try {
         let completedCount = 0;
         const totalTasks = 2;
+        let hasError = false;
 
         const overallPromise = callKimiAPI(generateOverallAnalysisPrompt()).then(result => {
             state.analysisResults.overall = cleanContent(result);
@@ -366,6 +411,20 @@ async function startAnalysis() {
                 checkAndShowIncompleteWarning();
             }
             return result;
+        }).catch(error => {
+            console.error('整体特征分析错误:', error);
+            hasError = true;
+            completedCount++;
+            // 如果整体分析失败，仍然显示部分结果（题型分析可能成功）
+            showPartialResults();
+            if (completedCount === totalTasks) {
+                analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
+                checkAndShowIncompleteWarning();
+                // 如果两个都失败，显示错误
+                if (hasError && !state.analysisResults.typeAnalysis) {
+                    throw error;
+                }
+            }
         });
 
         const typePromise = callKimiAPI(generateTypeAnalysisPrompt()).then(result => {
@@ -377,15 +436,38 @@ async function startAnalysis() {
                 checkAndShowIncompleteWarning();
             }
             return result;
+        }).catch(error => {
+            console.error('题型板块分析错误:', error);
+            hasError = true;
+            completedCount++;
+            // 如果题型分析失败，仍然显示部分结果（整体分析可能成功）
+            showPartialResults();
+            if (completedCount === totalTasks) {
+                analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
+                checkAndShowIncompleteWarning();
+                // 如果两个都失败，显示错误
+                if (hasError && !state.analysisResults.overall) {
+                    throw error;
+                }
+            }
         });
 
-        await Promise.all([overallPromise, typePromise]);
+        // 不等待Promise.all，让它们独立完成
+        // 只需要等待足够长的时间以确保错误被捕获
+        await Promise.race([
+            overallPromise,
+            typePromise,
+            new Promise(resolve => setTimeout(resolve, 180000)) // 3分钟超时
+        ]);
 
     } catch (error) {
         console.error('Analysis error:', error);
         analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
-        alert('分析过程中出现错误：' + error.message);
-        elements.analysisLoading.style.display = 'none';
+        // 只有两个都失败时才显示错误
+        if (!state.analysisResults.overall && !state.analysisResults.typeAnalysis) {
+            alert('分析过程中出现错误：' + error.message);
+            elements.analysisLoading.style.display = 'none';
+        }
     }
 }
 
@@ -658,7 +740,105 @@ async function callKimiAPI(prompt) {
         }
         // 检查是否为服务器超载错误
         if (error.message && error.message.toLowerCase().includes('currently overloaded')) {
-            throw new Error('小睿同学使用火爆，该功能当前超载中，请稍后重试~');
+            // 显示切换提示
+            showNotification('小睿同学使用火爆，已为您切换简易模式，如果分析不全面，请稍后重试', 'info');
+            // 自动切换到DeepSeek API
+            return await callDeepSeekAPI(prompt);
+        }
+        throw error;
+    }
+}
+
+async function callDeepSeekAPI(prompt) {
+    const controller = new AbortController();
+    let timeoutId = setTimeout(() => controller.abort(), 180000);
+
+    function resetTimeout() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => controller.abort(), 180000);
+    }
+
+    try {
+        const response = await fetch(DEEPSEEK_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    {
+                        role: 'system',
+                        content: '你是一位资深的试卷分析专家，拥有20年教学与命题研究经验。你的分析必须全面、深入、细致，覆盖试卷中的每一道题目和每一个考点。你的输出没有长度限制，必须完整输出所有内容。'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                temperature: 1,
+                stream: true,
+                max_tokens: 8192
+            }),
+            signal: controller.signal
+        });
+
+        if (!response.ok) {
+            clearTimeout(timeoutId);
+            let errorDetail = '';
+            try {
+                const errorData = await response.json();
+                errorDetail = errorData.error?.message || JSON.stringify(errorData);
+            } catch (e) {
+                errorDetail = await response.text().catch(() => '');
+            }
+            throw new Error(`DeepSeek API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            resetTimeout();
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed === 'data: [DONE]') continue;
+                if (!trimmed.startsWith('data: ')) continue;
+
+                try {
+                    const json = JSON.parse(trimmed.slice(6));
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) {
+                        fullContent += delta;
+                    }
+                } catch (e) {
+                    // skip malformed chunks
+                }
+            }
+        }
+
+        clearTimeout(timeoutId);
+
+        if (fullContent) {
+            return fullContent;
+        }
+        throw new Error('DeepSeek API返回数据格式异常');
+
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            throw new Error('DeepSeek API请求超时，请稍后重试');
         }
         throw error;
     }
