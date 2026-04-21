@@ -14,9 +14,10 @@ const state = {
 const KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
 const KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 
-let carouselTimer = null;
+let analysisCarouselTimer = null;
+let reportCarouselTimer = null;
 
-const carouselMessages = [
+const analysisCarouselMessages = [
     '🔍 小睿同学正在仔细阅读试卷内容...',
     '🧠 小睿同学正在深度分析知识点...',
     '📐 小睿同学正在拆解题型结构...',
@@ -25,6 +26,17 @@ const carouselMessages = [
     '📝 小睿同学正在撰写分析报告...',
     '🎯 小睿同学正在总结命题特点...',
     '⚡ 小睿同学正在努力分析中ing...'
+];
+
+const reportCarouselMessages = [
+    '🎨 小睿同学正在设计精美排版...',
+    '📊 小睿同学正在绘制数据图表...',
+    '🌈 小睿同学正在调配渐变配色...',
+    '✨ 小睿同学正在添加动画效果...',
+    '📱 小睿同学正在适配移动端...',
+    '🖼️ 小睿同学正在生成可视化卡片...',
+    '🔧 小睿同学正在优化代码结构...',
+    '⚡ 小睿同学正在努力生成中ing...'
 ];
 
 const elements = {
@@ -61,6 +73,7 @@ const elements = {
     toStep4: document.getElementById('toStep4'),
 
     reportLoading: document.getElementById('reportLoading'),
+    reportCarousel: document.getElementById('reportCarousel'),
     reportPreview: document.getElementById('reportPreview'),
     reportFrame: document.getElementById('reportFrame'),
     htmlCode: document.getElementById('htmlCode'),
@@ -113,20 +126,21 @@ function initializeEventListeners() {
     });
 }
 
-function startCarousel() {
+function startCarousel(messages, element, interval) {
     let index = 0;
-    elements.analysisCarousel.textContent = carouselMessages[0];
-    carouselTimer = setInterval(() => {
-        index = (index + 1) % carouselMessages.length;
-        elements.analysisCarousel.textContent = carouselMessages[index];
-    }, 3000);
+    element.textContent = messages[0];
+    const timer = setInterval(() => {
+        index = (index + 1) % messages.length;
+        element.textContent = messages[index];
+    }, interval);
+    return timer;
 }
 
-function stopCarousel() {
-    if (carouselTimer) {
-        clearInterval(carouselTimer);
-        carouselTimer = null;
+function stopCarousel(timerRef) {
+    if (timerRef) {
+        clearInterval(timerRef);
     }
+    return null;
 }
 
 function handleDragOver(e) {
@@ -307,32 +321,66 @@ async function startAnalysis() {
 
     elements.analysisLoading.style.display = 'block';
     elements.analysisResults.style.display = 'none';
+    elements.overallAnalysis.innerHTML = '';
+    elements.typeAnalysis.innerHTML = '';
 
-    startCarousel();
+    analysisCarouselTimer = startCarousel(analysisCarouselMessages, elements.analysisCarousel, 3000);
+
+    let overallDone = false;
+    let typeDone = false;
 
     try {
-        const overallPrompt = generateOverallAnalysisPrompt();
-        const typePrompt = generateTypeAnalysisPrompt();
+        const overallPromise = callKimiAPI(generateOverallAnalysisPrompt(), false).then(result => {
+            state.analysisResults.overall = cleanContent(result);
+            overallDone = true;
+            showPartialResults();
+        });
 
-        const [overallResult, typeResult] = await Promise.all([
-            callKimiAPI(overallPrompt, false),
-            callKimiAPI(typePrompt, false)
-        ]);
+        const typePromise = callKimiAPI(generateTypeAnalysisPrompt(), false).then(result => {
+            state.analysisResults.typeAnalysis = cleanContent(result);
+            typeDone = true;
+            showPartialResults();
+        });
 
-        state.analysisResults.overall = cleanContent(overallResult);
-        state.analysisResults.typeAnalysis = cleanContent(typeResult);
+        await Promise.all([overallPromise, typePromise]);
 
-        stopCarousel();
+        analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
 
         setTimeout(() => {
             displayAnalysisResults();
-        }, 500);
+        }, 300);
 
     } catch (error) {
         console.error('Analysis error:', error);
-        stopCarousel();
+        analysisCarouselTimer = stopCarousel(analysisCarouselTimer);
         alert('分析过程中出现错误：' + error.message);
         elements.analysisLoading.style.display = 'none';
+    }
+}
+
+function showPartialResults() {
+    if (state.analysisResults.overall || state.analysisResults.typeAnalysis) {
+        elements.analysisLoading.style.display = 'none';
+        elements.analysisResults.style.display = 'block';
+
+        const versionNames = {
+            'teaching': '教学参考版',
+            'marketing': '营销家长版'
+        };
+        elements.versionBadge.textContent = versionNames[state.selectedVersion];
+        elements.versionBadge.className = 'exam-version-badge ' + (state.selectedVersion === 'teaching' ? 'badge-teaching' : 'badge-marketing');
+
+        if (state.analysisResults.overall) {
+            elements.overallAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.overall);
+        } else {
+            elements.overallAnalysis.innerHTML = '<p style="color:#999;text-align:center;padding:20px"><i class="fas fa-spinner fa-spin"></i> 整体特征分析生成中...</p>';
+        }
+
+        if (state.analysisResults.typeAnalysis) {
+            elements.typeAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.typeAnalysis);
+        } else {
+            elements.typeAnalysis.innerHTML = '<p style="color:#999;text-align:center;padding:20px"><i class="fas fa-spinner fa-spin"></i> 题型板块分析生成中...</p>';
+        }
     }
 }
 
@@ -372,7 +420,7 @@ function generateTypeAnalysisPrompt() {
     const versionConfig = getVersionConfig();
     const subjectName = getSubjectName();
 
-    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷的【题型板块考向】进行详细分析。
+    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷的【题型板块考向】进行分析。
 
 【版本类型】
 ${versionConfig.name}
@@ -381,14 +429,12 @@ ${versionConfig.description}
 【核心要求】
 1. 只分析各题型板块的考向，不要分析整体特征
 2. 必须覆盖试卷中的每一种题型，不允许遗漏
-3. 逐题分析必须完整，不能只分析部分题目就停止
-4. 每道题的分析控制在80字以内，确保所有题目都能完整输出
-5. 输出字数控制在5000字以内，确保完整输出
+3. 逐题分析以考点为主，不需要太具体的解题过程，重点说明考查了什么知识点
+4. 每道题的分析控制在50字以内，简洁精炼
+5. 输出字数控制在3000字以内，确保完整输出
 
 【分析内容要求】
 ${versionConfig.typeRequirements}
-
-${versionConfig.questionDetail}
 
 【试卷内容】
 ${state.fileContent.substring(0, 12000)}
@@ -408,17 +454,12 @@ function getVersionConfig() {
 4. 命题特点：命题思路、创新点、与课标/考纲的契合度
 5. 能力考查：识记、理解、应用、分析、综合、评价各层级占比
 6. 教学导向：对教学的启示、能力培养方向、复习策略建议`,
-            typeRequirements: `请按试卷中出现的每一种题型进行详细分析，每种题型必须包含：
+            typeRequirements: `请按试卷中出现的每一种题型进行分析，每种题型包含：
 1. 题型概述：题量、分值、占总分百分比
-2. 考查知识点：逐一列出该题型涉及的所有知识点
-3. 考向分析：该题型的命题方向、考查重点
-4. 难度分析：该题型整体难度、内部难度梯度
-5. 逐题详解：对该题型下的每一道题目逐一分析`,
-            questionDetail: `逐题详解要求（每道题精简为以下内容，控制在80字以内）：
-- 题号与分值
-- 考查知识点
-- 难度等级（易/中/难/极难）
-- 解题关键与易错点`
+2. 考查知识点：列出该题型涉及的核心知识点
+3. 考向分析：该题型的命题方向和考查重点
+4. 难度分析：该题型整体难度
+5. 逐题考点：列出每道题考查的知识点（每题50字以内）`
         };
     } else {
         return {
@@ -431,17 +472,11 @@ function getVersionConfig() {
 4. 得分关键：哪些地方容易拿分，哪些地方容易丢分
 5. 学习建议：孩子需要重点掌握什么，接下来怎么复习
 6. 家长关注：家长最应该关注的几个点`,
-            typeRequirements: `请按试卷中出现的每一种题型进行详细分析，每种题型必须包含：
+            typeRequirements: `请按试卷中出现的每一种题型进行分析，每种题型包含：
 1. 题型介绍：这是什么题型，有几道题，占多少分
 2. 考什么内容：用大白话说明这种题型考的是什么
 3. 难度怎么样：简单还是难
-4. 怎么拿分：答题技巧和注意事项
-5. 逐题分析：把每道题都讲清楚`,
-            questionDetail: `逐题分析要求（用家长能听懂的话，每道题控制在60字以内）：
-- 第几题，几分
-- 这道题考什么
-- 难度怎么样
-- 容易在哪里出错`
+4. 逐题考点：列出每道题考什么（每题40字以内，用大白话）`
         };
     }
 }
@@ -561,8 +596,12 @@ function displayAnalysisResults() {
     elements.versionBadge.textContent = versionNames[state.selectedVersion];
     elements.versionBadge.className = 'exam-version-badge ' + (state.selectedVersion === 'teaching' ? 'badge-teaching' : 'badge-marketing');
 
-    elements.overallAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.overall);
-    elements.typeAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.typeAnalysis);
+    if (state.analysisResults.overall) {
+        elements.overallAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.overall);
+    }
+    if (state.analysisResults.typeAnalysis) {
+        elements.typeAnalysis.innerHTML = formatAnalysisContent(state.analysisResults.typeAnalysis);
+    }
 }
 
 function formatAnalysisContent(content) {
@@ -589,9 +628,13 @@ async function generateReport() {
     elements.reportLoading.style.display = 'block';
     elements.reportPreview.style.display = 'none';
 
+    reportCarouselTimer = startCarousel(reportCarouselMessages, elements.reportCarousel, 3000);
+
     try {
         const reportPrompt = generateReportPrompt();
         const htmlContent = await callKimiAPIWithContinuation(reportPrompt, true);
+
+        reportCarouselTimer = stopCarousel(reportCarouselTimer);
 
         let finalHtml = htmlContent;
         const htmlMatch = htmlContent.match(/```html\n?([\s\S]*?)```/);
@@ -608,6 +651,7 @@ async function generateReport() {
 
     } catch (error) {
         console.error('Report generation error:', error);
+        reportCarouselTimer = stopCarousel(reportCarouselTimer);
         alert('报告生成失败：' + error.message);
         elements.reportLoading.style.display = 'none';
     }
@@ -667,7 +711,7 @@ function generateReportPrompt() {
 - 题型名称、题量、分值、占比
 - 考查知识点列表
 - 难度分析（用颜色标签）
-- 逐题详解表格（题号、考点、难度、关键点）
+- 逐题考点表格（题号、考点、难度）
 - 答题技巧/建议
 
 四、数据可视化图表区（分）
