@@ -1069,8 +1069,10 @@ function generateReportPrompt() {
 
 【样式要求 - 精美丰富】
 1. 配色：主色#667eea→#764ba2渐变，难度色：易#10b981/中#f59e0b/难#ef4444，背景#f8fafc
-2. 使用Tailwind CSS CDN + Font Awesome 6 + Noto Sans SC字体
+2. 使用Tailwind CSS CDN + Font Awesome 6，字体使用系统字体栈：font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif
 3. 图表丰富：题型分值分布条形图、难度分布饼图、能力层级雷达图（纯CSS/SVG）
+   - ⚠️ SVG路径必须使用有效的path数据格式，禁止在path的d属性中包含非数字字符
+   - 确保所有SVG路径数据完整，不要截断或混入其他文本
 4. 卡片设计：大圆角(12px)、柔和阴影(0 8px 30px rgba)、悬停上浮效果
 5. 排版美观：适当留白、标题装饰线、图标点缀、色块区分
 6. 每种题型独立卡片，含题型图标、难度标签、考点标签云
@@ -1080,6 +1082,7 @@ function generateReportPrompt() {
    - 严禁使用#eee、#ddd、#ccc等浅色字体
    - 背景为白色/浅灰时，文字必须是深色，确保清晰可见
    - 违规将导致文字看不见，必须严格遵守！
+8. ⚠️ 【禁止外部字体】严禁引用Google Fonts或其他外部字体服务，必须使用系统字体！
 
 【内容结构】
 一、封面：学科名称+试卷分析报告（大标题居中，简约大气，无版本标识）
@@ -1128,8 +1131,10 @@ ${state.analysisResults.typeAnalysis}
 
 【样式要求 - 精美丰富】
 1. 配色：温暖色调，主色#667eea→#764ba2渐变，易#10b981/中#f59e0b/难#ef4444，背景#f8fafc
-2. 使用Tailwind CSS CDN + Font Awesome 6 + Noto Sans SC字体
+2. 使用Tailwind CSS CDN + Font Awesome 6，字体使用系统字体栈：font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif
 3. 多用emoji图标增加亲和力：📊📚✅⚠️💡🎯
+   - ⚠️ SVG路径必须使用有效的path数据格式，禁止在path的d属性中包含非数字字符
+   - 确保所有SVG路径数据完整，不要截断或混入其他文本
 4. 卡片设计：大圆角(12px)、柔和阴影、悬停效果
 5. 重点信息用彩色标签、高亮背景突出
 6. 通俗易懂，避免专业术语，多用大白话
@@ -1139,6 +1144,7 @@ ${state.analysisResults.typeAnalysis}
    - 严禁使用#eee、#ddd、#ccc等浅色字体
    - 背景为白色/浅灰时，文字必须是深色，确保清晰可见
    - 违规将导致文字看不见，必须严格遵守！
+8. ⚠️ 【禁止外部字体】严禁引用Google Fonts或其他外部字体服务，必须使用系统字体！
 
 【内容结构】
 一、封面：学科名称+学习分析报告（大标题，温馨风格，无版本标识）
