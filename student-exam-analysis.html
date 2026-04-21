@@ -11,298 +11,253 @@
 </head>
 <body>
     <div class="container">
-        <header class="app-header">
-            <div class="header-left">
-                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+        <header>
+            <div class="header-top">
+                <button class="back-btn" onclick="window.location.href='index.html'">← 返回首页</button>
             </div>
-            <div class="header-center">
-                <h1><i class="fas fa-user-graduate"></i> 学员考情分析系统</h1>
-                <p class="header-subtitle">针对考试，专业分析</p>
-            </div>
-            <div class="header-right">
-                <div class="version-info">
-                    <p>版本号：v3.1</p>
-                </div>
+            <h1>小睿同学·学员考情分析系统</h1>
+            <h2>针对考试·专业分析</h2>
+            <div class="version-info">
+                <p>版本号：v3.1</p>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="progress-bar-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
+        <main>
+            <div class="exam-progress-bar">
+                <div class="exam-step" data-step="1">
+                    <div class="exam-step-circle active">1</div>
+                    <span>填写信息</span>
                 </div>
-                <div class="step-indicator">
-                    <div class="step-item">
-                        <div class="step-dot active" id="dot1">1</div>
-                        <div class="step-label active" id="label1">填写信息</div>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-dot" id="dot2">2</div>
-                        <div class="step-label" id="label2">小睿分析</div>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-dot" id="dot3">3</div>
-                        <div class="step-label" id="label3">编辑内容</div>
-                    </div>
-                    <div class="step-item">
-                        <div class="step-dot" id="dot4">4</div>
-                        <div class="step-label" id="label4">生成报告</div>
-                    </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="2">
+                    <div class="exam-step-circle">2</div>
+                    <span>小睿分析</span>
+                </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="3">
+                    <div class="exam-step-circle">3</div>
+                    <span>编辑内容</span>
+                </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="4">
+                    <div class="exam-step-circle">4</div>
+                    <span>报告生成</span>
                 </div>
             </div>
 
-            <div class="step active" id="step1">
-                <div class="form-section">
-                    <h2 class="section-title"><i class="fas fa-file-upload"></i> 上传试卷并填写信息</h2>
-                    
-                    <div class="tips-box">
-                        <div class="tips-title"><i class="fas fa-lightbulb"></i> 提示</div>
-                        <div class="tips-content">请上传学生的试卷文件（PDF或Word格式），并填写学生的基本信息和错题情况。</div>
-                    </div>
+            <section id="seaStep1" class="form-section exam-fade-in">
+                <h3 class="exam-section-title">
+                    <i class="fas fa-user-graduate"></i>
+                    上传试卷并填写信息
+                </h3>
 
-                    <div class="form-group">
-                        <label>上传试卷文件</label>
-                        <div class="upload-area" id="uploadArea">
-                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                            <div class="upload-text">点击或拖拽文件到此处上传</div>
-                            <div class="upload-hint">支持 PDF、DOC、DOCX 格式</div>
-                            <input type="file" id="fileInput" accept=".pdf,.doc,.docx">
-                        </div>
-                        <div class="file-info" id="fileInfo">
-                            <div class="file-icon" id="fileIcon"><i class="fas fa-file"></i></div>
-                            <div class="file-details">
-                                <div class="file-name" id="fileName"></div>
-                                <div class="file-size" id="fileSize"></div>
-                            </div>
-                            <button class="file-remove" id="removeFile"><i class="fas fa-times"></i></button>
-                        </div>
+                <div id="seaUploadArea" class="exam-upload-area">
+                    <i class="fas fa-file-upload exam-upload-icon"></i>
+                    <p class="exam-upload-text">点击或拖拽文件到此处上传</p>
+                    <p class="exam-upload-hint">支持 PDF、DOC、DOCX 格式</p>
+                    <div class="exam-upload-formats">
+                        <span><i class="fas fa-check-circle" style="color:#27ae60"></i> Word 文档</span>
+                        <span><i class="fas fa-exclamation-circle" style="color:#f39c12"></i> PDF 需 A4 单页模式</span>
                     </div>
+                    <input type="file" id="seaFileInput" style="display:none" accept=".pdf,.doc,.docx">
+                </div>
 
-                    <div class="student-info-grid">
-                        <div class="form-group">
-                            <label for="studentName">学生姓名</label>
-                            <input type="text" id="studentName" placeholder="请输入学生姓名">
-                        </div>
-                        <div class="form-group">
-                            <label for="studentGrade">学生年级</label>
-                            <select id="studentGrade">
-                                <option value="">请选择年级</option>
-                                <option value="一年级">一年级</option>
-                                <option value="二年级">二年级</option>
-                                <option value="三年级">三年级</option>
-                                <option value="四年级">四年级</option>
-                                <option value="五年级">五年级</option>
-                                <option value="六年级">六年级</option>
-                                <option value="初一">初一</option>
-                                <option value="初二">初二</option>
-                                <option value="初三">初三</option>
-                                <option value="高一">高一</option>
-                                <option value="高二">高二</option>
-                                <option value="高三">高三</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="examSubject">考试科目</label>
-                            <select id="examSubject">
-                                <option value="">请选择科目</option>
-                                <option value="语文">语文</option>
-                                <option value="数学">数学</option>
-                                <option value="英语">英语</option>
-                                <option value="物理">物理</option>
-                                <option value="化学">化学</option>
-                                <option value="生物">生物</option>
-                                <option value="历史">历史</option>
-                                <option value="地理">地理</option>
-                                <option value="政治">政治</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="examName">考试名称</label>
-                            <input type="text" id="examName" placeholder="例如：九年级一模">
-                        </div>
-                    </div>
-
-                    <div class="student-info-grid">
-                        <div class="form-group">
-                            <label for="actualScore">实际得分</label>
-                            <input type="text" id="actualScore" placeholder="例如：85">
-                        </div>
-                        <div class="form-group">
-                            <label for="fullScore">满分</label>
-                            <input type="text" id="fullScore" placeholder="例如：100">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="errorDescription">错题情况描述</label>
-                        <textarea id="errorDescription" placeholder="请详细描述学生的错题情况，例如：&#10;- 第3题：计算错误&#10;- 第7题：概念理解不清&#10;- 第12题：解题思路有误"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>学生薄弱环节（可多选）</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak1" value="基础知识掌握不牢">
-                                <label for="weak1">基础知识掌握不牢</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak2" value="解题思路不清晰">
-                                <label for="weak2">解题思路不清晰</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak3" value="计算能力不足">
-                                <label for="weak3">计算能力不足</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak4" value="审题能力欠缺">
-                                <label for="weak4">审题能力欠缺</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak5" value="时间分配不合理">
-                                <label for="weak5">时间分配不合理</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="weak6" value="粗心大意">
-                                <label for="weak6">粗心大意</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>学生日常课堂表现（可多选）</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf1" value="课堂参与度高">
-                                <label for="perf1">课堂参与度高</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf2" value="积极回答问题">
-                                <label for="perf2">积极回答问题</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf3" value="注意力集中">
-                                <label for="perf3">注意力集中</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf4" value="作业完成及时">
-                                <label for="perf4">作业完成及时</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf5" value="需要老师督促">
-                                <label for="perf5">需要老师督促</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf6" value="课堂互动较少">
-                                <label for="perf6">课堂互动较少</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf7" value="笔记记录认真">
-                                <label for="perf7">笔记记录认真</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="perf8" value="课后提问积极">
-                                <label for="perf8">课后提问积极</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="classroomPerformance">课堂表现详细描述</label>
-                        <textarea id="classroomPerformance" placeholder="请详细描述学生的日常课堂表现"></textarea>
-                    </div>
-
-                    <div class="button-group">
-                        <button class="btn btn-primary" id="btnToStep2">下一步：生成考情分析 <i class="fas fa-arrow-right"></i></button>
+                <div id="seaPdfWarning" class="exam-warning" style="display:none">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <p class="exam-warning-title">PDF 文件上传提示</p>
+                        <p class="exam-warning-text">请确保 PDF 文件为 <strong>A4 单页模式</strong>，不支持 A3 试卷版本。如为 A3 格式，请先转换为 A4 格式后重新上传。</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="step" id="step2">
-                <div class="loading-container">
-                    <div class="loading-animation">
-                        <div class="brain-icon">🧠</div>
-                        <div class="loading-pulse"></div>
-                    </div>
-                    <div class="loading-title">小睿同学分析中</div>
-                    <div class="loading-status">
-                        <span class="loading-dot">.</span>
-                        <span class="loading-dot">.</span>
-                        <span class="loading-dot">.</span>
-                    </div>
-                    <div class="loading-steps">
-                        <div class="loading-step" id="loadStep1">
-                            <span class="step-icon">📄</span>
-                            <span class="step-text">正在读取试卷信息</span>
+                <div id="seaFileInfo" class="exam-file-info" style="display:none">
+                    <div class="exam-file-row">
+                        <div class="exam-file-detail">
+                            <i id="seaFileIcon" class="fas fa-file" style="font-size:1.8rem;color:#4a6fa5;margin-right:15px"></i>
+                            <div>
+                                <p id="seaFileName" class="exam-file-name"></p>
+                                <p id="seaFileSize" class="exam-file-size"></p>
+                            </div>
                         </div>
-                        <div class="loading-step" id="loadStep2">
-                            <span class="step-icon">🔍</span>
-                            <span class="step-text">分析错题情况</span>
-                        </div>
-                        <div class="loading-step" id="loadStep3">
-                            <span class="step-icon">📊</span>
-                            <span class="step-text">评估学习状况</span>
-                        </div>
-                        <div class="loading-step" id="loadStep4">
-                            <span class="step-icon">✨</span>
-                            <span class="step-text">生成学情报告</span>
-                        </div>
+                        <button id="seaRemoveFile" class="exam-remove-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="step" id="step3">
-                <div class="form-section">
-                    <h2 class="section-title"><i class="fas fa-edit"></i> 编辑考情分析</h2>
-                    
-                    <div class="tips-box">
-                        <div class="tips-title"><i class="fas fa-lightbulb"></i> 提示</div>
-                        <div class="tips-content">以下是小睿同学生成的考情分析，您可以手动修改和完善。确认无误后，点击生成美化版本。</div>
+                <div class="exam-form-grid">
+                    <div class="form-group">
+                        <label for="seaStudentName">学生姓名</label>
+                        <input type="text" id="seaStudentName" placeholder="请输入学生姓名">
                     </div>
-
-                    <div class="result-container">
-                        <div class="result-title">考情分析（可编辑）</div>
-                        <textarea class="editable-area" id="analysisText" placeholder="考情分析将显示在这里..."></textarea>
+                    <div class="form-group">
+                        <label for="seaStudentGrade">学生年级</label>
+                        <select id="seaStudentGrade">
+                            <option value="">请选择年级</option>
+                            <option value="一年级">一年级</option>
+                            <option value="二年级">二年级</option>
+                            <option value="三年级">三年级</option>
+                            <option value="四年级">四年级</option>
+                            <option value="五年级">五年级</option>
+                            <option value="六年级">六年级</option>
+                            <option value="初一">初一</option>
+                            <option value="初二">初二</option>
+                            <option value="初三">初三</option>
+                            <option value="高一">高一</option>
+                            <option value="高二">高二</option>
+                            <option value="高三">高三</option>
+                        </select>
                     </div>
-
-                    <div class="button-group">
-                        <button class="btn btn-secondary" id="btnBackStep1"><i class="fas fa-arrow-left"></i> 返回修改</button>
-                        <button class="btn btn-primary" id="btnToStep4">生成美化HTML版本 <i class="fas fa-magic"></i></button>
+                    <div class="form-group">
+                        <label for="seaExamSubject">考试科目</label>
+                        <select id="seaExamSubject">
+                            <option value="">请选择科目</option>
+                            <option value="语文">语文</option>
+                            <option value="数学">数学</option>
+                            <option value="英语">英语</option>
+                            <option value="物理">物理</option>
+                            <option value="化学">化学</option>
+                            <option value="生物">生物</option>
+                            <option value="历史">历史</option>
+                            <option value="地理">地理</option>
+                            <option value="政治">政治</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="seaExamName">考试名称</label>
+                        <input type="text" id="seaExamName" placeholder="例如：九年级一模">
+                    </div>
+                    <div class="form-group">
+                        <label for="seaActualScore">实际得分</label>
+                        <input type="text" id="seaActualScore" placeholder="例如：85">
+                    </div>
+                    <div class="form-group">
+                        <label for="seaFullScore">满分</label>
+                        <input type="text" id="seaFullScore" placeholder="例如：100">
                     </div>
                 </div>
-            </div>
 
-            <div class="step" id="step4">
-                <div class="form-section">
-                    <h2 class="section-title"><i class="fas fa-file-code"></i> 美化报告</h2>
-                    
-                    <div class="loading" id="loadingBeautify">
-                        <div class="spinner"></div>
-                        <div class="loading-text">正在生成精美的HTML报告...</div>
-                    </div>
+                <div class="form-group">
+                    <label for="seaErrorDescription">错题情况描述</label>
+                    <textarea id="seaErrorDescription" rows="5" placeholder="请详细描述学生的错题情况，例如：&#10;- 第3题：计算错误&#10;- 第7题：概念理解不清&#10;- 第12题：解题思路有误"></textarea>
+                </div>
 
-                    <div id="beautifyResult" style="display: none;">
-                        <div class="tips-box tips-success">
-                            <div class="tips-title"><i class="fas fa-check-circle"></i> 生成完成</div>
-                            <div class="tips-content">精美的考情分析报告已生成完成，您可以预览或下载。</div>
-                        </div>
-
-                        <div class="report-frame-wrapper">
-                            <iframe id="reportFrame" class="report-frame"></iframe>
-                        </div>
-
-                        <div class="button-group">
-                            <button class="btn btn-secondary" id="btnDownloadHtml"><i class="fas fa-download"></i> 下载HTML文件</button>
-                            <button class="btn btn-primary" id="btnStartNew"><i class="fas fa-redo"></i> 开始新的分析</button>
-                        </div>
+                <div class="form-group">
+                    <label>学生薄弱环节（可多选）</label>
+                    <div class="exam-checkbox-group">
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="基础知识掌握不牢"> 基础知识掌握不牢</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="解题思路不清晰"> 解题思路不清晰</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="计算能力不足"> 计算能力不足</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="审题能力欠缺"> 审题能力欠缺</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="时间分配不合理"> 时间分配不合理</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="粗心大意"> 粗心大意</label>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label>学生日常课堂表现（可多选）</label>
+                    <div class="exam-checkbox-group">
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课堂参与度高"> 课堂参与度高</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="积极回答问题"> 积极回答问题</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="注意力集中"> 注意力集中</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="作业完成及时"> 作业完成及时</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="需要老师督促"> 需要老师督促</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课堂互动较少"> 课堂互动较少</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="笔记记录认真"> 笔记记录认真</label>
+                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课后提问积极"> 课后提问积极</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="seaClassroomPerformance">课堂表现详细描述</label>
+                    <textarea id="seaClassroomPerformance" rows="4" placeholder="请详细描述学生的日常课堂表现"></textarea>
+                </div>
+
+                <div class="exam-nav-center">
+                    <button id="seaToStep2" class="exam-btn-primary">
+                        下一步：生成考情分析 <i class="fas fa-arrow-right" style="margin-left:8px"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section id="seaStep2" class="form-section exam-fade-in" style="display:none">
+                <div class="exam-loading-section">
+                    <div class="loading-spinner"></div>
+                    <h3 class="exam-loading-title">小睿同学正在努力分析中...</h3>
+                    <p class="exam-loading-note">预计完成时间约3分钟，请耐心等待...</p>
+                    <p id="seaAnalysisCarousel" class="exam-carousel-text">🔍 小睿同学正在仔细阅读试卷内容...</p>
+                </div>
+            </section>
+
+            <section id="seaStep3" class="form-section exam-fade-in" style="display:none">
+                <h3 class="exam-section-title">
+                    <i class="fas fa-edit"></i>
+                    编辑考情分析
+                </h3>
+
+                <div class="exam-analysis-block">
+                    <h4 class="exam-analysis-subtitle">
+                        <i class="fas fa-clipboard-list"></i>
+                        考情分析内容（可编辑）
+                    </h4>
+                    <div id="seaAnalysisText" class="exam-editable-content" contenteditable="true"></div>
+                </div>
+
+                <div class="exam-nav-between">
+                    <button id="seaBackStep1" class="exam-btn-outline">
+                        <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
+                    </button>
+                    <button id="seaToStep4" class="exam-btn-primary">
+                        生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section id="seaStep4" class="form-section exam-fade-in" style="display:none">
+                <div id="seaReportLoading" class="exam-loading-section">
+                    <div class="loading-spinner"></div>
+                    <h3 class="exam-loading-title">小睿同学正在生成 HTML 报告...</h3>
+                    <p class="exam-loading-note">预计完成时间约3分钟，请耐心等待...</p>
+                    <p id="seaReportCarousel" class="exam-carousel-text">🎨 小睿同学正在设计精美排版...</p>
+                </div>
+
+                <div id="seaReportPreview" style="display:none">
+                    <div class="exam-results-header" style="justify-content:space-between">
+                        <h3 class="exam-section-title" style="margin-bottom:0">
+                            <i class="fas fa-file-code"></i>
+                            考情分析报告
+                        </h3>
+                        <button id="seaDownloadReport" class="exam-btn-primary">
+                            <i class="fas fa-download" style="margin-right:6px"></i>下载 HTML
+                        </button>
+                    </div>
+
+                    <div class="exam-report-frame-wrapper" style="margin:20px 0">
+                        <iframe id="seaReportFrame" class="exam-report-frame"></iframe>
+                    </div>
+
+                    <div class="exam-nav-between" style="margin-top:20px">
+                        <button id="seaBackStep3" class="exam-btn-outline">
+                            <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
+                        </button>
+                        <button id="seaStartNew" class="exam-btn-primary">
+                            <i class="fas fa-plus" style="margin-right:8px"></i> 分析新学员
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="feedback-float">
+            <button class="feedback-btn" onclick="seaToggleFeedback()">💬</button>
+            <div class="feedback-popup" id="seaFeedbackPopup">
+                <span class="close-popup" onclick="seaToggleFeedback()">&times;</span>
+                <h4>问题反馈</h4>
+                <p>如有任何问题或建议，请添加微信咨询！</p>
+                <p style="text-align: center; margin: 20px 0; font-size: 20px;">微信：<strong style="color: #4a6fa5; font-size: 24px;">swsw823</strong></p>
+                <p>工作时间：每天 8:00-20:00</p>
             </div>
         </div>
-
-        <footer class="app-footer">
-            <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.1</p>
-        </footer>
     </div>
 
     <script src="student-exam-analysis.js"></script>

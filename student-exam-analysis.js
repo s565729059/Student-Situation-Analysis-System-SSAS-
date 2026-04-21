@@ -11,11 +11,7 @@ const SEA_KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 const SEA_ZHIPU_API_KEY = 'c460138604724e6590549fc11287ec74.4ZQY2YnR9LzyC01U';
 const SEA_ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
-const SEA_DEEPSEEK_API_KEY = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
-const SEA_DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-
-let seaLoadingInterval = null;
-let seaCurrentLoadingStep = 0;
+let seaCarouselInterval = null;
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -24,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initSeaEventListeners() {
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('seaUploadArea');
+    const fileInput = document.getElementById('seaFileInput');
 
     uploadArea.addEventListener('click', () => fileInput.click());
     uploadArea.addEventListener('dragover', (e) => {
@@ -44,19 +40,21 @@ function initSeaEventListeners() {
         if (e.target.files.length > 0) seaHandleFile(e.target.files[0]);
     });
 
-    document.getElementById('removeFile').addEventListener('click', (e) => {
+    document.getElementById('seaRemoveFile').addEventListener('click', (e) => {
         e.stopPropagation();
         seaState.uploadedFile = null;
         seaState.fileContent = '';
         fileInput.value = '';
-        document.getElementById('fileInfo').classList.remove('show');
+        document.getElementById('seaFileInfo').style.display = 'none';
+        document.getElementById('seaPdfWarning').style.display = 'none';
     });
 
-    document.getElementById('btnToStep2').addEventListener('click', seaGoToStep2);
-    document.getElementById('btnBackStep1').addEventListener('click', () => seaGoToStep(1));
-    document.getElementById('btnToStep4').addEventListener('click', seaGoToStep4);
-    document.getElementById('btnDownloadHtml').addEventListener('click', seaDownloadHtml);
-    document.getElementById('btnStartNew').addEventListener('click', seaStartNew);
+    document.getElementById('seaToStep2').addEventListener('click', seaGoToStep2);
+    document.getElementById('seaBackStep1').addEventListener('click', () => seaGoToStep(1));
+    document.getElementById('seaToStep4').addEventListener('click', seaGoToStep4);
+    document.getElementById('seaDownloadReport').addEventListener('click', seaDownloadHtml);
+    document.getElementById('seaStartNew').addEventListener('click', seaStartNew);
+    document.getElementById('seaBackStep3').addEventListener('click', () => seaGoToStep(3));
 }
 
 function seaHandleFile(file) {
@@ -69,13 +67,21 @@ function seaHandleFile(file) {
     }
 
     seaState.uploadedFile = file;
-    document.getElementById('fileName').textContent = file.name;
-    document.getElementById('fileSize').textContent = seaFormatFileSize(file.size);
-    document.getElementById('fileIcon').innerHTML = fileExtension === '.pdf'
-        ? '<i class="fas fa-file-pdf" style="color:#ef4444"></i>'
-        : '<i class="fas fa-file-word" style="color:#3b82f6"></i>';
-    document.getElementById('fileInfo').classList.add('show');
+    document.getElementById('seaFileName').textContent = file.name;
+    document.getElementById('seaFileSize').textContent = seaFormatFileSize(file.size);
 
+    const fileIcon = document.getElementById('seaFileIcon');
+    if (fileExtension === '.pdf') {
+        fileIcon.className = 'fas fa-file-pdf';
+        fileIcon.style.color = '#ef4444';
+        document.getElementById('seaPdfWarning').style.display = 'flex';
+    } else {
+        fileIcon.className = 'fas fa-file-word';
+        fileIcon.style.color = '#3b82f6';
+        document.getElementById('seaPdfWarning').style.display = 'none';
+    }
+
+    document.getElementById('seaFileInfo').style.display = 'block';
     seaExtractFileContent(file);
 }
 
@@ -118,57 +124,50 @@ function seaFormatFileSize(bytes) {
 }
 
 function seaGoToStep(step) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step' + step).classList.add('active');
-
-    const progress = (step / 4) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
-
     for (let i = 1; i <= 4; i++) {
-        const dot = document.getElementById('dot' + i);
-        const label = document.getElementById('label' + i);
-        dot.classList.remove('active', 'completed');
-        label.classList.remove('active', 'completed');
-        if (i < step) {
-            dot.classList.add('completed');
-            label.classList.add('completed');
-            dot.textContent = '✓';
-        } else if (i === step) {
-            dot.classList.add('active');
-            label.classList.add('active');
-            dot.textContent = i;
-        } else {
-            dot.textContent = i;
-        }
+        const section = document.getElementById('seaStep' + i);
+        if (section) section.style.display = (i === step) ? 'block' : 'none';
     }
+
+    document.querySelectorAll('.exam-step').forEach((el) => {
+        const s = parseInt(el.dataset.step);
+        const circle = el.querySelector('.exam-step-circle');
+        const span = el.querySelector('span');
+        circle.classList.remove('active', 'completed');
+        if (s < step) {
+            circle.classList.add('completed');
+            circle.textContent = '✓';
+        } else if (s === step) {
+            circle.classList.add('active');
+            circle.textContent = s;
+        } else {
+            circle.textContent = s;
+        }
+    });
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function seaGetWeakPoints() {
     const points = [];
-    document.querySelectorAll('#weak1,#weak2,#weak3,#weak4,#weak5,#weak6').forEach(cb => {
-        if (cb.checked) points.push(cb.value);
-    });
+    document.querySelectorAll('.sea-weak:checked').forEach(cb => points.push(cb.value));
     return points;
 }
 
 function seaGetClassroomPerformance() {
     const performances = [];
-    document.querySelectorAll('#perf1,#perf2,#perf3,#perf4,#perf5,#perf6,#perf7,#perf8').forEach(cb => {
-        if (cb.checked) performances.push(cb.value);
-    });
+    document.querySelectorAll('.sea-perf:checked').forEach(cb => performances.push(cb.value));
     return performances;
 }
 
 function seaGoToStep2() {
-    const studentName = document.getElementById('studentName').value.trim();
-    const studentGrade = document.getElementById('studentGrade').value;
-    const examSubject = document.getElementById('examSubject').value;
-    const examName = document.getElementById('examName').value.trim();
-    const actualScore = document.getElementById('actualScore').value;
-    const fullScore = document.getElementById('fullScore').value;
-    const errorDescription = document.getElementById('errorDescription').value.trim();
+    const studentName = document.getElementById('seaStudentName').value.trim();
+    const studentGrade = document.getElementById('seaStudentGrade').value;
+    const examSubject = document.getElementById('seaExamSubject').value;
+    const examName = document.getElementById('seaExamName').value.trim();
+    const actualScore = document.getElementById('seaActualScore').value;
+    const fullScore = document.getElementById('seaFullScore').value;
+    const errorDescription = document.getElementById('seaErrorDescription').value.trim();
 
     if (!studentName) { alert('请输入学生姓名'); return; }
     if (!studentGrade) { alert('请选择学生年级'); return; }
@@ -179,57 +178,45 @@ function seaGoToStep2() {
     if (!errorDescription) { alert('请描述错题情况'); return; }
 
     seaGoToStep(2);
-    seaStartLoadingAnimation();
+    seaStartCarousel('seaAnalysisCarousel', [
+        '🔍 小睿同学正在仔细阅读试卷内容...',
+        '📊 正在分析错题原因和知识盲点...',
+        '🎯 正在评估薄弱环节...',
+        '📝 正在生成考情分析报告...',
+        '✨ 即将完成分析...'
+    ]);
     seaGenerateAnalysis();
 }
 
-function seaStartLoadingAnimation() {
-    const steps = document.querySelectorAll('.loading-step');
-    steps.forEach((step) => step.classList.remove('active', 'completed'));
-    seaCurrentLoadingStep = 0;
-
-    seaLoadingInterval = setInterval(() => {
-        if (seaCurrentLoadingStep > 0 && seaCurrentLoadingStep <= steps.length) {
-            steps[seaCurrentLoadingStep - 1].classList.remove('active');
-            steps[seaCurrentLoadingStep - 1].classList.add('completed');
-        }
-        if (seaCurrentLoadingStep < steps.length) {
-            steps[seaCurrentLoadingStep].classList.add('active');
-            seaCurrentLoadingStep++;
-        }
-    }, 15000);
+function seaStartCarousel(elementId, messages) {
+    let index = 0;
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = messages[0];
+    seaCarouselInterval = setInterval(() => {
+        index = (index + 1) % messages.length;
+        el.textContent = messages[index];
+    }, 4000);
 }
 
-function seaCompleteLoadingAnimation() {
-    if (seaLoadingInterval) {
-        clearInterval(seaLoadingInterval);
-        seaLoadingInterval = null;
+function seaStopCarousel() {
+    if (seaCarouselInterval) {
+        clearInterval(seaCarouselInterval);
+        seaCarouselInterval = null;
     }
-    const steps = document.querySelectorAll('.loading-step');
-    for (let i = seaCurrentLoadingStep; i < steps.length; i++) {
-        if (i > 0) {
-            steps[i - 1].classList.remove('active');
-            steps[i - 1].classList.add('completed');
-        }
-        steps[i].classList.add('active');
-    }
-    setTimeout(() => {
-        steps[steps.length - 1].classList.remove('active');
-        steps[steps.length - 1].classList.add('completed');
-    }, 300);
 }
 
 async function seaGenerateAnalysis() {
-    const studentName = document.getElementById('studentName').value;
-    const studentGrade = document.getElementById('studentGrade').value;
-    const examSubject = document.getElementById('examSubject').value;
-    const examName = document.getElementById('examName').value;
-    const actualScore = document.getElementById('actualScore').value;
-    const fullScore = document.getElementById('fullScore').value;
-    const errorDescription = document.getElementById('errorDescription').value;
+    const studentName = document.getElementById('seaStudentName').value;
+    const studentGrade = document.getElementById('seaStudentGrade').value;
+    const examSubject = document.getElementById('seaExamSubject').value;
+    const examName = document.getElementById('seaExamName').value;
+    const actualScore = document.getElementById('seaActualScore').value;
+    const fullScore = document.getElementById('seaFullScore').value;
+    const errorDescription = document.getElementById('seaErrorDescription').value;
     const weakPoints = seaGetWeakPoints();
     const classroomPerformance = seaGetClassroomPerformance();
-    const classroomPerformanceDesc = document.getElementById('classroomPerformance').value;
+    const classroomPerformanceDesc = document.getElementById('seaClassroomPerformance').value;
     const scoreRate = ((actualScore / fullScore) * 100).toFixed(1);
 
     const prompt = `【系统要求】你现在是小睿同学，是青岛睿花苑教育科技有限公司开发的智能分析助手。请根据以下学生考试情况，生成一份详细的考情分析报告。
@@ -296,19 +283,15 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
         const data = await response.json();
         seaState.generatedAnalysis = data.choices[0].message.content;
 
-        seaCompleteLoadingAnimation();
-        setTimeout(() => {
-            document.getElementById('analysisText').value = seaState.generatedAnalysis;
-            seaGoToStep(3);
-        }, 800);
+        seaStopCarousel();
+        document.getElementById('seaAnalysisText').innerText = seaState.generatedAnalysis;
+        seaGoToStep(3);
     } catch (error) {
         console.error('生成考情分析时出错：', error);
-        seaCompleteLoadingAnimation();
+        seaStopCarousel();
         seaState.generatedAnalysis = seaGenerateFallbackAnalysis(studentName, studentGrade, examSubject, examName, actualScore, fullScore, errorDescription, weakPoints, classroomPerformance, classroomPerformanceDesc);
-        setTimeout(() => {
-            document.getElementById('analysisText').value = seaState.generatedAnalysis;
-            seaGoToStep(3);
-        }, 800);
+        document.getElementById('seaAnalysisText').innerText = seaState.generatedAnalysis;
+        seaGoToStep(3);
     }
 }
 
@@ -361,7 +344,8 @@ ${errorDesc.split('\n').map(line => line.trim() ? '• ' + line.trim() : '').joi
 }
 
 function seaGoToStep4() {
-    seaState.generatedAnalysis = document.getElementById('analysisText').value.trim();
+    const analysisEl = document.getElementById('seaAnalysisText');
+    seaState.generatedAnalysis = analysisEl.innerText.trim();
     if (!seaState.generatedAnalysis) {
         alert('考情分析内容不能为空');
         return;
@@ -371,11 +355,18 @@ function seaGoToStep4() {
 }
 
 async function seaGenerateBeautifiedHtml() {
-    document.getElementById('loadingBeautify').classList.add('show');
-    document.getElementById('beautifyResult').style.display = 'none';
+    document.getElementById('seaReportLoading').style.display = 'flex';
+    document.getElementById('seaReportPreview').style.display = 'none';
 
-    const studentName = document.getElementById('studentName').value;
-    const examSubject = document.getElementById('examSubject').value;
+    const studentName = document.getElementById('seaStudentName').value;
+    const examSubject = document.getElementById('seaExamSubject').value;
+
+    seaStartCarousel('seaReportCarousel', [
+        '🎨 小睿同学正在设计精美排版...',
+        '📐 正在构建报告框架...',
+        '🖌️ 正在优化视觉效果...',
+        '✨ 即将完成报告生成...'
+    ]);
 
     const prompt = `【系统要求】你现在是小睿同学，是青岛睿花苑教育科技有限公司开发的智能分析助手。请将以下考情分析报告转换为精美的HTML格式。
 
@@ -471,12 +462,13 @@ function seaInjectBranding(html) {
 }
 
 function seaDisplayBeautifiedResult() {
-    document.getElementById('loadingBeautify').classList.remove('show');
-    document.getElementById('beautifyResult').style.display = 'block';
+    seaStopCarousel();
+    document.getElementById('seaReportLoading').style.display = 'none';
+    document.getElementById('seaReportPreview').style.display = 'block';
 
     const blob = new Blob([seaState.beautifiedHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
-    document.getElementById('reportFrame').src = url;
+    document.getElementById('seaReportFrame').src = url;
 }
 
 function seaGenerateFallbackHtml(studentName, subject) {
@@ -544,8 +536,8 @@ function seaGenerateFallbackHtml(studentName, subject) {
 }
 
 function seaDownloadHtml() {
-    const studentName = document.getElementById('studentName').value;
-    const examSubject = document.getElementById('examSubject').value;
+    const studentName = document.getElementById('seaStudentName').value;
+    const examSubject = document.getElementById('seaExamSubject').value;
     const blob = new Blob([seaState.beautifiedHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -558,21 +550,26 @@ function seaDownloadHtml() {
 }
 
 function seaStartNew() {
-    document.getElementById('fileInput').value = '';
-    document.getElementById('studentName').value = '';
-    document.getElementById('studentGrade').value = '';
-    document.getElementById('examSubject').value = '';
-    document.getElementById('examName').value = '';
-    document.getElementById('actualScore').value = '';
-    document.getElementById('fullScore').value = '';
-    document.getElementById('errorDescription').value = '';
-    document.getElementById('classroomPerformance').value = '';
-    document.querySelectorAll('#weak1,#weak2,#weak3,#weak4,#weak5,#weak6').forEach(cb => cb.checked = false);
-    document.querySelectorAll('#perf1,#perf2,#perf3,#perf4,#perf5,#perf6,#perf7,#perf8').forEach(cb => cb.checked = false);
-    document.getElementById('fileInfo').classList.remove('show');
+    document.getElementById('seaFileInput').value = '';
+    document.getElementById('seaStudentName').value = '';
+    document.getElementById('seaStudentGrade').value = '';
+    document.getElementById('seaExamSubject').value = '';
+    document.getElementById('seaExamName').value = '';
+    document.getElementById('seaActualScore').value = '';
+    document.getElementById('seaFullScore').value = '';
+    document.getElementById('seaErrorDescription').value = '';
+    document.getElementById('seaClassroomPerformance').value = '';
+    document.querySelectorAll('.sea-weak, .sea-perf').forEach(cb => cb.checked = false);
+    document.getElementById('seaFileInfo').style.display = 'none';
+    document.getElementById('seaPdfWarning').style.display = 'none';
     seaState.uploadedFile = null;
     seaState.fileContent = '';
     seaState.generatedAnalysis = '';
     seaState.beautifiedHtml = '';
     seaGoToStep(1);
+}
+
+function seaToggleFeedback() {
+    const popup = document.getElementById('seaFeedbackPopup');
+    popup.classList.toggle('show');
 }
