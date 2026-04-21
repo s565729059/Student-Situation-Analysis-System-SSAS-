@@ -74,6 +74,7 @@ const elements = {
     versionBadge: document.getElementById('versionBadge'),
     backToStep2: document.getElementById('backToStep2'),
     toStep4: document.getElementById('toStep4'),
+    regenerateReport: document.getElementById('regenerateReport'),
 
     reportLoading: document.getElementById('reportLoading'),
     reportCarousel: document.getElementById('reportCarousel'),
@@ -113,7 +114,8 @@ function initializeEventListeners() {
     elements.backToStep1.addEventListener('click', () => goToStep(1));
     elements.toStep3.addEventListener('click', startAnalysis);
     elements.backToStep2.addEventListener('click', () => goToStep(2));
-    elements.toStep4.addEventListener('click', generateReport);
+    elements.toStep4.addEventListener('click', handleToStep4);
+    elements.regenerateReport.addEventListener('click', generateReport);
     elements.backToStep3.addEventListener('click', () => goToStep(3));
     elements.startNew.addEventListener('click', resetApplication);
 
@@ -302,8 +304,33 @@ function goToStep(step) {
     document.getElementById(`step${step}`).style.display = 'block';
     updateProgressIndicators(step);
 
+    if (step === 3) {
+        updateStep3Buttons();
+    }
+
     state.currentStep = step;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStep3Buttons() {
+    if (state.htmlReport) {
+        elements.toStep4.innerHTML = '查看已生成报告 <i class="fas fa-eye" style="margin-left:8px"></i>';
+        elements.regenerateReport.style.display = 'inline-block';
+    } else {
+        elements.toStep4.innerHTML = '生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>';
+        elements.regenerateReport.style.display = 'none';
+    }
+}
+
+function handleToStep4() {
+    if (state.htmlReport) {
+        goToStep(4);
+        elements.reportLoading.style.display = 'none';
+        elements.reportPreview.style.display = 'block';
+        displayReport(state.htmlReport);
+    } else {
+        generateReport();
+    }
 }
 
 function updateProgressIndicators(currentStep) {
