@@ -1,0 +1,186 @@
+#updateNotificationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: updateFadeIn 0.3s ease;
+}
+
+#updateNotificationModal.update-fade-out {
+    animation: updateFadeOut 0.3s ease forwards;
+}
+
+.update-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.update-modal {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    animation: updateSlideUp 0.4s ease;
+}
+
+.update-modal-header {
+    text-align: center;
+    padding: 30px 24px 20px;
+    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    color: white;
+}
+
+.update-modal-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.update-modal-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.update-modal-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.85;
+}
+
+.update-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.update-version-block {
+    margin-bottom: 20px;
+}
+
+.update-version-block:last-child {
+    margin-bottom: 0;
+}
+
+.update-version-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.update-version-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.update-version-date {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.update-changes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.update-changes-list li {
+    position: relative;
+    padding: 6px 0 6px 20px;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.5;
+}
+
+.update-changes-list li::before {
+    content: '✨';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    font-size: 0.8rem;
+}
+
+.update-modal-footer {
+    padding: 16px 24px 24px;
+    text-align: center;
+}
+
+.update-confirm-btn {
+    padding: 12px 48px;
+    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.update-confirm-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(74, 111, 165, 0.4);
+}
+
+@keyframes updateFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes updateFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes updateSlideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .update-modal {
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .update-modal-header {
+        padding: 24px 20px 16px;
+    }
+
+    .update-modal-icon {
+        font-size: 2.5rem;
+    }
+
+    .update-modal-header h3 {
+        font-size: 1.3rem;
+    }
+
+    .update-modal-body {
+        padding: 16px;
+    }
+
+    .update-confirm-btn {
+        padding: 10px 36px;
+        font-size: 0.95rem;
+    }
+}
