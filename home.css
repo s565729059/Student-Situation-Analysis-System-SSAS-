@@ -141,6 +141,16 @@ main {
     cursor: not-allowed;
 }
 
+.beta-tag {
+    display: inline-block;
+    padding: 10px 25px;
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    color: white;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
 .enter-btn {
     display: inline-block;
     padding: 12px 35px;

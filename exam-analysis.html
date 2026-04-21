@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>睿花苑·智能试卷分析系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <button class="back-btn" onclick="window.location.href='index.html'">← 返回首页</button>
+            </div>
+            <h1>睿花苑·智能试卷分析系统</h1>
+            <h2>AI驱动的试卷深度解析与报告生成</h2>
+            <div class="version-info">
+                <p>版本号：v1.2</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="exam-progress-bar">
+                <div class="exam-step" data-step="1">
+                    <div class="exam-step-circle active">1</div>
+                    <span>上传试卷</span>
+                </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="2">
+                    <div class="exam-step-circle">2</div>
+                    <span>选择版本</span>
+                </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="3">
+                    <div class="exam-step-circle">3</div>
+                    <span>AI分析与报告</span>
+                </div>
+            </div>
+
+            <section id="step1" class="form-section exam-fade-in">
+                <h3 class="exam-section-title">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    上传试卷文件
+                </h3>
+
+                <div id="uploadArea" class="exam-upload-area">
+                    <i class="fas fa-file-upload exam-upload-icon"></i>
+                    <p class="exam-upload-text">点击或拖拽文件到此处上传</p>
+                    <p class="exam-upload-hint">支持 PDF、DOC、DOCX 格式</p>
+                    <div class="exam-upload-formats">
+                        <span><i class="fas fa-check-circle" style="color:#27ae60"></i> Word 文档</span>
+                        <span><i class="fas fa-exclamation-circle" style="color:#f39c12"></i> PDF 需 A4 单页模式</span>
+                    </div>
+                    <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx">
+                </div>
+
+                <div id="pdfWarning" class="exam-warning" style="display:none">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <p class="exam-warning-title">PDF 文件上传提示</p>
+                        <p class="exam-warning-text">请确保 PDF 文件为 <strong>A4 单页模式</strong>，不支持 A3 试卷版本。如为 A3 格式，请先转换为 A4 格式后重新上传。</p>
+                    </div>
+                </div>
+
+                <div id="fileInfo" class="exam-file-info" style="display:none">
+                    <div class="exam-file-row">
+                        <div class="exam-file-detail">
+                            <i id="fileIcon" class="fas fa-file text-3xl" style="color:#4a6fa5;margin-right:15px"></i>
+                            <div>
+                                <p id="fileName" class="exam-file-name"></p>
+                                <p id="fileSize" class="exam-file-size"></p>
+                            </div>
+                        </div>
+                        <button id="removeFile" class="exam-remove-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="filePreview" class="exam-file-preview" style="display:none">
+                        <p class="exam-preview-label">文件内容预览：</p>
+                        <div id="previewContent" class="exam-preview-content"></div>
+                    </div>
+                </div>
+
+                <div id="subjectSection" class="form-group" style="display:none">
+                    <label for="subjectSelect">选择学科</label>
+                    <select id="subjectSelect">
+                        <option value="">请选择学科</option>
+                        <option value="math">数学</option>
+                        <option value="chinese">语文</option>
+                        <option value="english">英语</option>
+                        <option value="physics">物理</option>
+                        <option value="chemistry">化学</option>
+                        <option value="biology">生物</option>
+                        <option value="history">历史</option>
+                        <option value="geography">地理</option>
+                        <option value="politics">政治</option>
+                    </select>
+                </div>
+
+                <div class="exam-nav-center">
+                    <button id="toStep2" class="submit-btn" disabled>
+                        下一步 <i class="fas fa-arrow-right" style="margin-left:8px"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section id="step2" class="form-section exam-fade-in" style="display:none">
+                <h3 class="exam-section-title">
+                    <i class="fas fa-code-branch"></i>
+                    选择分析版本
+                </h3>
+
+                <div class="exam-version-grid">
+                    <div class="exam-version-card" data-version="teaching">
+                        <div class="exam-version-header">
+                            <div class="exam-version-icon teaching-icon">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div>
+                                <h4 class="exam-version-name">教学参考版</h4>
+                                <p class="exam-version-target">面向教师与教研人员</p>
+                            </div>
+                        </div>
+                        <ul class="exam-version-features">
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 深度知识点解析</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 详细考向分析</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 专业难度评估</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 教学建议与策略</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 考点分布统计</li>
+                        </ul>
+                        <p class="exam-version-note">* 内容专业详细，适合教学研究使用</p>
+                    </div>
+
+                    <div class="exam-version-card" data-version="marketing">
+                        <div class="exam-version-header">
+                            <div class="exam-version-icon marketing-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <h4 class="exam-version-name">营销家长版</h4>
+                                <p class="exam-version-target">面向家长与营销人员</p>
+                            </div>
+                        </div>
+                        <ul class="exam-version-features">
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 通俗易懂的解读</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 直观的图表展示</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 口语化表达</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 重点突出醒目</li>
+                            <li><i class="fas fa-check" style="color:#27ae60"></i> 学习建议与规划</li>
+                        </ul>
+                        <p class="exam-version-note">* 内容简洁明了，适合家长快速理解</p>
+                    </div>
+                </div>
+
+                <div class="exam-nav-between">
+                    <button id="backToStep1" class="exam-btn-outline">
+                        <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回
+                    </button>
+                    <button id="toStep3" class="submit-btn" disabled>
+                        开始分析 <i class="fas fa-magic" style="margin-left:8px"></i>
+                    </button>
+                </div>
+            </section>
+
+            <section id="step3" class="form-section exam-fade-in" style="display:none">
+                <div id="analysisLoading" class="exam-loading-section">
+                    <div class="loading-spinner"></div>
+                    <h3 class="exam-loading-title">AI 正在分析试卷...</h3>
+                    <p id="analysisStatus" class="exam-loading-status">正在提取试卷内容...</p>
+                    <div class="exam-progress-wrapper">
+                        <div class="exam-progress-track">
+                            <div id="analysisProgress" class="exam-progress-fill" style="width:0%"></div>
+                        </div>
+                        <p id="analysisStep" class="exam-progress-label">分析中...</p>
+                    </div>
+                </div>
+
+                <div id="analysisResults" style="display:none">
+                    <div class="exam-results-header">
+                        <h3 class="exam-section-title" style="margin-bottom:0">
+                            <i class="fas fa-clipboard-check"></i>
+                            AI 分析结果
+                        </h3>
+                        <span id="versionBadge" class="exam-version-badge"></span>
+                    </div>
+
+                    <div class="exam-analysis-block">
+                        <h4 class="exam-analysis-subtitle">
+                            <i class="fas fa-chart-pie"></i>
+                            试卷整体特征
+                        </h4>
+                        <div id="overallAnalysis" class="exam-editable-content" contenteditable="true"></div>
+                    </div>
+
+                    <div class="exam-analysis-block">
+                        <h4 class="exam-analysis-subtitle">
+                            <i class="fas fa-th-large"></i>
+                            题型板块考向分析
+                        </h4>
+                        <div id="typeAnalysis" class="exam-editable-content" contenteditable="true"></div>
+                    </div>
+
+                    <div class="exam-nav-between">
+                        <button id="backToStep2" class="exam-btn-outline">
+                            <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回
+                        </button>
+                        <button id="toStep4" class="submit-btn">
+                            生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="step4" class="form-section exam-fade-in" style="display:none">
+                <div id="reportLoading" class="exam-loading-section">
+                    <div class="loading-spinner"></div>
+                    <h3 class="exam-loading-title">正在生成 HTML 报告...</h3>
+                    <p class="exam-loading-status">Kimi K2.5 正在美化排版、生成图表...</p>
+                </div>
+
+                <div id="reportPreview" style="display:none">
+                    <div class="exam-results-header">
+                        <h3 class="exam-section-title" style="margin-bottom:0">
+                            <i class="fas fa-file-code"></i>
+                            HTML 分析报告
+                        </h3>
+                        <div class="exam-report-actions">
+                            <button id="previewReport" class="exam-btn-outline">
+                                <i class="fas fa-eye" style="margin-right:6px"></i>预览
+                            </button>
+                            <button id="downloadReport" class="submit-btn" style="padding:10px 20px;font-size:14px">
+                                <i class="fas fa-download" style="margin-right:6px"></i>下载 HTML
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="exam-report-frame-wrapper">
+                        <iframe id="reportFrame" class="exam-report-frame"></iframe>
+                    </div>
+
+                    <div class="form-group" style="margin-top:20px">
+                        <label>HTML 源代码</label>
+                        <textarea id="htmlCode" class="exam-html-code" readonly></textarea>
+                    </div>
+
+                    <div class="exam-nav-between" style="margin-top:20px">
+                        <button id="backToStep3" class="exam-btn-outline">
+                            <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
+                        </button>
+                        <button id="startNew" class="exam-btn-green">
+                            <i class="fas fa-plus" style="margin-right:8px"></i> 分析新试卷
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="reportModal" class="exam-modal" style="display:none">
+            <div class="exam-modal-inner">
+                <div class="exam-modal-header">
+                    <h3>试卷分析报告预览</h3>
+                    <button id="closeModal" class="exam-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="exam-modal-body"></div>
+            </div>
+        </div>
+
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <p>正在分析，请稍候...</p>
+        </div>
+
+        <div class="feedback-float">
+            <button class="feedback-btn" onclick="toggleFeedback()">💬</button>
+            <div class="feedback-popup" id="feedbackPopup">
+                <span class="close-popup" onclick="toggleFeedback()">&times;</span>
+                <h4>问题反馈</h4>
+                <p>如有任何问题或建议，请添加微信咨询！</p>
+                <p style="text-align: center; margin: 20px 0; font-size: 20px;">微信：<strong style="color: #4a6fa5; font-size: 24px;">swsw823</strong></p>
+                <p>工作时间：每天 8:00-20:00</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="exam-analysis.js"></script>
+</body>
+</html>
