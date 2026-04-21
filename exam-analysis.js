@@ -496,7 +496,12 @@ function getSubjectName() {
 
 async function callKimiAPI(prompt) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000);
+    let timeoutId = setTimeout(() => controller.abort(), 180000);
+
+    function resetTimeout() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => controller.abort(), 180000);
+    }
 
     try {
         const response = await fetch(KIMI_API_URL, {
@@ -518,14 +523,14 @@ async function callKimiAPI(prompt) {
                     }
                 ],
                 temperature: 1,
-                max_tokens: 8192
+                max_tokens: 8192,
+                stream: true
             }),
             signal: controller.signal
         });
 
-        clearTimeout(timeoutId);
-
         if (!response.ok) {
+            clearTimeout(timeoutId);
             let errorDetail = '';
             try {
                 const errorData = await response.json();
@@ -536,9 +541,42 @@ async function callKimiAPI(prompt) {
             throw new Error(`Kimi API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
         }
 
-        const data = await response.json();
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-            return data.choices[0].message.content;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            resetTimeout();
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed === 'data: [DONE]') continue;
+                if (!trimmed.startsWith('data: ')) continue;
+
+                try {
+                    const json = JSON.parse(trimmed.slice(6));
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) {
+                        fullContent += delta;
+                    }
+                } catch (e) {
+                    // skip malformed chunks
+                }
+            }
+        }
+
+        clearTimeout(timeoutId);
+
+        if (fullContent) {
+            return fullContent;
         }
         throw new Error('Kimi API返回数据格式异常');
 
