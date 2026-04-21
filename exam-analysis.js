@@ -632,7 +632,7 @@ async function callZhipuAPI(prompt) {
                 'Authorization': `Bearer ${ZHIPU_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'glm-4.5',
+                model: 'glm-5',
                 messages: [
                     {
                         role: 'system',
@@ -643,8 +643,11 @@ async function callZhipuAPI(prompt) {
                         content: prompt
                     }
                 ],
-                temperature: 0.7,
-                max_tokens: 16384,
+                thinking: {
+                    type: 'enabled'
+                },
+                temperature: 1.0,
+                max_tokens: 65536,
                 stream: true
             }),
             signal: controller.signal
