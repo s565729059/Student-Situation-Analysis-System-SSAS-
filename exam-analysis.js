@@ -418,7 +418,7 @@ function generateTypeAnalysisPrompt() {
     const versionConfig = getVersionConfig();
     const subjectName = getSubjectName();
 
-    return `你是一位资深的${subjectName}教育分析专家，拥有20年教学与命题研究经验。请对以下试卷的【题型板块考向】进行分析。
+    return `你是一位资深的${subjectName}教育分析专家。请对以下试卷的【题型板块考向】进行分析。
 
 【版本类型】
 ${versionConfig.name}
@@ -426,10 +426,10 @@ ${versionConfig.description}
 
 【核心要求】
 1. 只分析各题型板块的考向，不要分析整体特征
-2. 必须覆盖试卷中的每一种题型，不允许遗漏
-3. 逐题分析以考点为主，不需要太具体的解题过程，重点说明考查了什么知识点
-4. 每道题的分析控制在50字以内，简洁精炼
-5. 输出字数控制在3000字以内，确保完整输出
+2. 必须覆盖试卷中的每一种题型，不允许遗漏任何题型
+3. 每种题型精简分析：题型名+题量+分值+核心考点列表即可
+4. 逐题考点每题控制在30字以内，只写考查的知识点名称
+5. 输出字数控制在2000字以内，确保完整输出不截断
 
 【分析内容要求】
 ${versionConfig.typeRequirements}
@@ -453,11 +453,10 @@ function getVersionConfig() {
 5. 能力考查：识记、理解、应用、分析、综合、评价各层级占比
 6. 教学导向：对教学的启示、能力培养方向、复习策略建议`,
             typeRequirements: `请按试卷中出现的每一种题型进行分析，每种题型包含：
-1. 题型概述：题量、分值、占总分百分比
-2. 考查知识点：列出该题型涉及的核心知识点
-3. 考向分析：该题型的命题方向和考查重点
-4. 难度分析：该题型整体难度
-5. 逐题考点：列出每道题考查的知识点（每题50字以内）`
+1. 题型概述：题量、分值、占比
+2. 难度评估：该题型整体难度（易/中/难）
+3. 核心考点：列出该题型涉及的知识点（简洁列表）
+4. 逐题考点：每题只写题号、考查知识点、难度（30字以内）`
         };
     } else {
         return {
@@ -471,10 +470,10 @@ function getVersionConfig() {
 5. 学习建议：孩子需要重点掌握什么，接下来怎么复习
 6. 家长关注：家长最应该关注的几个点`,
             typeRequirements: `请按试卷中出现的每一种题型进行分析，每种题型包含：
-1. 题型介绍：这是什么题型，有几道题，占多少分
-2. 考什么内容：用大白话说明这种题型考的是什么
-3. 难度怎么样：简单还是难
-4. 逐题考点：列出每道题考什么（每题40字以内，用大白话）`
+1. 题型介绍：题型名、几道题、占多少分
+2. 难度怎么样：简单还是难
+3. 考什么：用大白话说明考的是什么
+4. 逐题考点：每题只写考什么知识点、难度（30字以内，大白话）`
         };
     }
 }
@@ -591,7 +590,12 @@ async function callKimiAPI(prompt) {
 
 async function callDeepSeekAPI(prompt) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 180000);
+    let timeoutId = setTimeout(() => controller.abort(), 180000);
+
+    function resetTimeout() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => controller.abort(), 180000);
+    }
 
     try {
         const response = await fetch(DEEPSEEK_API_URL, {
@@ -613,14 +617,14 @@ async function callDeepSeekAPI(prompt) {
                     }
                 ],
                 temperature: 0.7,
-                max_tokens: 8192
+                max_tokens: 8192,
+                stream: true
             }),
             signal: controller.signal
         });
 
-        clearTimeout(timeoutId);
-
         if (!response.ok) {
+            clearTimeout(timeoutId);
             let errorDetail = '';
             try {
                 const errorData = await response.json();
@@ -631,9 +635,42 @@ async function callDeepSeekAPI(prompt) {
             throw new Error(`DeepSeek API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
         }
 
-        const data = await response.json();
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-            return data.choices[0].message.content;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            resetTimeout();
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed === 'data: [DONE]') continue;
+                if (!trimmed.startsWith('data: ')) continue;
+
+                try {
+                    const json = JSON.parse(trimmed.slice(6));
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) {
+                        fullContent += delta;
+                    }
+                } catch (e) {
+                    // skip malformed chunks
+                }
+            }
+        }
+
+        clearTimeout(timeoutId);
+
+        if (fullContent) {
+            return fullContent;
         }
         throw new Error('DeepSeek API返回数据格式异常');
 
@@ -693,22 +730,19 @@ async function generateReport() {
 
     try {
         const reportPrompt = generateReportPrompt();
-        const htmlContent = await callDeepSeekAPI(reportPrompt);
+        let htmlContent = await callDeepSeekAPI(reportPrompt);
 
         reportCarouselTimer = stopCarousel(reportCarouselTimer);
 
-        let finalHtml = htmlContent;
-        const htmlMatch = htmlContent.match(/```html\n?([\s\S]*?)```/);
+        const htmlMatch = htmlContent.match(/```html\n?([\s\S]*)```/);
         if (htmlMatch) {
-            finalHtml = htmlMatch[1].trim();
+            htmlContent = htmlMatch[1].trim();
         }
 
-        if (!finalHtml.includes('</html>')) {
-            finalHtml += '\n</body>\n</html>';
-        }
+        htmlContent = htmlContent.replace(/^```\w*\n?/, '').replace(/\n?```$/,'');
 
-        state.htmlReport = finalHtml;
-        displayReport(finalHtml);
+        state.htmlReport = htmlContent;
+        displayReport(htmlContent);
 
     } catch (error) {
         console.error('Report generation error:', error);
@@ -723,90 +757,44 @@ function generateReportPrompt() {
     const subjectName = getSubjectName();
     const versionName = state.selectedVersion === 'teaching' ? '教师与教研人员' : '家长与营销人员';
 
-    return `你是一位世界顶级的HTML报告设计师和前端工程师。请基于以下试卷分析内容，生成一份极其精美、震撼的HTML格式分析报告。
+    return `请基于以下试卷分析内容，生成一份HTML格式的分析报告。
 
-【报告基本信息】
-- 版本类型：${versionConfig.name}
-- 目标受众：${versionName}
-- 学科：${subjectName}
+【基本信息】版本：${versionConfig.name}，受众：${versionName}，学科：${subjectName}
 
-【设计要求 - 必须严格遵守】
-1. **视觉设计**：使用渐变背景（紫色/蓝色系）、玻璃态卡片、柔和阴影、圆角边框
-2. **配色方案**：
-   - 主色：渐变紫蓝色 (#667eea → #764ba2)
-   - 简单/易：绿色 (#10b981)
-   - 中等：黄色/橙色 (#f59e0b)
-   - 较难：橙色 (#f97316)
-   - 困难：红色 (#ef4444)
-   - 背景：浅灰白 (#f8fafc)
-3. **字体**：使用 Google Fonts 的 Noto Sans SC
-4. **图标**：使用 Font Awesome 6 图标
-5. **动画**：卡片悬停有微妙的浮起效果
-6. **响应式**：适配桌面和移动设备
+【最高优先级 - 内容完整性】
+⚠️ 你必须在8192 token内输出完整报告！为此必须：
+1. 优先保证所有题型板块都出现，宁可样式简单也不能遗漏任何题型
+2. 布局紧凑：减少padding/margin，卡片间距缩小，不要大面积留白
+3. 每种题型的详解精简为：题型名+分值+核心考点（表格形式，每行一个考点）
+4. 封面和总结部分尽量简短，把token留给核心的题型详解部分
+5. 不要写逐题考点表格，改为按考点归类汇总
 
-【图表要求 - 极其重要，必须能正常显示】
-⚠️ 图表必须使用纯CSS+HTML绘制，不使用Chart.js等需要JS初始化的库！
-使用以下方式绘制图表：
-1. **题型分值分布**：使用CSS绘制的横向条形图（div宽度百分比表示占比）
-2. **难度分布**：使用CSS绘制的彩色进度条或柱状图
-3. **知识点覆盖**：使用CSS绘制的标签云或热力色块
-4. 每个图表必须有标题、图例、数据标签
+【样式要求 - 简洁高效】
+1. 配色：主色#667eea→#764ba2渐变，易#10b981，中#f59e0b，难#ef4444，背景#f8fafc
+2. 使用Tailwind CSS CDN + Font Awesome 6 + Noto Sans SC字体
+3. 图表用纯CSS横向条形图（div宽度百分比），不用Chart.js
+4. 卡片圆角阴影，悬停微浮起效果
 
-【内容结构 - 总分总模式，必须完整输出】
+【内容结构 - 必须全部输出】
+一、封面：标题+副标题+时间+基本信息卡片（极简）
+二、整体特征：结构概览+难度评估（简明扼要）
+三、各题型板块详解：⚠️必须覆盖所有题型！每种题型一个紧凑卡片（题型名+分值占比+考点汇总）
+四、数据图表：题型分值分布条形图+难度分布条
+五、总结建议：${state.selectedVersion === 'teaching' ? '教学建议' : '给家长的建议'}（简短）
+六、页脚："小睿同学·智能试卷分析系统"+时间
 
-一、报告封面（总）
-- 大标题：${subjectName}试卷分析报告
-- 副标题：${versionConfig.name}
-- 生成时间
-- 试卷基本信息卡片（学科、总分、题型数量、难度概览）
-
-二、试卷整体特征（总）
-- 试卷结构概览
-- 知识覆盖分析
-- 难度评估总结
-- 命题特点点评
-
-三、各题型板块详解（分 - 核心内容，必须完整）
-⚠️ 必须覆盖分析内容中的每一种题型，不允许遗漏！
-每种题型一个独立卡片，包含：
-- 题型名称、题量、分值、占比
-- 考查知识点列表
-- 难度分析（用颜色标签）
-- 逐题考点表格（题号、考点、难度）
-- 答题技巧/建议
-
-四、数据可视化图表区（分）
-- 题型分值分布图（CSS横向条形图）
-- 难度分布图（CSS彩色柱状图）
-- 知识点覆盖图（CSS标签云）
-
-五、总结与建议（总 - 放在页面最底部）
-- 试卷整体评价
-- ${state.selectedVersion === 'teaching' ? '教学建议与复习策略' : '给家长的实用建议'}
-- 重点提醒事项
-
-六、页脚
-- "小睿同学·智能试卷分析系统"
-- 生成时间
-
-【分析内容 - 必须全部体现在报告中】
-
+【分析内容】
 ${state.analysisResults.overall}
 
 ${state.analysisResults.typeAnalysis}
 
-【关键提醒 - 务必遵守】
-1. 直接输出完整的HTML代码，不要任何前缀说明
-2. HTML必须包含完整的<!DOCTYPE html>、<html>、<head>、<body>、</body>、</html>
-3. 在<head>中引入：Tailwind CSS CDN、Font Awesome 6、Noto Sans SC字体
-4. ⚠️ 不要使用Chart.js！所有图表用纯CSS+HTML绘制，确保能正常显示
-5. ⚠️ 必须输出完整内容！每种题型都要有详解，不能因为篇幅截断
-6. ⚠️ 内容必须翔实全面，把分析内容中的所有信息都体现在报告中
-7. ${state.selectedVersion === 'marketing' ? '语言要极其通俗易懂，多用emoji，让家长一眼就能看懂' : '语言要专业严谨，适合教学研究使用'}
-8. 页面最底部必须是总结与建议部分
-9. ⚠️ 你没有输出长度限制！必须完整输出所有HTML代码，直到</html>标签！
+【关键规则】
+1. 直接输出HTML代码，不要前缀说明，不要用\`\`\`html包裹
+2. 必须包含完整<!DOCTYPE html>到</html>
+3. ⚠️ 所有题型必须全部出现，这是最重要的要求！如果token不够，压缩样式和封面，绝不能省略题型
+4. ${state.selectedVersion === 'marketing' ? '语言通俗易懂，多用emoji' : '语言专业严谨'}
 
-请立即生成完整的HTML代码：`;
+请立即生成：`;
 }
 
 function displayReport(htmlContent) {
