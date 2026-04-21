@@ -1403,6 +1403,73 @@ main {
     cursor: pointer;
 }
 
+.sea-dual-result {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.sea-result-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e8ecf2;
+    transition: all 0.3s ease;
+    animation: seaCardFadeIn 0.5s ease;
+}
+
+.sea-result-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.sea-result-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #f0f4f8, #e8ecf2);
+    border-bottom: 1px solid #e0e4f0;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+}
+
+.sea-result-icon {
+    font-size: 1.2rem;
+}
+
+.sea-result-status {
+    margin-left: auto;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #f39c12;
+}
+
+.sea-result-card-body {
+    padding: 16px 18px;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@keyframes seaCardFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .sea-dual-result {
+        grid-template-columns: 1fr;
+    }
+}
+
 .exam-html-code {
     width: 100%;
     height: 180px;

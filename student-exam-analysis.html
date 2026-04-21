@@ -31,7 +31,7 @@
                 <div class="exam-step-line"></div>
                 <div class="exam-step" data-step="2">
                     <div class="exam-step-circle">2</div>
-                    <span>小睿分析</span>
+                    <span>考情分析</span>
                 </div>
                 <div class="exam-step-line"></div>
                 <div class="exam-step" data-step="3">
@@ -94,9 +94,6 @@
                         <label for="seaStudentGrade">学生年级</label>
                         <select id="seaStudentGrade">
                             <option value="">请选择年级</option>
-                            <option value="一年级">一年级</option>
-                            <option value="二年级">二年级</option>
-                            <option value="三年级">三年级</option>
                             <option value="四年级">四年级</option>
                             <option value="五年级">五年级</option>
                             <option value="六年级">六年级</option>
@@ -187,20 +184,46 @@
                     <p class="exam-loading-note">预计完成时间约3分钟，请耐心等待...</p>
                     <p id="seaAnalysisCarousel" class="exam-carousel-text">🔍 小睿同学正在仔细阅读试卷内容...</p>
                 </div>
+                <div class="sea-dual-result" style="display:none" id="seaDualResult">
+                    <div class="sea-result-card" id="seaResultCard1" style="display:none">
+                        <div class="sea-result-card-header">
+                            <span class="sea-result-icon">📊</span>
+                            <span>考情分析</span>
+                            <span class="sea-result-status" id="seaStatus1">⏳ 生成中...</span>
+                        </div>
+                        <div class="sea-result-card-body" id="seaPreview1"></div>
+                    </div>
+                    <div class="sea-result-card" id="seaResultCard2" style="display:none">
+                        <div class="sea-result-card-header">
+                            <span class="sea-result-icon">📋</span>
+                            <span>学习方案</span>
+                            <span class="sea-result-status" id="seaStatus2">⏳ 生成中...</span>
+                        </div>
+                        <div class="sea-result-card-body" id="seaPreview2"></div>
+                    </div>
+                </div>
             </section>
 
             <section id="seaStep3" class="form-section exam-fade-in" style="display:none">
                 <h3 class="exam-section-title">
                     <i class="fas fa-edit"></i>
-                    编辑考情分析
+                    编辑分析内容
                 </h3>
 
                 <div class="exam-analysis-block">
                     <h4 class="exam-analysis-subtitle">
                         <i class="fas fa-clipboard-list"></i>
-                        考情分析内容（可编辑）
+                        考情分析（可编辑）
                     </h4>
                     <div id="seaAnalysisText" class="exam-editable-content" contenteditable="true"></div>
+                </div>
+
+                <div class="exam-analysis-block">
+                    <h4 class="exam-analysis-subtitle">
+                        <i class="fas fa-tasks"></i>
+                        学习方案（可编辑）
+                    </h4>
+                    <div id="seaPlanText" class="exam-editable-content" contenteditable="true"></div>
                 </div>
 
                 <div class="exam-nav-between">
