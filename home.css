@@ -45,6 +45,43 @@ header h1 {
     font-weight: normal;
 }
 
+.notice-bar {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border: 1px solid #ffcc80;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+
+.notice-icon {
+    font-size: 1.3rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.notice-scroll {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.notice-text {
+    display: inline-block;
+    color: #e65100;
+    font-size: 0.95rem;
+    font-weight: bold;
+    animation: noticeScroll 18s linear infinite;
+}
+
+@keyframes noticeScroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
 main {
     flex: 1;
 }
@@ -688,6 +725,14 @@ footer p {
     
     .subtitle {
         font-size: 1.1rem;
+    }
+    
+    .notice-bar {
+        padding: 8px 14px;
+    }
+    
+    .notice-text {
+        font-size: 0.85rem;
     }
     
     .function-cards {
