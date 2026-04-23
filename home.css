@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #fff5f3 0%, #f5d5cf 100%);
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
@@ -26,10 +26,10 @@ header {
     text-align: center;
     margin-bottom: 50px;
     padding: 40px 20px;
-    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    background: linear-gradient(135deg, #c06050, #d48a7f);
     color: white;
     border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3);
+    box-shadow: 0 8px 20px rgba(192, 96, 80, 0.3);
 }
 
 header h1 {
@@ -99,7 +99,7 @@ main {
 
 .department-title h2 {
     font-size: 2rem;
-    color: #4a6fa5;
+    color: #c06050;
     margin-bottom: 5px;
     font-weight: bold;
 }
@@ -137,16 +137,16 @@ main {
     left: 0;
     right: 0;
     height: 5px;
-    background: linear-gradient(90deg, #4a6fa5, #6c8ebf);
+    background: linear-gradient(90deg, #c06050, #d48a7f);
 }
 
 .function-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 12px 30px rgba(74, 111, 165, 0.25);
+    box-shadow: 0 12px 30px rgba(192, 96, 80, 0.25);
 }
 
 .function-card.active {
-    border: 2px solid #4a6fa5;
+    border: 2px solid #c06050;
 }
 
 .dept-tag {
@@ -188,7 +188,7 @@ main {
 
 .function-card h3 {
     font-size: 1.6rem;
-    color: #4a6fa5;
+    color: #c06050;
     margin-bottom: 15px;
     font-weight: bold;
 }
@@ -224,7 +224,7 @@ main {
 .enter-btn {
     display: inline-block;
     padding: 12px 35px;
-    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    background: linear-gradient(135deg, #c06050, #d48a7f);
     color: white;
     border-radius: 25px;
     font-weight: bold;
@@ -233,7 +233,7 @@ main {
 }
 
 .enter-btn:hover {
-    background: linear-gradient(135deg, #3a5a85, #5a78a5);
+    background: linear-gradient(135deg, #a85048, #bb7a70);
     transform: scale(1.05);
 }
 
@@ -380,7 +380,7 @@ footer p {
 .update-system-status h3,
 .update-changelog h3 {
     font-size: 1rem;
-    color: #4a6fa5;
+    color: #c06050;
     margin-bottom: 12px;
     font-weight: bold;
 }
@@ -397,7 +397,7 @@ footer p {
     gap: 10px;
     padding: 10px 12px;
     border-radius: 8px;
-    background: #f8f9fa;
+    background: #fdf2f0;
 }
 
 .status-dot {
@@ -470,8 +470,8 @@ footer p {
 }
 
 .update-tag.tag-opt {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: #fde8e5;
+    color: #c06050;
 }
 
 .update-tag.tag-fix {
@@ -508,7 +508,7 @@ footer p {
 
 .update-btn-primary {
     padding: 10px 40px;
-    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    background: linear-gradient(135deg, #c06050, #d48a7f);
     color: white;
     border: none;
     border-radius: 25px;
@@ -520,7 +520,7 @@ footer p {
 
 .update-btn-primary:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(74, 111, 165, 0.4);
+    box-shadow: 0 4px 15px rgba(192, 96, 80, 0.4);
 }
 
 .changelog-section {
@@ -537,7 +537,7 @@ footer p {
     gap: 10px;
     margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #f5e0dc;
 }
 
 .changelog-icon {
@@ -546,7 +546,7 @@ footer p {
 
 .changelog-header h2 {
     font-size: 1.5rem;
-    color: #4a6fa5;
+    color: #c06050;
     font-weight: bold;
 }
 
@@ -559,18 +559,18 @@ footer p {
 .changelog-item {
     padding: 20px;
     border-radius: 10px;
-    background: #fafbfc;
+    background: #fdf8f7;
     border-left: 4px solid #ddd;
     transition: all 0.3s ease;
 }
 
 .changelog-item:hover {
-    background: #f0f4f8;
+    background: #fbf0ee;
 }
 
 .changelog-latest {
-    border-left-color: #e67e22;
-    background: linear-gradient(135deg, #fffaf5, #fff5e6);
+    border-left-color: #c06050;
+    background: linear-gradient(135deg, #fff8f6, #fef0ec);
 }
 
 .changelog-version {
@@ -583,7 +583,7 @@ footer p {
 .version-tag {
     display: inline-block;
     padding: 4px 12px;
-    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    background: linear-gradient(135deg, #c06050, #d48a7f);
     color: white;
     border-radius: 20px;
     font-weight: bold;
@@ -591,7 +591,7 @@ footer p {
 }
 
 .changelog-latest .version-tag {
-    background: linear-gradient(135deg, #e67e22, #f39c12);
+    background: linear-gradient(135deg, #c06050, #d48a7f);
 }
 
 .version-date {
@@ -641,6 +641,11 @@ footer p {
     color: white;
 }
 
+.group-student-exam {
+    background: linear-gradient(135deg, #e17055, #fab1a0);
+    color: white;
+}
+
 .changelog-content ul {
     list-style: none;
     padding: 0;
@@ -676,8 +681,8 @@ footer p {
 }
 
 .tag-optimize {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: #fde8e5;
+    color: #c06050;
 }
 
 .tag-fix {
@@ -698,10 +703,10 @@ footer p {
     max-width: 200px;
     margin: 20px auto 0;
     padding: 10px 20px;
-    background: #f0f4f8;
-    border: 1px solid #d0dae8;
+    background: #fdf2f0;
+    border: 1px solid #e8c5be;
     border-radius: 8px;
-    color: #4a6fa5;
+    color: #c06050;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
@@ -709,8 +714,8 @@ footer p {
 }
 
 .changelog-toggle-btn:hover {
-    background: #e0e8f2;
-    border-color: #4a6fa5;
+    background: #fbe5e1;
+    border-color: #c06050;
 }
 
 .changelog-toggle-btn i {
