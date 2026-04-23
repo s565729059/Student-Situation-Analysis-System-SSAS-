@@ -129,6 +129,16 @@ main {
     color: white;
 }
 
+.dept-tag-xueguan-yingxiao {
+    background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    color: white;
+}
+
+.dept-tag-jiaoxue-xueguan {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    color: white;
+}
+
 .dept-tag-jiaoxue {
     background: linear-gradient(135deg, #27ae60, #2ecc71);
     color: white;

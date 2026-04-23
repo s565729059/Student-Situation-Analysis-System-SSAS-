@@ -22,7 +22,7 @@
                 
                 <div class="function-cards">
                     <div class="function-card active" onclick="window.location.href='student-analysis.html'">
-                        <span class="dept-tag dept-tag-xueguan">学管部主推</span>
+                        <span class="dept-tag dept-tag-xueguan-yingxiao">学管部&咨询部</span>
                         <div class="card-icon">📊</div>
                         <h3>学生情况分析</h3>
                         <p class="card-desc">全面分析学生学习情况，生成个性化报告</p>
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="function-card active" onclick="window.location.href='student-exam-analysis.html'">
-                        <span class="dept-tag dept-tag-jiaoxue">教学部主推</span>
+                        <span class="dept-tag dept-tag-jiaoxue-xueguan">教学部&学管部</span>
                         <div class="card-icon">🎯</div>
                         <h3>学员考情分析</h3>
                         <p class="card-desc">深入分析个体考情，提供精准辅导方案</p>
@@ -85,6 +85,21 @@
             </div>
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
+                    <div class="changelog-version">
+                        <span class="version-tag">v3.3.6</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>学生情况分析部门标签细化：学管部主推 → 学管部&咨询部</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>学员考情分析部门标签细化：教学部主推 → 教学部&学管部</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>多部门标签样式：紫色（学管部&咨询部）、青色（教学部&学管部）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
                     <div class="changelog-version">
                         <span class="version-tag">v3.3.5</span>
                         <span class="version-date">2026-04-23</span>
@@ -228,7 +243,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.5</p>
+            <p class="version-info">版本号：v3.3.6</p>
         </footer>
     </div>
     
@@ -243,7 +258,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.5</h2>
+                <h2>小睿同学已更新至 v3.3.6</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -288,13 +303,12 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.5 更新内容</h3>
+                    <h3>📝 v3.3.6 更新内容</h3>
                     <div class="changelog-group"><span class="changelog-group-tag group-home">� 首页</span>
                         <ul>
-                            <li><span class="update-tag tag-new">新增</span><strong>更新日志按系统分组</strong>：彩色标签区分各功能系统</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>考情分析系统落地</strong>：通过内测，进入系统</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>班课反馈生成</strong>：等待开发区域展示</li>
-                            <li><span class="update-tag tag-opt">优化</span><strong>一对一反馈生成</strong>：名称精简</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>学生情况分析部门标签</strong>：学管部主推 → 学管部&咨询部</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>学员考情分析部门标签</strong>：教学部主推 → 教学部&学管部</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>多部门标签样式</strong>：紫色/青色渐变区分部门组合</li>
                         </ul>
                     </div>
                 </div>
@@ -306,7 +320,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.5';
+        const CURRENT_VERSION = '3.3.6';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
