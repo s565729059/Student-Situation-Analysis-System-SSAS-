@@ -18,7 +18,7 @@
             <h1>小睿同学·学员考情分析系统</h1>
             <h2>针对考试·专业分析</h2>
             <div class="version-info">
-                <p>版本号：v3.3.2</p>
+                <p>版本号：v3.3.3</p>
             </div>
         </header>
 
@@ -51,6 +51,7 @@
                     上传试卷并填写信息
                 </h3>
 
+                <input type="file" id="seaFileInput" style="display:none" accept=".pdf,.doc,.docx">
                 <div id="seaUploadArea" class="exam-upload-area">
                     <i class="fas fa-file-upload exam-upload-icon"></i>
                     <p class="exam-upload-text">点击或拖拽文件到此处上传</p>
@@ -59,7 +60,6 @@
                         <span><i class="fas fa-check-circle" style="color:#27ae60"></i> Word 文档</span>
                         <span><i class="fas fa-exclamation-circle" style="color:#f39c12"></i> PDF 需 A4 单页模式</span>
                     </div>
-                    <input type="file" id="seaFileInput" style="display:none" accept=".pdf,.doc,.docx">
                 </div>
 
                 <div id="seaPdfWarning" class="exam-warning" style="display:none">
@@ -133,38 +133,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="seaErrorDescription">错题情况描述</label>
+                    <label for="seaErrorDescription">错题情况描述 <span class="sea-required">* 必填</span></label>
                     <textarea id="seaErrorDescription" rows="5" placeholder="请详细描述学生的错题情况，例如：&#10;- 第3题：计算错误&#10;- 第7题：概念理解不清&#10;- 第12题：解题思路有误"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>学生薄弱环节（可多选）</label>
-                    <div class="exam-checkbox-group">
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="基础知识掌握不牢"> 基础知识掌握不牢</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="解题思路不清晰"> 解题思路不清晰</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="计算能力不足"> 计算能力不足</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="审题能力欠缺"> 审题能力欠缺</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="时间分配不合理"> 时间分配不合理</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="粗心大意"> 粗心大意</label>
+                    <div class="exam-checkbox-group" id="seaWeakPointsContainer">
+                        <span class="sea-select-subject-hint">请先选择考试科目，系统将自动展示对应学科的薄弱环节选项</span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>学生日常课堂表现（可多选）</label>
-                    <div class="exam-checkbox-group">
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课堂参与度高"> 课堂参与度高</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="积极回答问题"> 积极回答问题</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="注意力集中"> 注意力集中</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="作业完成及时"> 作业完成及时</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="需要老师督促"> 需要老师督促</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课堂互动较少"> 课堂互动较少</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="笔记记录认真"> 笔记记录认真</label>
-                        <label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="课后提问积极"> 课后提问积极</label>
+                    <div class="exam-checkbox-group" id="seaClassroomPerfContainer">
+                        <span class="sea-select-subject-hint">请先选择考试科目，系统将自动展示对应学科的课堂表现选项</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="seaClassroomPerformance">课堂表现详细描述</label>
+                    <label for="seaClassroomPerformance">课堂表现详细描述 <span class="sea-optional">（选填）</span></label>
                     <textarea id="seaClassroomPerformance" rows="4" placeholder="请详细描述学生的日常课堂表现"></textarea>
                 </div>
 

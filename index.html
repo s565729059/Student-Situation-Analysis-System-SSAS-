@@ -78,6 +78,22 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.3</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <ul>
+                            <li><span class="changelog-tag tag-feature">新增</span><strong>薄弱环节按学科动态展示</strong>：7个学科各自10个针对性选项，选择科目后自动切换</li>
+                            <li><span class="changelog-tag tag-feature">新增</span><strong>课堂表现按学科动态展示</strong>：7个学科各自12个针对性选项，含学科特色表现</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>基础信息框布局调整</strong>：6个输入框改为一行3列布局，响应式适配</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>必填/选填标签样式升级</strong>：必填改为红色药丸标签，更融合整体UI风格</li>
+                            <li><span class="changelog-tag tag-fix">修复</span><strong>试卷上传功能修复</strong>：修复JS语法错误导致上传点击无反应的问题</li>
+                            <li><span class="changelog-tag tag-fix">修复</span><strong>科目选项切换修复</strong>：修复选择科目后薄弱环节和课堂表现选项不显示的问题</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3.2</span>
                         <span class="version-date">2026-04-23</span>
                     </div>
@@ -150,7 +166,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.2</p>
+            <p class="version-info">版本号：v3.3.3</p>
         </footer>
     </div>
     
@@ -165,7 +181,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.2</h2>
+                <h2>小睿同学已更新至 v3.3.3</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -203,14 +219,14 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.2 更新内容</h3>
+                    <h3>📝 v3.3.3 更新内容</h3>
                     <ul>
-                        <li><span class="update-tag tag-opt">优化</span><strong>考情分析AI提示词全面升级</strong>：细化问题分析、增加闪光点表扬、强调家长沟通场景</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>学习方案AI提示词升级</strong>：允许长期方案、强调家长配合场景、结构化输出</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>美化报告AI提示词升级</strong>：加入最高优先级强制字体大小要求（正文≥20px）</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>美化环节AI模型升级</strong>：从glm-4-flash升级为glm-5，采用流式传输+thinking模式</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>超时控制机制调整</strong>：AI分析超时延长至180秒，超时后显示重试按钮</li>
-                        <li><span class="update-tag tag-fix">修复</span><strong>移除流式传输动画</strong>：回滚流式文字效果，改为直接完整显示AI生成内容</li>
+                        <li><span class="update-tag tag-new">新增</span><strong>薄弱环节按学科动态展示</strong>：7个学科各自10个针对性选项</li>
+                        <li><span class="update-tag tag-new">新增</span><strong>课堂表现按学科动态展示</strong>：7个学科各自12个针对性选项</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>基础信息框布局调整</strong>：一行3列布局，响应式适配</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>必填/选填标签样式升级</strong>：必填改为红色药丸标签</li>
+                        <li><span class="update-tag tag-fix">修复</span><strong>试卷上传功能修复</strong>：修复JS语法错误导致上传无反应</li>
+                        <li><span class="update-tag tag-fix">修复</span><strong>科目选项切换修复</strong>：修复选择科目后选项不显示</li>
                     </ul>
                 </div>
             </div>
@@ -221,7 +237,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.2';
+        const CURRENT_VERSION = '3.3.3';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

@@ -16,8 +16,52 @@ let seaCarouselInterval = null;
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+const SEA_SUBJECT_WEAK_POINTS = {
+    '数学': ['基础知识掌握不牢', '公式定理理解不透', '计算能力不足', '审题能力欠缺', '解题思路不清晰', '逻辑推理能力弱', '空间想象能力不足', '时间分配不合理', '粗心大意', '压轴题突破困难'],
+    '语文': ['基础知识掌握不牢', '阅读理解能力弱', '文言文理解困难', '写作表达欠佳', '古诗词鉴赏能力不足', '审题立意偏差', '作文结构混乱', '语言组织能力弱', '名著阅读积累不足', '答题规范意识差'],
+    '英语': ['词汇量不足', '语法知识薄弱', '阅读理解能力弱', '听力理解困难', '写作表达欠佳', '口语输出能力不足', '长难句分析困难', '完形填空失分多', '翻译能力欠缺', '时态语态混淆'],
+    '物理': ['基础概念理解不透', '公式推导应用困难', '物理图像分析能力弱', '受力分析不全面', '实验探究能力弱', '电磁学模块薄弱', '力学模块薄弱', '计算过程易出错', '建模能力欠缺', '审题忽略关键条件'],
+    '化学': ['基础概念理解不透', '化学方程式记忆混乱', '实验操作原理不清', '物质的量计算困难', '有机化学推断困难', '化学反应原理薄弱', '化学平衡分析困难', '电化学理解困难', '元素周期律应用弱', '实验设计能力不足'],
+    '生物': ['基础概念记忆模糊', '遗传计算困难', '实验分析能力弱', '图表信息提取不全', '实验设计能力不足', '细胞代谢理解不透', '生态系统知识薄弱', '基因工程理解困难', '答题专业术语欠缺', '知识迁移应用弱'],
+    '地理': ['基础概念记忆模糊', '地图读图能力弱', '区域地理定位困难', '气候类型判断错误', '地理计算能力弱', '综合题分析不全面', '人文地理答题不规范', '自然地理原理理解不透', '地理信息技术应用弱', '知识迁移应用弱']
+};
+
+const SEA_SUBJECT_CLASSROOM_PERF = {
+    '数学': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '逻辑思维敏捷', '解题思路独特', '需要老师督促', '课堂互动较少', '做题速度偏慢', '对难题有钻研精神'],
+    '语文': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '朗读声音洪亮', '写作思路活跃', '需要老师督促', '课堂互动较少', '阅读理解能力强', '对文学作品有感悟'],
+    '英语': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '口语表达积极', '听力训练认真', '需要老师督促', '课堂互动较少', '单词记忆主动', '对英语文化感兴趣'],
+    '物理': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '实验操作积极', '善于观察现象', '需要老师督促', '课堂互动较少', '动手能力较强', '对物理现象好奇'],
+    '化学': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '实验操作规范', '方程式书写认真', '需要老师督促', '课堂互动较少', '对实验现象敏感', '善于总结规律'],
+    '生物': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '实验观察细致', '画图能力较强', '需要老师督促', '课堂互动较少', '对生命现象好奇', '善于归纳总结'],
+    '地理': ['课堂参与度高', '积极回答问题', '注意力集中', '作业完成及时', '笔记记录认真', '课后提问积极', '地图读图认真', '关注时事地理', '需要老师督促', '课堂互动较少', '空间思维较好', '善于联系实际']
+};
+
+function seaUpdateSubjectOptions() {
+    const subject = document.getElementById('seaExamSubject').value;
+    const weakContainer = document.getElementById('seaWeakPointsContainer');
+    const perfContainer = document.getElementById('seaClassroomPerfContainer');
+
+    if (!subject) {
+        weakContainer.innerHTML = '<span class="sea-select-subject-hint">请先选择考试科目，系统将自动展示对应学科的薄弱环节选项</span>';
+        perfContainer.innerHTML = '<span class="sea-select-subject-hint">请先选择考试科目，系统将自动展示对应学科的课堂表现选项</span>';
+        return;
+    }
+
+    const weakPoints = SEA_SUBJECT_WEAK_POINTS[subject] || SEA_SUBJECT_WEAK_POINTS['数学'];
+    const performances = SEA_SUBJECT_CLASSROOM_PERF[subject] || SEA_SUBJECT_CLASSROOM_PERF['数学'];
+
+    weakContainer.innerHTML = weakPoints.map(wp =>
+        `<label class="exam-checkbox-item"><input type="checkbox" class="sea-weak" value="${wp}"> ${wp}</label>`
+    ).join('');
+
+    perfContainer.innerHTML = performances.map(p =>
+        `<label class="exam-checkbox-item"><input type="checkbox" class="sea-perf" value="${p}"> ${p}</label>`
+    ).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initSeaEventListeners();
+    document.getElementById('seaExamSubject').addEventListener('change', seaUpdateSubjectOptions);
 });
 
 function initSeaEventListeners() {
@@ -406,7 +450,7 @@ ${studentInfoBlock}
     })();
 
     await Promise.all([promise1, promise2]);
-
+}
 
 function seaRetryAnalysis(type) {
     const studentName = document.getElementById('seaStudentName').value;
@@ -489,7 +533,7 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
         document.getElementById(statusId).textContent = '✅ 已完成';
         document.getElementById(statusId).style.color = '#27ae60';
         document.getElementById(previewId).textContent = content.substring(0, 300) + '...';
-
+    })
     .catch(error => {
         clearTimeout(timeoutId);
         console.error('重新生成失败：', error);
