@@ -12,6 +12,9 @@ const SEA_KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 const SEA_ZHIPU_API_KEY = 'c460138604724e6590549fc11287ec74.4ZQY2YnR9LzyC01U';
 const SEA_ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
+const SEA_DEEPSEEK_API_KEY = 'sk-860f8bfd65ae4a93aff52266015e29c9';
+const SEA_DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+
 let seaCarouselInterval = null;
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -726,47 +729,24 @@ async function seaGenerateBeautifiedHtml() {
     const prompt = `你是一位世界顶级的HTML报告设计师和前端工程师。请将以下考情分析和学习方案内容转换为一份极其精美、现代化的HTML报告。
 
 【内容结构要求 - 必须严格按此顺序组织】
-一、标题区：青岛睿花苑·${examSubject}考情分析报告（标题自然融入页面，不需要大面积封面或占位，必须包含"青岛睿花苑"字样）
-二、学生信息卡：只展示学生姓名（${studentName}）和成绩信息即可，不要展示年级、考试名称等其他个人信息
-三、考情分析部分：将考情分析文字按逻辑分段，使用卡片/模块化布局，每段一个小标题
-    - 如果文中没有提供具体题型的失分数据，则不要自行预估失分，只需分析该板块的易错点和学生表现即可
-四、学习方案部分【重点展示区域】：这是报告的核心亮点，必须重点突出！
-    - 使用与考情分析不同的、更醒目的视觉风格（如渐变背景、特殊边框、图标装饰等）
-    - 学习方案应占据报告较大篇幅，视觉权重不低于考情分析
-    - 将学习方案中的阶段性目标、优先攻克方向等用时间线或步骤卡片展示
-    - 鼓励性语言使用醒目的样式
-五、教师寄语：以教师口吻给出鼓励性总结，注意不要出现具体的教师姓氏（如"王老师""李老师"等），不要署名，不要写日期时间，方便所有老师直接使用
-六、页脚：必须包含以下内容（无年份）：
+一、标题区：青岛睿花苑·${examSubject}考情分析报告（必须包含"青岛睿花苑"字样）
+二、学生信息卡：只展示学生姓名（${studentName}）和成绩信息，不要展示年级、考试名称等其他个人信息
+三、考情分析部分：将考情分析文字按逻辑分段，每段一个小标题
+    - 如文中没有提供具体题型的失分数据，则不要自行预估失分，只需分析该板块的易错点和学生表现
+四、学习方案部分【核心亮点，重点展示】：学习方案是报告最核心的内容，视觉上必须重点突出，篇幅与考情分析相当或更大
+五、教师寄语：教师口吻鼓励性总结，不出现具体教师姓氏，不署名，不写日期时间
+六、页脚：必须包含以下三行内容（无年份），三行严格各占一行，第三行较长需缩小字号保证不换行：
     - 主文字："小睿同学·智能考情分析系统"
     - 版权信息："©版权所有·青岛睿花苑教育科技有限公司"
     - 企业标语："打造最适合人才发展的教育平台，为所到地区带去最优质的教育"
 
-【学习方案重点展示要求 - 极其重要】
-- 学习方案是本报告的核心亮点，必须在视觉上与考情分析形成鲜明对比
-- 使用不同的背景色块、更粗的边框来突出学习方案
-- 学习方案中的目标、建议等条目使用步骤卡片或时间线样式
+【美化方向】
+充分发挥你的设计能力，自行决定配色方案、排版风格、视觉层次和装饰元素，生成一份专业、精美、令人印象深刻的考情分析报告。
 
-【装饰与美学要求 - 重点关注】
-- 适当使用CSS绘制的装饰图案：渐变色带、几何图形点缀、装饰性分割线、圆角卡片阴影等
-- 使用内联SVG绘制精致的小图标和装饰元素（如书本、灯泡、星星、箭头等）
-- 在标题区、段落间、卡片顶部等位置添加精致的装饰图案，增强视觉层次
-- 数据呈现：如有数据，使用进度条、环形图或可视化方式展示
-- 整体布局符合美学原则：对称与均衡、对比与统一、节奏与韵律
-
-【整体风格要求】
-- 整体风格：现代简约，高端大气，精致紧凑，彰显高级感
-- 排版：内容紧凑但不拥挤，留白精致得当，避免大面积空白
-- 视觉层次：通过颜色、间距、背景建立清晰的信息层级
-- 配色方案：自由选择配色，以美观、协调、高端为原则，不受学科限制
-- 响应式：适配手机和电脑
-- 打印友好：添加@media print样式
-
-【技术要求】
-- 输出完整、可运行的HTML代码，绝不能截断
-- 所有CSS内联在<style>标签中
-- 图标使用Unicode字符或内联SVG绘制，不依赖外部图标库
-- 不使用外部JS库，纯HTML+CSS
-- 只输出HTML代码，不要在HTML之外输出任何设计说明、注释或解释文字
+【输出规则】
+1. 输出完整、可运行的HTML代码，绝不能截断
+2. 直接输出HTML代码，不要Markdown代码块标记，不要在HTML之外附加任何说明文字
+3. 内容必须充实专业，分析深入透彻，方案具体可行，不得泛泛而谈
 
 考情分析内容：
 ${seaState.generatedAnalysis}
@@ -774,7 +754,7 @@ ${seaState.generatedAnalysis}
 学习方案内容：
 ${seaState.generatedPlan}
 
-请直接返回完整的HTML代码，不需要Markdown代码块标记，不要在HTML代码之外附加任何说明文字。`;
+请直接返回完整的HTML代码：`;
 
     const controller = new AbortController();
     let timeoutId = setTimeout(() => controller.abort(), 300000);
@@ -785,25 +765,21 @@ ${seaState.generatedPlan}
     }
 
     try {
-        const response = await fetch(SEA_ZHIPU_API_URL, {
+        const response = await fetch(SEA_DEEPSEEK_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${SEA_ZHIPU_API_KEY}`
+                'Authorization': `Bearer ${SEA_DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'glm-5',
+                model: 'deepseek-reasoner',
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"，标题自然融入页面，不需要大面积封面；2. 学生信息卡只展示姓名和成绩，不展示年级、考试名称等其他个人信息；3. 教师寄语中不得出现具体教师姓氏，不得署名，不得写日期时间，使用通用表述方便所有老师直接使用；4. 如未提供具体题型失分数据，不得自行预估失分，只分析易错点和表现；5. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。【装饰要求】适当使用CSS装饰图案（渐变色带、几何图形、装饰分割线、圆角卡片阴影）和内联SVG小图标（书本、灯泡、星星、箭头等），增强视觉层次和美感。【学习方案重点展示要求】学习方案是报告核心亮点，必须在视觉上重点突出：使用更醒目的视觉风格（渐变背景、特殊边框、图标装饰），视觉面积与考情分析相当或更大，阶段性目标用时间线或步骤卡片展示。【输出限制】只输出纯HTML代码，绝对不允许在</html>标签之后输出任何设计说明、解释文字或注释。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。【强制品牌要求】1. 报告标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"；2. 学生信息卡只展示姓名和成绩，不展示年级、考试名称等其他个人信息；3. 教师寄语中不得出现具体教师姓氏，不得署名，不得写日期时间，使用通用表述方便所有老师直接使用；4. 如未提供具体题型失分数据，不得自行预估失分，只分析易错点和表现；5. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"；6. 页脚排版要求：三行文字严格各占一行且仅占一行，第三行文字较长，必须通过缩小字号或调整间距使其在单行内完整显示，绝不换行。以上品牌信息为强制要求，不可省略。【内容要求】报告必须内容充实、专业严谨，考情分析深入透彻，学习方案具体可行，体现教研专业水准，不得泛泛而谈。【输出限制】只输出纯HTML代码，绝对不允许在</html>标签之后输出任何设计说明、解释文字或注释。'
                     },
                     { role: 'user', content: prompt }
                 ],
-                thinking: {
-                    type: 'enabled'
-                },
-                temperature: 1.0,
                 max_tokens: 65536,
                 stream: true
             }),
@@ -819,7 +795,7 @@ ${seaState.generatedPlan}
             } catch (e) {
                 errorDetail = await response.text().catch(() => '');
             }
-            throw new Error(`智谱API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
+            throw new Error(`DeepSeek API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
         }
 
         const reader = response.body.getReader();
@@ -844,9 +820,9 @@ ${seaState.generatedPlan}
 
                 try {
                     const json = JSON.parse(trimmed.slice(6));
-                    const delta = json.choices?.[0]?.delta?.content;
-                    if (delta) {
-                        fullContent += delta;
+                    const delta = json.choices?.[0]?.delta;
+                    if (delta?.content) {
+                        fullContent += delta.content;
                     }
                 } catch (e) {
                     // skip malformed chunks
@@ -866,7 +842,7 @@ ${seaState.generatedPlan}
             seaState.beautifiedHtml = htmlContent;
             seaDisplayBeautifiedResult();
         } else {
-            throw new Error('智谱API返回数据格式异常');
+            throw new Error('DeepSeek API返回数据格式异常');
         }
 
     } catch (error) {

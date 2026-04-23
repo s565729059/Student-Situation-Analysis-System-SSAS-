@@ -93,6 +93,29 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.7</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>美化AI切换为DeepSeek Reasoner模型</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>精简美化指令：去掉格式细节限制，允许AI自由发挥设计风格</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>页脚排版约束：三行文字各占一行不换行</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-group"><span class="changelog-group-tag group-student-exam">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>美化AI切换为DeepSeek Reasoner模型</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>精简美化指令：去掉装饰/风格/技术限制，允许AI自由发挥</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>页脚排版约束：三行文字各占一行不换行</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>强化内容专业度要求：分析深入、方案具体、不得泛泛而谈</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3.6</span>
                         <span class="version-date">2026-04-23</span>
                     </div>
@@ -251,7 +274,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.6</p>
+            <p class="version-info">版本号：v3.3.7</p>
         </footer>
     </div>
     
@@ -266,7 +289,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.6</h2>
+                <h2>小睿同学已更新至 v3.3.7</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -311,13 +334,20 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.6 更新内容</h3>
-                    <div class="changelog-group"><span class="changelog-group-tag group-home">� 首页</span>
+                    <h3>📝 v3.3.7 更新内容</h3>
+                    <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
                         <ul>
-                            <li><span class="update-tag tag-opt">优化</span><strong>学生情况分析部门标签</strong>：学管部主推 → 学管部&咨询部</li>
-                            <li><span class="update-tag tag-opt">优化</span><strong>学员考情分析部门标签</strong>：教学部主推 → 教学部&学管部</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>多部门标签样式</strong>：紫色/青色渐变区分部门组合</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>滚动播报提示</strong>：并发上限与错峰使用提醒</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>DeepSeek Reasoner</strong>：美化AI切换为DeepSeek思考模型</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>美化指令精简</strong>：去掉格式限制，允许AI自由发挥设计风格</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>页脚排版</strong>：三行文字各占一行不换行</li>
+                        </ul>
+                    </div>
+                    <div class="changelog-group"><span class="changelog-group-tag group-student-exam">🎯 考情分析</span>
+                        <ul>
+                            <li><span class="update-tag tag-new">新增</span><strong>DeepSeek Reasoner</strong>：美化AI切换为DeepSeek思考模型</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>美化指令精简</strong>：去掉装饰/风格/技术限制，允许AI自由发挥</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>页脚排版</strong>：三行文字各占一行不换行</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>内容专业度</strong>：强化分析深度和方案可行性要求</li>
                         </ul>
                     </div>
                 </div>
@@ -329,7 +359,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.6';
+        const CURRENT_VERSION = '3.3.7';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
