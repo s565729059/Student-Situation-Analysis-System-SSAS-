@@ -1471,7 +1471,7 @@ main {
 }
 
 .exam-loading-tips {
-    margin-top: 20px;
+    margin: 20px auto 0;
     padding: 14px 18px;
     background: #fff8e6;
     border: 1px solid #ffd699;

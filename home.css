@@ -239,6 +239,125 @@ footer p {
     font-size: 20px;
 }
 
+.changelog-section {
+    margin-top: 50px;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.changelog-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.changelog-icon {
+    font-size: 1.8rem;
+}
+
+.changelog-header h2 {
+    font-size: 1.5rem;
+    color: #4a6fa5;
+    font-weight: bold;
+}
+
+.changelog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.changelog-item {
+    padding: 20px;
+    border-radius: 10px;
+    background: #fafbfc;
+    border-left: 4px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.changelog-item:hover {
+    background: #f0f4f8;
+}
+
+.changelog-latest {
+    border-left-color: #e67e22;
+    background: linear-gradient(135deg, #fffaf5, #fff5e6);
+}
+
+.changelog-version {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.version-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    color: white;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.changelog-latest .version-tag {
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+}
+
+.version-date {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.changelog-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.changelog-content li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+    color: #555;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.changelog-content li:last-child {
+    margin-bottom: 0;
+}
+
+.changelog-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.tag-feature {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.tag-optimize {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.changelog-content strong {
+    color: #333;
+}
+
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
@@ -278,4 +397,20 @@ footer p {
         padding: 12px 20px;
         font-size: 14px;
     }
-}
+    
+    .changelog-section {
+        padding: 20px;
+    }
+    
+    .changelog-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .changelog-item {
+        padding: 15px;
+    }
+    
+    .changelog-content li {
+        font-size: 0.9rem;
+    }
+
