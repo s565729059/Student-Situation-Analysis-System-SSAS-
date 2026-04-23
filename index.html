@@ -129,5 +129,95 @@
             <span>想法&建议</span>
         </a>
     </div>
+
+    <div id="updateModal" class="update-modal" style="display:none">
+        <div class="update-modal-content">
+            <div class="update-modal-header">
+                <span class="update-modal-icon">🎉</span>
+                <h2>小睿同学已更新至 v3.3</h2>
+                <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
+            </div>
+            <div class="update-modal-body">
+                <div class="update-system-status">
+                    <h3>📊 系统状态总览</h3>
+                    <div class="status-grid">
+                        <div class="status-item status-online">
+                            <div class="status-dot"></div>
+                            <div class="status-info">
+                                <strong>学生情况分析</strong>
+                                <span>正常运行</span>
+                            </div>
+                        </div>
+                        <div class="status-item status-online">
+                            <div class="status-dot"></div>
+                            <div class="status-info">
+                                <strong>试卷分析</strong>
+                                <span>正常运行</span>
+                            </div>
+                        </div>
+                        <div class="status-item status-beta">
+                            <div class="status-dot"></div>
+                            <div class="status-info">
+                                <strong>学员考情分析</strong>
+                                <span>限时内测中</span>
+                            </div>
+                        </div>
+                        <div class="status-item status-pending">
+                            <div class="status-dot"></div>
+                            <div class="status-info">
+                                <strong>反馈生成</strong>
+                                <span>规划中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="update-changelog">
+                    <h3>📝 v3.3 更新内容</h3>
+                    <ul>
+                        <li><span class="update-tag tag-new">新增</span><strong>考情分析双问题并发</strong>：同时生成考情分析 + 学习方案，先完成先展示</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>报告字体加大加醒目</strong>：正文≥20px、小标题≥26px、大标题≥34px，方便家长阅览</li>
+                        <li><span class="update-tag tag-new">新增</span><strong>Loading界面用户提示</strong>：分析等待和报告生成等待界面增加操作引导</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>学习方案重点展示</strong>：美化报告中学习方案作为核心亮点突出展示</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="update-modal-footer">
+                <button class="update-btn-primary" onclick="closeUpdateModal()">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CURRENT_VERSION = '3.3';
+        const LAST_SEEN_KEY = 'ssas_last_seen_version';
+
+        function checkVersionUpdate() {
+            const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
+            if (lastSeen !== CURRENT_VERSION) {
+                const modal = document.getElementById('updateModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        }
+
+        function closeUpdateModal() {
+            const modal = document.getElementById('updateModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            localStorage.setItem(LAST_SEEN_KEY, CURRENT_VERSION);
+        }
+
+        document.addEventListener('DOMContentLoaded', checkVersionUpdate);
+
+        document.getElementById('updateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeUpdateModal();
+            }
+        });
+    </script>
 </body>
 </html>

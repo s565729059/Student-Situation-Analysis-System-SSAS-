@@ -239,6 +239,216 @@ footer p {
     font-size: 20px;
 }
 
+.update-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.update-modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideUp 0.4s ease;
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.update-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.update-modal-icon {
+    font-size: 1.8rem;
+}
+
+.update-modal-header h2 {
+    font-size: 1.3rem;
+    color: #333;
+    font-weight: bold;
+    margin: 0;
+}
+
+.update-modal-close {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.update-modal-close:hover {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.update-modal-body {
+    padding: 20px 24px;
+}
+
+.update-system-status {
+    margin-bottom: 20px;
+}
+
+.update-system-status h3,
+.update-changelog h3 {
+    font-size: 1rem;
+    color: #4a6fa5;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-online .status-dot {
+    background: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+}
+
+.status-beta .status-dot {
+    background: #e67e22;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+}
+
+.status-pending .status-dot {
+    background: #95a5a6;
+    box-shadow: 0 0 0 3px rgba(149, 165, 166, 0.2);
+}
+
+.status-info strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.status-info span {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.update-changelog ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.update-changelog li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #555;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+
+.update-changelog li:last-child {
+    margin-bottom: 0;
+}
+
+.update-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.update-tag.tag-new {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.update-tag.tag-opt {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.update-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.update-btn-primary {
+    padding: 10px 40px;
+    background: linear-gradient(135deg, #4a6fa5, #6c8ebf);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.update-btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(74, 111, 165, 0.4);
+}
+
 .changelog-section {
     margin-top: 50px;
     background: white;
@@ -413,4 +623,37 @@ footer p {
     .changelog-content li {
         font-size: 0.9rem;
     }
-
+    
+    .update-modal-content {
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    
+    .update-modal-header {
+        padding: 16px 18px;
+    }
+    
+    .update-modal-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .update-modal-body {
+        padding: 16px 18px;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-item {
+        padding: 8px 10px;
+    }
+    
+    .update-changelog li {
+        font-size: 0.85rem;
+    }
+    
+    .update-btn-primary {
+        padding: 10px 30px;
+        font-size: 0.95rem;
+    }
