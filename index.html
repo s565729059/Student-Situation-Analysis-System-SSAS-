@@ -36,6 +36,14 @@
                         <p class="card-desc">智能分析试卷数据，生成详细的考试报告</p>
                         <div class="enter-btn">进入系统</div>
                     </div>
+
+                    <div class="function-card active" onclick="window.location.href='student-exam-analysis.html'">
+                        <span class="dept-tag dept-tag-jiaoxue">教学部主推</span>
+                        <div class="card-icon">🎯</div>
+                        <h3>学员考情分析</h3>
+                        <p class="card-desc">针对个体学员进行深度考情分析，提供精准辅导方案</p>
+                        <div class="enter-btn">进入系统</div>
+                    </div>
                 </div>
                 
                 <div class="department-title">
@@ -44,12 +52,12 @@
                 </div>
                 
                 <div class="function-cards">
-                    <div class="function-card" onclick="window.location.href='student-exam-analysis.html'">
+                    <div class="function-card" onclick="void(0)">
                         <span class="dept-tag dept-tag-jiaoxue">教学部主推</span>
-                        <div class="card-icon">🎯</div>
-                        <h3>学员考情分析</h3>
-                        <p class="card-desc">针对个体学员进行深度考情分析，提供精准辅导方案</p>
-                        <div class="beta-tag">限时内测</div>
+                        <div class="card-icon">💬</div>
+                        <h3>一对一反馈生成</h3>
+                        <p class="card-desc">快速生成学生学习反馈，高效完成个性化评价</p>
+                        <div class="coming-soon">开发中</div>
                     </div>
                 </div>
                 
@@ -59,12 +67,12 @@
                 </div>
                 
                 <div class="function-cards">
-                    <div class="function-card" onclick="window.location.href='#'">
+                    <div class="function-card" onclick="void(0)">
                         <span class="dept-tag dept-tag-jiaoxue">教学部主推</span>
-                        <div class="card-icon">💬</div>
-                        <h3>反馈生成</h3>
-                        <p class="card-desc">小睿同学辅助生成学生学习反馈和个性化建议</p>
-                        <div class="coming-soon">即将上线</div>
+                        <div class="card-icon">🏫</div>
+                        <h3>班课反馈生成</h3>
+                        <p class="card-desc">针对班级整体生成学习反馈，批量高效完成评价</p>
+                        <div class="coming-soon">规划中</div>
                     </div>
                 </div>
             </div>
@@ -78,19 +86,42 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.5</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>更新日志按系统分组标注：彩色标签区分考情分析/试卷分析/首页/系统</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>考情分析系统落地：通过内测，移至落地项目，进入系统</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>等待开发区域：班课反馈生成</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>一对一反馈生成名称精简</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3.4</span>
                         <span class="version-date">2026-04-23</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>考情分析提示词重构</strong>：专注分析不做方案拓展，整体评价+分版块分层分析，不称呼家长不署名</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>学习方案提示词优化</strong>：不称呼家长不署名，简洁直接</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化报告提示词全面重写</strong>：仅展示姓名和成绩、增加SVG装饰图案、自由配色、教师寄语不署名、无失分不预估</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>语文学科分数段精准定位</strong>：98分=优秀学生，不再误判为中等偏上</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>展示流程简化</strong>：4步变3步，生成完直接显示编辑框，移除中间预览卡片</li>
-                            <li><span class="changelog-tag tag-fix">修复</span><strong>报告末尾设计说明乱码</strong>：代码层截断</html>后多余内容</li>
-                            <li><span class="changelog-tag tag-fix">修复</span><strong>等待动画排版问题</strong>：加载区域改为flex纵向布局，生成中占位居中</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sea">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>提示词重构：专注分析不做方案拓展，不称呼家长不署名</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>学习方案提示词：不称呼家长不署名，简洁直接</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>语文分数段精准定位：98分=优秀学生，不再误判为中等偏上</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>展示流程简化：4步变3步，生成完直接显示编辑框</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>美化报告提示词重写：仅展示姓名成绩、自由配色、SVG装饰、教师寄语不署名</li>
+                                <li><span class="changelog-tag tag-fix">修复</span>报告末尾设计说明乱码：截断HTML后多余内容</li>
+                                <li><span class="changelog-tag tag-fix">修复</span>等待动画排版：flex纵向布局，生成中占位居中</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>考情分析系统落地：通过内测，移至落地项目区域</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -99,14 +130,16 @@
                         <span class="version-date">2026-04-23</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-feature">新增</span><strong>薄弱环节按学科动态展示</strong>：7个学科各自10个针对性选项，选择科目后自动切换</li>
-                            <li><span class="changelog-tag tag-feature">新增</span><strong>课堂表现按学科动态展示</strong>：7个学科各自12个针对性选项，含学科特色表现</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>基础信息框布局调整</strong>：6个输入框改为一行3列布局，响应式适配</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>必填/选填标签样式升级</strong>：必填改为红色药丸标签，更融合整体UI风格</li>
-                            <li><span class="changelog-tag tag-fix">修复</span><strong>试卷上传功能修复</strong>：修复JS语法错误导致上传点击无反应的问题</li>
-                            <li><span class="changelog-tag tag-fix">修复</span><strong>科目选项切换修复</strong>：修复选择科目后薄弱环节和课堂表现选项不显示的问题</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sea">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>薄弱环节按学科动态展示：7学科各10个选项</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>课堂表现按学科动态展示：7学科各12个选项</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>基础信息框布局：一行3列，响应式适配</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>必填/选填标签：必填改为红色药丸标签</li>
+                                <li><span class="changelog-tag tag-fix">修复</span>试卷上传点击无反应（JS语法错误）</li>
+                                <li><span class="changelog-tag tag-fix">修复</span>选择科目后选项不显示</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -115,14 +148,14 @@
                         <span class="version-date">2026-04-23</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>考情分析AI提示词全面升级</strong>：细化问题分析要求、增加闪光点表扬、强调家长沟通场景</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>学习方案AI提示词升级</strong>：允许长期方案、强调家长配合场景、结构化输出要求</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化报告AI提示词升级</strong>：加入最高优先级强制字体大小要求（正文≥20px）</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化环节AI模型升级</strong>：从glm-4-flash升级为glm-5，采用流式传输+thinking模式</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>超时控制机制调整</strong>：AI分析超时从60秒延长至180秒，超时后显示重试按钮</li>
-                            <li><span class="changelog-tag tag-fix">修复</span><strong>移除流式传输动画</strong>：回滚流式文字效果，改为直接完整显示AI生成内容</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sea">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>考情分析/学习方案AI提示词全面升级</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>美化环节AI模型：glm-4-flash→glm-5，流式+thinking模式</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>超时控制：60秒→180秒，超时显示重试按钮</li>
+                                <li><span class="changelog-tag tag-fix">修复</span>移除流式传输动画，改为直接完整显示</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -131,9 +164,11 @@
                         <span class="version-date">2026-04-21</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>版本号规则调整</strong>：版本号粒度从+0.1调整为+0.0.1，避免频繁大版本变动，当前版本v3.3.1</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>版本号规则：粒度从+0.1调整为+0.0.1</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -142,12 +177,18 @@
                         <span class="version-date">2026-04-21</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-feature">新增</span><strong>考情分析双问题并发</strong>：同时生成考情分析 + 学习方案，先完成先展示，合并提交美化报告</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>AI生成报告字体加大加醒目</strong>：正文≥20px、小标题≥26px、大标题≥34px，并加入后处理强制矫正，方便家长阅览</li>
-                            <li><span class="changelog-tag tag-feature">新增</span><strong>Loading界面用户提示</strong>：分析等待和报告生成等待界面增加操作提示，引导老师正确使用系统</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span><strong>学习方案重点展示</strong>：美化报告中学习方案作为核心亮点，视觉面积与考情分析相当或更大</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sea">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>考情分析双问题并发：同时生成考情分析+学习方案</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>Loading界面用户提示</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>学习方案重点展示，视觉面积与考情分析相当</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>AI生成报告字体加大加醒目，正文≥20px</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -156,10 +197,12 @@
                         <span class="version-date">2026-04-21</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-feature">新增</span>学员考情分析系统限时内测上线</li>
-                            <li><span class="changelog-tag tag-optimize">优化</span>学员考情分析界面布局与试卷分析风格统一</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sea">🎯 考情分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>学员考情分析系统内测上线</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>界面布局与试卷分析风格统一</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="changelog-item">
@@ -168,10 +211,12 @@
                         <span class="version-date">2026-04-21</span>
                     </div>
                     <div class="changelog-content">
-                        <ul>
-                            <li><span class="changelog-tag tag-feature">新增</span>试卷分析系统增加教学参考版和营销家长版双版本</li>
-                            <li><span class="changelog-tag tag-feature">新增</span>品牌防伪：AI生成报告强制包含青岛睿花苑企业信息</li>
-                        </ul>
+                        <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>教学参考版和营销家长版双版本</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>品牌防伪：AI报告强制包含企业信息</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,7 +228,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.4</p>
+            <p class="version-info">版本号：v3.3.5</p>
         </footer>
     </div>
     
@@ -198,7 +243,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.4</h2>
+                <h2>小睿同学已更新至 v3.3.5</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -219,32 +264,39 @@
                                 <span>正常运行</span>
                             </div>
                         </div>
-                        <div class="status-item status-beta">
+                        <div class="status-item status-online">
                             <div class="status-dot"></div>
                             <div class="status-info">
                                 <strong>学员考情分析</strong>
-                                <span>限时内测中</span>
+                                <span>已上线</span>
                             </div>
                         </div>
                         <div class="status-item status-pending">
                             <div class="status-dot"></div>
                             <div class="status-info">
-                                <strong>反馈生成</strong>
+                                <strong>一对一反馈生成</strong>
+                                <span>开发中</span>
+                            </div>
+                        </div>
+                        <div class="status-item status-pending">
+                            <div class="status-dot"></div>
+                            <div class="status-info">
+                                <strong>班课反馈生成</strong>
                                 <span>规划中</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.4 更新内容</h3>
-                    <ul>
-                        <li><span class="update-tag tag-opt">优化</span><strong>考情分析提示词重构</strong>：专注分析、不称呼家长不署名</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>美化报告提示词重写</strong>：仅展示姓名成绩、SVG装饰、自由配色</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>语文学科分数段精准定位</strong>：98分=优秀学生</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>展示流程简化</strong>：4步变3步，移除预览卡片</li>
-                        <li><span class="update-tag tag-fix">修复</span><strong>报告末尾乱码</strong>：截断HTML后多余内容</li>
-                        <li><span class="update-tag tag-fix">修复</span><strong>等待动画排版</strong>：flex纵向布局</li>
-                    </ul>
+                    <h3>📝 v3.3.5 更新内容</h3>
+                    <div class="changelog-group"><span class="changelog-group-tag group-home">� 首页</span>
+                        <ul>
+                            <li><span class="update-tag tag-new">新增</span><strong>更新日志按系统分组</strong>：彩色标签区分各功能系统</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>考情分析系统落地</strong>：通过内测，进入系统</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>班课反馈生成</strong>：等待开发区域展示</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>一对一反馈生成</strong>：名称精简</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="update-modal-footer">
@@ -254,7 +306,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.4';
+        const CURRENT_VERSION = '3.3.5';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

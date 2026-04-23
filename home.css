@@ -427,6 +427,32 @@ footer p {
     color: #1565c0;
 }
 
+.update-tag.tag-fix {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.update-changelog .changelog-group {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #eee;
+}
+
+.update-changelog .changelog-group:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.update-changelog .changelog-group-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
 .update-modal-footer {
     padding: 16px 24px;
     border-top: 1px solid #eee;
@@ -526,6 +552,48 @@ footer p {
     font-size: 0.85rem;
 }
 
+.changelog-group {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #e8e8e8;
+}
+
+.changelog-group:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.changelog-group-tag {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.group-sea {
+    background: linear-gradient(135deg, #ff6b35, #ff8c42);
+    color: white;
+}
+
+.group-exam {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+}
+
+.group-home {
+    background: linear-gradient(135deg, #00b894, #55efc4);
+    color: white;
+}
+
+.group-sys {
+    background: linear-gradient(135deg, #636e72, #b2bec3);
+    color: white;
+}
+
 .changelog-content ul {
     list-style: none;
     padding: 0;
@@ -563,6 +631,11 @@ footer p {
 .tag-optimize {
     background: #e3f2fd;
     color: #1565c0;
+}
+
+.tag-fix {
+    background: #fff3e0;
+    color: #e65100;
 }
 
 .changelog-content strong {
