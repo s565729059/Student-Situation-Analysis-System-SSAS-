@@ -78,6 +78,23 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.4</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <ul>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>考情分析提示词重构</strong>：专注分析不做方案拓展，整体评价+分版块分层分析，不称呼家长不署名</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>学习方案提示词优化</strong>：不称呼家长不署名，简洁直接</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化报告提示词全面重写</strong>：仅展示姓名和成绩、增加SVG装饰图案、自由配色、教师寄语不署名、无失分不预估</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>语文学科分数段精准定位</strong>：98分=优秀学生，不再误判为中等偏上</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>展示流程简化</strong>：4步变3步，生成完直接显示编辑框，移除中间预览卡片</li>
+                            <li><span class="changelog-tag tag-fix">修复</span><strong>报告末尾设计说明乱码</strong>：代码层截断</html>后多余内容</li>
+                            <li><span class="changelog-tag tag-fix">修复</span><strong>等待动画排版问题</strong>：加载区域改为flex纵向布局，生成中占位居中</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3.3</span>
                         <span class="version-date">2026-04-23</span>
                     </div>
@@ -166,7 +183,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.3</p>
+            <p class="version-info">版本号：v3.3.4</p>
         </footer>
     </div>
     
@@ -181,7 +198,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.3</h2>
+                <h2>小睿同学已更新至 v3.3.4</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -219,14 +236,14 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.3 更新内容</h3>
+                    <h3>📝 v3.3.4 更新内容</h3>
                     <ul>
-                        <li><span class="update-tag tag-new">新增</span><strong>薄弱环节按学科动态展示</strong>：7个学科各自10个针对性选项</li>
-                        <li><span class="update-tag tag-new">新增</span><strong>课堂表现按学科动态展示</strong>：7个学科各自12个针对性选项</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>基础信息框布局调整</strong>：一行3列布局，响应式适配</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>必填/选填标签样式升级</strong>：必填改为红色药丸标签</li>
-                        <li><span class="update-tag tag-fix">修复</span><strong>试卷上传功能修复</strong>：修复JS语法错误导致上传无反应</li>
-                        <li><span class="update-tag tag-fix">修复</span><strong>科目选项切换修复</strong>：修复选择科目后选项不显示</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>考情分析提示词重构</strong>：专注分析、不称呼家长不署名</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>美化报告提示词重写</strong>：仅展示姓名成绩、SVG装饰、自由配色</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>语文学科分数段精准定位</strong>：98分=优秀学生</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>展示流程简化</strong>：4步变3步，移除预览卡片</li>
+                        <li><span class="update-tag tag-fix">修复</span><strong>报告末尾乱码</strong>：截断HTML后多余内容</li>
+                        <li><span class="update-tag tag-fix">修复</span><strong>等待动画排版</strong>：flex纵向布局</li>
                     </ul>
                 </div>
             </div>
@@ -237,7 +254,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.3';
+        const CURRENT_VERSION = '3.3.4';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

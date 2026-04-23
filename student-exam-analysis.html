@@ -18,7 +18,7 @@
             <h1>小睿同学·学员考情分析系统</h1>
             <h2>针对考试·专业分析</h2>
             <div class="version-info">
-                <p>版本号：v3.3.3</p>
+                <p>版本号：v3.3.4</p>
             </div>
         </header>
 
@@ -36,11 +36,6 @@
                 <div class="exam-step-line"></div>
                 <div class="exam-step" data-step="3">
                     <div class="exam-step-circle">3</div>
-                    <span>编辑内容</span>
-                </div>
-                <div class="exam-step-line"></div>
-                <div class="exam-step" data-step="4">
-                    <div class="exam-step-circle">4</div>
                     <span>报告生成</span>
                 </div>
             </div>
@@ -164,7 +159,12 @@
             </section>
 
             <section id="seaStep2" class="form-section exam-fade-in" style="display:none">
-                <div class="exam-loading-section">
+                <h3 class="exam-section-title">
+                    <i class="fas fa-edit"></i>
+                    编辑分析内容
+                </h3>
+
+                <div class="exam-loading-section" id="seaLoadingSection">
                     <div class="loading-spinner"></div>
                     <h3 class="exam-loading-title">小睿同学正在努力分析中...</h3>
                     <p class="exam-loading-note">预计完成时间约3分钟，请耐心等待...</p>
@@ -174,65 +174,48 @@
                         <div class="exam-tip-item"><i class="fas fa-info-circle"></i><span>请等待两个问题都生成答案并修改结束后，再点击生成HTML报告。</span></div>
                     </div>
                 </div>
-                <div class="sea-dual-result" style="display:none" id="seaDualResult">
-                    <div class="sea-result-card" id="seaResultCard1" style="display:none">
-                        <div class="sea-result-card-header">
-                            <span class="sea-result-icon">📊</span>
-                            <span>考情分析</span>
-                            <span class="sea-result-status" id="seaStatus1">⏳ 生成中...</span>
+
+                <div id="seaAnalysisBlocks" style="display:none">
+                    <div class="exam-analysis-block">
+                        <h4 class="exam-analysis-subtitle">
+                            <i class="fas fa-clipboard-list"></i>
+                            考情分析（可编辑）
+                            <span class="sea-result-status" id="seaStatus1" style="margin-left:10px">⏳ 生成中...</span>
+                        </h4>
+                        <div id="seaAnalysisText" class="exam-editable-content" contenteditable="true">
+                            <div class="sea-generating-placeholder"><div class="loading-spinner"></div>考情分析生成中，请稍候...</div>
                         </div>
-                        <div class="sea-result-card-body" id="seaPreview1"></div>
                         <button class="sea-retry-btn" id="seaRetry1" style="display:none" onclick="seaRetryAnalysis(1)">
                             <i class="fas fa-redo"></i> 重新生成
                         </button>
                     </div>
-                    <div class="sea-result-card" id="seaResultCard2" style="display:none">
-                        <div class="sea-result-card-header">
-                            <span class="sea-result-icon">📋</span>
-                            <span>学习方案</span>
-                            <span class="sea-result-status" id="seaStatus2">⏳ 生成中...</span>
+
+                    <div class="exam-analysis-block">
+                        <h4 class="exam-analysis-subtitle">
+                            <i class="fas fa-tasks"></i>
+                            学习方案（可编辑）
+                            <span class="sea-result-status" id="seaStatus2" style="margin-left:10px">⏳ 生成中...</span>
+                        </h4>
+                        <div id="seaPlanText" class="exam-editable-content" contenteditable="true">
+                            <div class="sea-generating-placeholder"><div class="loading-spinner"></div>学习方案生成中，请稍候...</div>
                         </div>
-                        <div class="sea-result-card-body" id="seaPreview2"></div>
                         <button class="sea-retry-btn" id="seaRetry2" style="display:none" onclick="seaRetryAnalysis(2)">
                             <i class="fas fa-redo"></i> 重新生成
+                        </button>
+                    </div>
+
+                    <div class="exam-nav-between" id="seaStep2NavButtons" style="display:none">
+                        <button id="seaBackStep1" class="exam-btn-outline">
+                            <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
+                        </button>
+                        <button id="seaToStep4" class="exam-btn-primary">
+                            生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
                         </button>
                     </div>
                 </div>
             </section>
 
             <section id="seaStep3" class="form-section exam-fade-in" style="display:none">
-                <h3 class="exam-section-title">
-                    <i class="fas fa-edit"></i>
-                    编辑分析内容
-                </h3>
-
-                <div class="exam-analysis-block">
-                    <h4 class="exam-analysis-subtitle">
-                        <i class="fas fa-clipboard-list"></i>
-                        考情分析（可编辑）
-                    </h4>
-                    <div id="seaAnalysisText" class="exam-editable-content" contenteditable="true"></div>
-                </div>
-
-                <div class="exam-analysis-block">
-                    <h4 class="exam-analysis-subtitle">
-                        <i class="fas fa-tasks"></i>
-                        学习方案（可编辑）
-                    </h4>
-                    <div id="seaPlanText" class="exam-editable-content" contenteditable="true"></div>
-                </div>
-
-                <div class="exam-nav-between">
-                    <button id="seaBackStep1" class="exam-btn-outline">
-                        <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
-                    </button>
-                    <button id="seaToStep4" class="exam-btn-primary">
-                        生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
-                    </button>
-                </div>
-            </section>
-
-            <section id="seaStep4" class="form-section exam-fade-in" style="display:none">
                 <div id="seaReportLoading" class="exam-loading-section">
                     <div class="loading-spinner"></div>
                     <h3 class="exam-loading-title">小睿同学正在生成 HTML 报告...</h3>

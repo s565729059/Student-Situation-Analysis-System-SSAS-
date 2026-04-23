@@ -99,7 +99,7 @@ function initSeaEventListeners() {
     document.getElementById('seaToStep4').addEventListener('click', seaGoToStep4);
     document.getElementById('seaDownloadReport').addEventListener('click', seaDownloadHtml);
     document.getElementById('seaStartNew').addEventListener('click', seaStartNew);
-    document.getElementById('seaBackStep3').addEventListener('click', () => seaGoToStep(3));
+    document.getElementById('seaBackStep3').addEventListener('click', () => seaGoToStep(2));
 }
 
 function seaHandleFile(file) {
@@ -212,9 +212,11 @@ function seaFormatFileSize(bytes) {
 }
 
 function seaGoToStep(step) {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 3; i++) {
         const section = document.getElementById('seaStep' + i);
-        if (section) section.style.display = (i === step) ? 'block' : 'none';
+        if (section) {
+            section.style.display = (i === step) ? 'block' : 'none';
+        }
     }
 
     document.querySelectorAll('.exam-step').forEach((el) => {
@@ -268,13 +270,17 @@ function seaGoToStep2() {
     seaState.generatedAnalysis = '';
     seaState.generatedPlan = '';
 
-    document.getElementById('seaDualResult').style.display = 'none';
-    document.getElementById('seaResultCard1').style.display = 'none';
-    document.getElementById('seaResultCard2').style.display = 'none';
+    document.getElementById('seaLoadingSection').style.display = 'flex';
+    document.getElementById('seaAnalysisBlocks').style.display = 'none';
+    document.getElementById('seaStep2NavButtons').style.display = 'none';
     document.getElementById('seaStatus1').textContent = '⏳ 生成中...';
+    document.getElementById('seaStatus1').style.color = '';
     document.getElementById('seaStatus2').textContent = '⏳ 生成中...';
-    document.getElementById('seaPreview1').textContent = '';
-    document.getElementById('seaPreview2').textContent = '';
+    document.getElementById('seaStatus2').style.color = '';
+    document.getElementById('seaRetry1').style.display = 'none';
+    document.getElementById('seaRetry2').style.display = 'none';
+    document.getElementById('seaAnalysisText').innerHTML = '<div class="sea-generating-placeholder"><div class="loading-spinner"></div>考情分析生成中，请稍候...</div>';
+    document.getElementById('seaPlanText').innerHTML = '<div class="sea-generating-placeholder"><div class="loading-spinner"></div>学习方案生成中，请稍候...</div>';
 
     seaGoToStep(2);
     seaStartCarousel('seaAnalysisCarousel', [
@@ -300,12 +306,25 @@ async function seaGenerateDualAnalysis() {
     const classroomPerformanceDesc = document.getElementById('seaClassroomPerformance').value;
     const scoreRate = ((actualScore / fullScore) * 100).toFixed(1);
 
+    const subjectScoreContext = {
+        '语文': '【重要】语文学科分数特征与理科截然不同，不易得高分！满分通常120分，最高分一般在103-105分左右，平均分在78-82分左右。分数段定位：110分以上=顶级学霸，100-109分=尖子生，90-99分=优秀学生，80-89分=中上水平，70-79分=中等水平，60-69分=需努力。特别注意：语文考98分已经是优秀学生水平，绝非"中等偏上"！请严格按照此标准评估学生水平。',
+        '数学': '数学学科满分通常120分，分数区分度大，高分段和低分段差距明显。平均分一般在70-85分左右，得分率90%以上属于优秀。',
+        '英语': '英语学科满分通常120分，分数分布相对集中，中等偏上学生较多。平均分一般在75-90分左右，得分率85%以上属于优秀。',
+        '物理': '物理学科满分通常80或100分，区分度较大，平均分一般在55-65分（满分80）或65-75分（满分100）左右。',
+        '化学': '化学学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。',
+        '生物': '生物学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。',
+        '地理': '地理学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。'
+    };
+    const scoreContext = subjectScoreContext[examSubject] || '该学科平均分一般在满分的65-70%左右，得分率80%以上属于优秀水平。';
+
     const studentInfoBlock = `学生信息：
 - 姓名：${studentName}
 - 年级：${studentGrade}
 - 科目：${examSubject}
 - 考试名称：${examName}
 - 考试成绩：${actualScore}分/满分${fullScore}分（得分率${scoreRate}%）
+
+【学科分数特征参考】${scoreContext}请根据此学科特点合理评估学生的实际水平，不要仅凭得分率机械判断。
 
 错题情况描述：
 ${errorDescription}
@@ -326,15 +345,15 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
 
 ${studentInfoBlock}
 
-请你根据上述内容给${studentName}的${examName}做题情况做一个分析。要求：
-1. 切合实际，可以制定部分长期学习计划，但要切实可完成，最好是家长可以配合的
-2. 说出问题和需要注意的点，此项需要稍微详细丰富一点，尤其是分析试卷出错处
+请你专注分析这次考试的做题情况，只做分析，不需要制定后续学习方案或计划。要求：
+1. 先给出整体评价，再分版块、分段、分层进行详细分析
+2. 说出问题和需要注意的点，此项需要详细丰富，尤其是分析试卷出错处的具体原因
 3. 要认可学生存在的闪光点，适当在报告中表扬学生
-4. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通
+4. 表述简洁明了、干净整洁，直接开始分析，不要称呼家长，不要署名，不要寒暄
 5. 结合${examSubject}学科特色进行分析，比如${subjectFeature}等方面
-6. 分析要具体到知识点，不要泛泛而谈
+6. 分析要具体到知识点，不要泛泛而谈，不要做任何拓展性方案建议，只需要分析错题情况即可
 7. 输出格式：结构化文本，分点清晰，有数据支撑
-8. 这份报告是要呈现给家长看的，注意语言输出场景`;
+8. 这份报告是要呈现给家长看的，注意语言输出场景，但不需要单独称呼家长`;
 
     const prompt2 = `你是一位经验丰富的${examSubject}教师和学业规划师，请根据以下学生信息，为${studentName}同学制定接下来的学习方案。
 
@@ -346,18 +365,23 @@ ${studentInfoBlock}
 3. 重点指出接下来应该优先攻克的知识点和需要掌握的能力
 4. 给出具体可执行的学习方法和建议
 5. 结合${examSubject}学科特色，比如${subjectFeature}等方面
-6. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通
+6. 表述简洁明了、干净整洁，直接开始方案，不要称呼家长，不要署名，不要寒暄
 7. 输出格式：结构化文本，分点清晰，有数据支撑
-8. 这份报告是要呈现给家长看的，注意语言输出场景`;
+8. 这份报告是要呈现给家长看的，注意语言输出场景，但不需要单独称呼家长`;
 
     let completedCount = 0;
     const TIMEOUT_MS = 180000;
+
+    function onFirstResult() {
+        document.getElementById('seaLoadingSection').style.display = 'none';
+        document.getElementById('seaAnalysisBlocks').style.display = 'block';
+    }
 
     function onOneComplete() {
         completedCount++;
         if (completedCount === 2) {
             seaStopCarousel();
-            setTimeout(() => seaGoToStep(3), 600);
+            document.getElementById('seaStep2NavButtons').style.display = 'flex';
         }
     }
 
@@ -394,24 +418,22 @@ ${studentInfoBlock}
     const promise1 = (async () => {
         const result = await fetchWithTimeout(prompt1);
 
-        document.getElementById('seaDualResult').style.display = 'grid';
-        document.getElementById('seaResultCard1').style.display = 'block';
+        onFirstResult();
 
         if (result.success) {
             seaState.generatedAnalysis = result.content;
             document.getElementById('seaStatus1').textContent = '✅ 已完成';
             document.getElementById('seaStatus1').style.color = '#27ae60';
-            document.getElementById('seaPreview1').textContent = result.content.substring(0, 300) + '...';
             document.getElementById('seaAnalysisText').innerText = result.content;
         } else {
             if (result.error.name === 'AbortError') {
                 document.getElementById('seaStatus1').textContent = '⏳ 生成超时';
                 document.getElementById('seaStatus1').style.color = '#f39c12';
-                document.getElementById('seaPreview1').innerHTML = '<span style="color:#f39c12">AI响应超过3分钟。您可以点击下方"重新生成"按钮再次尝试，或者继续编辑备用内容。</span>';
+                document.getElementById('seaAnalysisText').innerHTML = '<div class="sea-generating-placeholder" style="color:#f39c12;font-style:normal">AI响应超过3分钟。您可以点击"重新生成"按钮再次尝试，或者继续编辑备用内容。</div>';
             } else {
                 document.getElementById('seaStatus1').textContent = '❌ 生成失败';
                 document.getElementById('seaStatus1').style.color = '#e74c3c';
-                document.getElementById('seaPreview1').innerHTML = '<span style="color:#e74c3c">AI生成失败：' + result.error.message + '。您可以点击下方"重新生成"按钮再次尝试。</span>';
+                document.getElementById('seaAnalysisText').innerHTML = '<div class="sea-generating-placeholder" style="color:#e74c3c;font-style:normal">AI生成失败：' + result.error.message + '。您可以点击"重新生成"按钮再次尝试。</div>';
             }
             document.getElementById('seaRetry1').style.display = 'block';
             seaState.generatedAnalysis = seaGenerateFallbackAnalysis(studentName, studentGrade, examSubject, examName, actualScore, fullScore, errorDescription, weakPoints, classroomPerformance, classroomPerformanceDesc);
@@ -423,24 +445,22 @@ ${studentInfoBlock}
     const promise2 = (async () => {
         const result = await fetchWithTimeout(prompt2);
 
-        document.getElementById('seaDualResult').style.display = 'grid';
-        document.getElementById('seaResultCard2').style.display = 'block';
+        onFirstResult();
 
         if (result.success) {
             seaState.generatedPlan = result.content;
             document.getElementById('seaStatus2').textContent = '✅ 已完成';
             document.getElementById('seaStatus2').style.color = '#27ae60';
-            document.getElementById('seaPreview2').textContent = result.content.substring(0, 300) + '...';
             document.getElementById('seaPlanText').innerText = result.content;
         } else {
             if (result.error.name === 'AbortError') {
                 document.getElementById('seaStatus2').textContent = '⏳ 生成超时';
                 document.getElementById('seaStatus2').style.color = '#f39c12';
-                document.getElementById('seaPreview2').innerHTML = '<span style="color:#f39c12">AI响应超过3分钟。您可以点击下方"重新生成"按钮再次尝试，或者继续编辑备用内容。</span>';
+                document.getElementById('seaPlanText').innerHTML = '<div class="sea-generating-placeholder" style="color:#f39c12;font-style:normal">AI响应超过3分钟。您可以点击"重新生成"按钮再次尝试，或者继续编辑备用内容。</div>';
             } else {
                 document.getElementById('seaStatus2').textContent = '❌ 生成失败';
                 document.getElementById('seaStatus2').style.color = '#e74c3c';
-                document.getElementById('seaPreview2').innerHTML = '<span style="color:#e74c3c">AI生成失败：' + result.error.message + '。您可以点击下方"重新生成"按钮再次尝试。</span>';
+                document.getElementById('seaPlanText').innerHTML = '<div class="sea-generating-placeholder" style="color:#e74c3c;font-style:normal">AI生成失败：' + result.error.message + '。您可以点击"重新生成"按钮再次尝试。</div>';
             }
             document.getElementById('seaRetry2').style.display = 'block';
             seaState.generatedPlan = seaGenerateFallbackPlan(studentName, examSubject, examName, actualScore, fullScore, weakPoints);
@@ -465,12 +485,25 @@ function seaRetryAnalysis(type) {
     const classroomPerformanceDesc = document.getElementById('seaClassroomPerformance').value;
     const scoreRate = ((actualScore / fullScore) * 100).toFixed(1);
 
+    const subjectScoreContext = {
+        '语文': '【重要】语文学科分数特征与理科截然不同，不易得高分！满分通常120分，最高分一般在103-105分左右，平均分在78-82分左右。分数段定位：110分以上=顶级学霸，100-109分=尖子生，90-99分=优秀学生，80-89分=中上水平，70-79分=中等水平，60-69分=需努力。特别注意：语文考98分已经是优秀学生水平，绝非"中等偏上"！请严格按照此标准评估学生水平。',
+        '数学': '数学学科满分通常120分，分数区分度大，高分段和低分段差距明显。平均分一般在70-85分左右，得分率90%以上属于优秀。',
+        '英语': '英语学科满分通常120分，分数分布相对集中，中等偏上学生较多。平均分一般在75-90分左右，得分率85%以上属于优秀。',
+        '物理': '物理学科满分通常80或100分，区分度较大，平均分一般在55-65分（满分80）或65-75分（满分100）左右。',
+        '化学': '化学学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。',
+        '生物': '生物学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。',
+        '地理': '地理学科满分通常60或100分，平均分一般在40-45分（满分60）或65-75分（满分100）左右。'
+    };
+    const scoreContext = subjectScoreContext[examSubject] || '该学科平均分一般在满分的65-70%左右，得分率80%以上属于优秀水平。';
+
     const studentInfoBlock = `学生信息：
 - 姓名：${studentName}
 - 年级：${studentGrade}
 - 科目：${examSubject}
 - 考试名称：${examName}
 - 考试成绩：${actualScore}分/满分${fullScore}分（得分率${scoreRate}%）
+
+【学科分数特征参考】${scoreContext}请根据此学科特点合理评估学生的实际水平，不要仅凭得分率机械判断。
 
 错题情况描述：
 ${errorDescription}
@@ -488,20 +521,20 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
     const subjectFeature = examSubject === '数学' ? '计算能力、逻辑思维、解题规范' : examSubject === '英语' ? '词汇积累、语法运用、阅读理解' : examSubject === '语文' ? '阅读理解、写作表达、基础知识' : '学科核心能力';
 
     const statusId = type === 1 ? 'seaStatus1' : 'seaStatus2';
-    const previewId = type === 1 ? 'seaPreview1' : 'seaPreview2';
     const retryBtnId = type === 1 ? 'seaRetry1' : 'seaRetry2';
+    const editableId = type === 1 ? 'seaAnalysisText' : 'seaPlanText';
 
     document.getElementById(statusId).textContent = '⏳ 重新生成中...';
     document.getElementById(statusId).style.color = '#f39c12';
     document.getElementById(retryBtnId).style.display = 'none';
-    document.getElementById(previewId).textContent = '';
+    document.getElementById(editableId).innerHTML = '<div class="sea-generating-placeholder"><div class="loading-spinner"></div>' + (type === 1 ? '考情分析' : '学习方案') + '重新生成中，请稍候...</div>';
 
     const prompt = type === 1
-        ? `你是一位经验丰富的${examSubject}教师，请根据以下信息，对${studentName}同学的${examName}做题情况做一个深入分析。\n\n${studentInfoBlock}\n\n请你根据上述内容给${studentName}的${examName}做题情况做一个分析。要求：\n1. 切合实际，可以制定部分长期学习计划，但要切实可完成，最好是家长可以配合的\n2. 说出问题和需要注意的点，此项需要稍微详细丰富一点，尤其是分析试卷出错处\n3. 要认可学生存在的闪光点，适当在报告中表扬学生\n4. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通\n5. 结合${examSubject}学科特色进行分析，比如${subjectFeature}等方面\n6. 分析要具体到知识点，不要泛泛而谈\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景`
-        : `你是一位经验丰富的${examSubject}教师和学业规划师，请根据以下学生信息，为${studentName}同学制定接下来的学习方案。\n\n${studentInfoBlock}\n\n请你根据学生现在的情况，制定接下来的学习方案。要求：\n1. 方案要切合实际，不要"每日提分计划"之类不切实际的内容，可以制定长期方案\n2. 要有阶段性目标（短期、中期），但不要过于死板\n3. 重点指出接下来应该优先攻克的知识点和需要掌握的能力\n4. 给出具体可执行的学习方法和建议\n5. 结合${examSubject}学科特色，比如${subjectFeature}等方面\n6. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景`;
+        ? `你是一位经验丰富的${examSubject}教师，请根据以下信息，对${studentName}同学的${examName}做题情况做一个深入分析。\n\n${studentInfoBlock}\n\n请你专注分析这次考试的做题情况，只做分析，不需要制定后续学习方案或计划。要求：\n1. 先给出整体评价，再分版块、分段、分层进行详细分析\n2. 说出问题和需要注意的点，此项需要详细丰富，尤其是分析试卷出错处的具体原因\n3. 要认可学生存在的闪光点，适当在报告中表扬学生\n4. 表述简洁明了、干净整洁，直接开始分析，不要称呼家长，不要署名，不要寒暄\n5. 结合${examSubject}学科特色进行分析，比如${subjectFeature}等方面\n6. 分析要具体到知识点，不要泛泛而谈，不要做任何拓展性方案建议\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景，但不需要单独称呼家长`
+        : `你是一位经验丰富的${examSubject}教师和学业规划师，请根据以下学生信息，为${studentName}同学制定接下来的学习方案。\n\n${studentInfoBlock}\n\n请你根据学生现在的情况，制定接下来的学习方案。要求：\n1. 方案要切合实际，不要"每日提分计划"之类不切实际的内容，可以制定长期方案\n2. 要有阶段性目标（短期、中期），但不要过于死板\n3. 重点指出接下来应该优先攻克的知识点和需要掌握的能力\n4. 给出具体可执行的学习方法和建议\n5. 结合${examSubject}学科特色，比如${subjectFeature}等方面\n6. 表述简洁明了、干净整洁，直接开始方案，不要称呼家长，不要署名，不要寒暄\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景，但不需要单独称呼家长`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
 
     fetch(SEA_KIMI_API_URL, {
         method: 'POST',
@@ -525,21 +558,26 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
         const content = data.choices[0].message.content;
         if (type === 1) {
             seaState.generatedAnalysis = content;
-            document.getElementById('seaAnalysisText').innerText = content;
         } else {
             seaState.generatedPlan = content;
-            document.getElementById('seaPlanText').innerText = content;
         }
+        document.getElementById(editableId).innerText = content;
         document.getElementById(statusId).textContent = '✅ 已完成';
         document.getElementById(statusId).style.color = '#27ae60';
-        document.getElementById(previewId).textContent = content.substring(0, 300) + '...';
     })
     .catch(error => {
         clearTimeout(timeoutId);
         console.error('重新生成失败：', error);
-        document.getElementById(statusId).textContent = '❌ 再次失败';
-        document.getElementById(statusId).style.color = '#e74c3c';
-        document.getElementById(previewId).innerHTML = '<span style="color:#e74c3c">重新生成仍然失败，请检查网络后重试，或继续编辑现有内容。</span>';
+        if (error.name === 'AbortError') {
+            document.getElementById(statusId).textContent = '⏳ 生成超时';
+            document.getElementById(statusId).style.color = '#f39c12';
+            document.getElementById(editableId).innerHTML = '<div class="sea-generating-placeholder" style="color:#f39c12;font-style:normal">AI响应超过3分钟。请再次点击"重新生成"按钮重试。</div>';
+        } else {
+            document.getElementById(statusId).textContent = '❌ 再次失败';
+            document.getElementById(statusId).style.color = '#e74c3c';
+            document.getElementById(editableId).innerHTML = '<div class="sea-generating-placeholder" style="color:#e74c3c;font-style:normal">重新生成仍然失败：' + error.message + '。请检查网络后重试，或继续编辑现有内容。</div>';
+        }
+        document.getElementById(retryBtnId).style.display = 'block';
     });
 }
 
@@ -667,7 +705,7 @@ function seaGoToStep4() {
         alert('学习方案内容不能为空');
         return;
     }
-    seaGoToStep(4);
+    seaGoToStep(3);
     seaGenerateBeautifiedHtml();
 }
 
@@ -685,56 +723,50 @@ async function seaGenerateBeautifiedHtml() {
         '✨ 即将完成报告生成...'
     ]);
 
-    const prompt = `你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。
+    const prompt = `你是一位世界顶级的HTML报告设计师和前端工程师。请将以下考情分析和学习方案内容转换为一份极其精美、现代化的HTML报告。
 
 【内容结构要求 - 必须严格按此顺序组织】
-一、封面：青岛睿花苑·${examSubject}考情分析报告（大标题居中，必须包含"青岛睿花苑"字样，无版本标识）
-二、学生信息卡：姓名（${studentName}）、年级、考试名称、成绩等关键信息，使用卡片式布局
+一、标题区：青岛睿花苑·${examSubject}考情分析报告（标题自然融入页面，不需要大面积封面或占位，必须包含"青岛睿花苑"字样）
+二、学生信息卡：只展示学生姓名（${studentName}）和成绩信息即可，不要展示年级、考试名称等其他个人信息
 三、考情分析部分：将考情分析文字按逻辑分段，使用卡片/模块化布局，每段一个小标题
+    - 如果文中没有提供具体题型的失分数据，则不要自行预估失分，只需分析该板块的易错点和学生表现即可
 四、学习方案部分【重点展示区域】：这是报告的核心亮点，必须重点突出！
     - 使用与考情分析不同的、更醒目的视觉风格（如渐变背景、特殊边框、图标装饰等）
     - 学习方案应占据报告较大篇幅，视觉权重不低于考情分析
     - 将学习方案中的阶段性目标、优先攻克方向等用时间线或步骤卡片展示
-    - 鼓励性语言使用特别醒目的样式（如大字号、渐变色、特殊背景）
-五、总结与鼓励：突出鼓励性语言，使用醒目的样式
-六、装饰元素：适当使用CSS绘制的装饰线条、渐变色块、图标等
-七、配色方案：根据${examSubject}学科特色选择配色（${examSubject === '数学' ? '蓝色系，理性严谨' : examSubject === '英语' ? '绿色系，活力开放' : examSubject === '语文' ? '红棕色系，文化底蕴' : '紫色系，智慧优雅'}）
-八、页脚：必须包含以下内容（无年份）：
+    - 鼓励性语言使用醒目的样式
+五、教师寄语：以教师口吻给出鼓励性总结，注意不要出现具体的教师姓氏（如"王老师""李老师"等），不要署名，不要写日期时间，方便所有老师直接使用
+六、页脚：必须包含以下内容（无年份）：
     - 主文字："小睿同学·智能考情分析系统"
     - 版权信息："©版权所有·青岛睿花苑教育科技有限公司"
     - 企业标语："打造最适合人才发展的教育平台，为所到地区带去最优质的教育"
 
-★★★【最高优先级-强制字体大小要求】★★★
-本报告面向家长阅读，所有文字必须特别大、特别醒目！
-- body基础font-size必须设为20px
-- 正文段落文字不低于20px
-- 小标题不低于26px
-- 大标题/板块标题不低于34px
-- 关键数据、分数、百分比不低于24px且加粗
-- 列表项不低于20px
-- 行高line-height不低于2.0
-如果你生成的HTML中任何正文文字小于20px，就是不合格输出！
-★★★★★★★★★★★★
-
 【学习方案重点展示要求 - 极其重要】
-- 学习方案是本报告的最大亮点，必须在视觉上与考情分析形成鲜明对比
-- 建议使用不同的背景色块、更大的标题字号、更粗的边框来突出学习方案
+- 学习方案是本报告的核心亮点，必须在视觉上与考情分析形成鲜明对比
+- 使用不同的背景色块、更粗的边框来突出学习方案
 - 学习方案中的目标、建议等条目使用步骤卡片或时间线样式
-- 整体布局上，学习方案部分的视觉面积应与考情分析相当或更大
 
-【整体特征分析 - 重点关注】
-- 整体风格：现代简约，高端大气，有设计感
-- 排版：内容丰富但不拥挤，留白得当
-- 视觉层次：通过字号、颜色、间距建立清晰的信息层级
-- 数据呈现：如有数据，使用进度条或可视化方式展示
+【装饰与美学要求 - 重点关注】
+- 适当使用CSS绘制的装饰图案：渐变色带、几何图形点缀、装饰性分割线、圆角卡片阴影等
+- 使用内联SVG绘制精致的小图标和装饰元素（如书本、灯泡、星星、箭头等）
+- 在标题区、段落间、卡片顶部等位置添加精致的装饰图案，增强视觉层次
+- 数据呈现：如有数据，使用进度条、环形图或可视化方式展示
+- 整体布局符合美学原则：对称与均衡、对比与统一、节奏与韵律
+
+【整体风格要求】
+- 整体风格：现代简约，高端大气，精致紧凑，彰显高级感
+- 排版：内容紧凑但不拥挤，留白精致得当，避免大面积空白
+- 视觉层次：通过颜色、间距、背景建立清晰的信息层级
+- 配色方案：自由选择配色，以美观、协调、高端为原则，不受学科限制
 - 响应式：适配手机和电脑
 - 打印友好：添加@media print样式
 
 【技术要求】
 - 输出完整、可运行的HTML代码，绝不能截断
 - 所有CSS内联在<style>标签中
-- 图标使用Unicode字符或CSS绘制，不依赖外部图标库
+- 图标使用Unicode字符或内联SVG绘制，不依赖外部图标库
 - 不使用外部JS库，纯HTML+CSS
+- 只输出HTML代码，不要在HTML之外输出任何设计说明、注释或解释文字
 
 考情分析内容：
 ${seaState.generatedAnalysis}
@@ -742,7 +774,7 @@ ${seaState.generatedAnalysis}
 学习方案内容：
 ${seaState.generatedPlan}
 
-请直接返回完整的HTML代码，不需要Markdown代码块标记。`;
+请直接返回完整的HTML代码，不需要Markdown代码块标记，不要在HTML代码之外附加任何说明文字。`;
 
     const controller = new AbortController();
     let timeoutId = setTimeout(() => controller.abort(), 300000);
@@ -764,7 +796,7 @@ ${seaState.generatedPlan}
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。★★★【最高优先级-强制字体大小要求】★★★ 本报告面向家长阅读，所有文字必须特别大、特别醒目！具体硬性指标：body基础font-size必须设为20px！正文段落文字不低于20px！小标题不低于26px！大标题/板块标题不低于34px！关键数据、分数、百分比不低于24px且加粗！列表项不低于20px！行高line-height不低于2.0！这是最高优先级要求，比美观更重要，绝对不允许出现14px、16px等小字号！如果你生成的HTML中任何正文文字小于20px，就是不合格输出！★★★★★★★★★★★★【学习方案重点展示要求】报告中包含考情分析和学习方案两部分内容，学习方案是报告的核心亮点，必须在视觉上重点突出：使用更醒目的视觉风格（渐变背景、特殊边框、图标装饰），学习方案的视觉面积应与考情分析相当或更大，阶段性目标用时间线或步骤卡片展示。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"，标题自然融入页面，不需要大面积封面；2. 学生信息卡只展示姓名和成绩，不展示年级、考试名称等其他个人信息；3. 教师寄语中不得出现具体教师姓氏，不得署名，不得写日期时间，使用通用表述方便所有老师直接使用；4. 如未提供具体题型失分数据，不得自行预估失分，只分析易错点和表现；5. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。【装饰要求】适当使用CSS装饰图案（渐变色带、几何图形、装饰分割线、圆角卡片阴影）和内联SVG小图标（书本、灯泡、星星、箭头等），增强视觉层次和美感。【学习方案重点展示要求】学习方案是报告核心亮点，必须在视觉上重点突出：使用更醒目的视觉风格（渐变背景、特殊边框、图标装饰），视觉面积与考情分析相当或更大，阶段性目标用时间线或步骤卡片展示。【输出限制】只输出纯HTML代码，绝对不允许在</html>标签之后输出任何设计说明、解释文字或注释。'
                     },
                     { role: 'user', content: prompt }
                 ],
@@ -826,6 +858,10 @@ ${seaState.generatedPlan}
 
         if (fullContent) {
             let htmlContent = fullContent.replace(/^```\w*\n?/, '').replace(/\n?```$/, '');
+            const htmlEndIndex = htmlContent.lastIndexOf('</html>');
+            if (htmlEndIndex !== -1) {
+                htmlContent = htmlContent.substring(0, htmlEndIndex + '</html>'.length);
+            }
             htmlContent = seaInjectBranding(htmlContent);
             seaState.beautifiedHtml = htmlContent;
             seaDisplayBeautifiedResult();
