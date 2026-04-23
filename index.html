@@ -75,8 +75,24 @@
                 <span class="changelog-icon">📋</span>
                 <h2>更新日志</h2>
             </div>
-            <div class="changelog-list">
+            <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
+                    <div class="changelog-version">
+                        <span class="version-tag">v3.3.2</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <ul>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>考情分析AI提示词全面升级</strong>：细化问题分析要求、增加闪光点表扬、强调家长沟通场景</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>学习方案AI提示词升级</strong>：允许长期方案、强调家长配合场景、结构化输出要求</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化报告AI提示词升级</strong>：加入最高优先级强制字体大小要求（正文≥20px）</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>美化环节AI模型升级</strong>：从glm-4-flash升级为glm-5，采用流式传输+thinking模式</li>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>超时控制机制调整</strong>：AI分析超时从60秒延长至180秒，超时后显示重试按钮</li>
+                            <li><span class="changelog-tag tag-fix">修复</span><strong>移除流式传输动画</strong>：回滚流式文字效果，改为直接完整显示AI生成内容</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="changelog-item">
                     <div class="changelog-version">
                         <span class="version-tag">v3.3.1</span>
                         <span class="version-date">2026-04-21</span>
@@ -126,11 +142,15 @@
                     </div>
                 </div>
             </div>
+            <button class="changelog-toggle-btn" id="changelogToggleBtn" onclick="toggleChangelog()">
+                <span>查看更多</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
         </div>
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.1</p>
+            <p class="version-info">版本号：v3.3.2</p>
         </footer>
     </div>
     
@@ -145,7 +165,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.1</h2>
+                <h2>小睿同学已更新至 v3.3.2</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -183,9 +203,14 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.1 更新内容</h3>
+                    <h3>📝 v3.3.2 更新内容</h3>
                     <ul>
-                        <li><span class="update-tag tag-opt">优化</span><strong>版本号规则调整</strong>：版本号粒度从+0.1调整为+0.0.1，避免频繁大版本变动</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>考情分析AI提示词全面升级</strong>：细化问题分析、增加闪光点表扬、强调家长沟通场景</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>学习方案AI提示词升级</strong>：允许长期方案、强调家长配合场景、结构化输出</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>美化报告AI提示词升级</strong>：加入最高优先级强制字体大小要求（正文≥20px）</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>美化环节AI模型升级</strong>：从glm-4-flash升级为glm-5，采用流式传输+thinking模式</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>超时控制机制调整</strong>：AI分析超时延长至180秒，超时后显示重试按钮</li>
+                        <li><span class="update-tag tag-fix">修复</span><strong>移除流式传输动画</strong>：回滚流式文字效果，改为直接完整显示AI生成内容</li>
                     </ul>
                 </div>
             </div>
@@ -196,7 +221,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.1';
+        const CURRENT_VERSION = '3.3.2';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
@@ -229,6 +254,44 @@
                 closeUpdateModal();
             }
         });
+
+        function toggleChangelog() {
+            const list = document.getElementById('changelogList');
+            const btn = document.getElementById('changelogToggleBtn');
+            const items = list.querySelectorAll('.changelog-item');
+            const isExpanded = list.classList.contains('expanded');
+
+            if (isExpanded) {
+                items.forEach((item, index) => {
+                    if (index >= 4) item.style.display = 'none';
+                });
+                list.classList.remove('expanded');
+                btn.querySelector('span').textContent = '查看更多';
+                btn.querySelector('i').className = 'fas fa-chevron-down';
+            } else {
+                items.forEach(item => item.style.display = 'block');
+                list.classList.add('expanded');
+                btn.querySelector('span').textContent = '收起';
+                btn.querySelector('i').className = 'fas fa-chevron-up';
+            }
+        }
+
+        function initChangelog() {
+            const list = document.getElementById('changelogList');
+            const btn = document.getElementById('changelogToggleBtn');
+            const items = list.querySelectorAll('.changelog-item');
+
+            if (items.length <= 4) {
+                btn.style.display = 'none';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                if (index >= 4) item.style.display = 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initChangelog);
     </script>
 </body>
 </html>

@@ -18,7 +18,7 @@
             <h1>小睿同学·学员考情分析系统</h1>
             <h2>针对考试·专业分析</h2>
             <div class="version-info">
-                <p>版本号：v3.3.1</p>
+                <p>版本号：v3.3.2</p>
             </div>
         </header>
 
@@ -194,6 +194,9 @@
                             <span class="sea-result-status" id="seaStatus1">⏳ 生成中...</span>
                         </div>
                         <div class="sea-result-card-body" id="seaPreview1"></div>
+                        <button class="sea-retry-btn" id="seaRetry1" style="display:none" onclick="seaRetryAnalysis(1)">
+                            <i class="fas fa-redo"></i> 重新生成
+                        </button>
                     </div>
                     <div class="sea-result-card" id="seaResultCard2" style="display:none">
                         <div class="sea-result-card-header">
@@ -202,6 +205,9 @@
                             <span class="sea-result-status" id="seaStatus2">⏳ 生成中...</span>
                         </div>
                         <div class="sea-result-card-body" id="seaPreview2"></div>
+                        <button class="sea-retry-btn" id="seaRetry2" style="display:none" onclick="seaRetryAnalysis(2)">
+                            <i class="fas fa-redo"></i> 重新生成
+                        </button>
                     </div>
                 </div>
             </section>

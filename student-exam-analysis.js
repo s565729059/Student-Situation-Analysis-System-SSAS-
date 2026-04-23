@@ -282,28 +282,32 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
 
 ${studentInfoBlock}
 
-请你根据上述内容给${studentName}的${examName}做题情况做一个分析，分析这次的做题情况和后面需要努力的点。要求：
-1. 切合实际一些，不要每日提分计划之类不切实际的内容
-2. 说出问题和需要注意的点
-3. 多鼓励一下学生
-4. 表述不要太人机，要像一个真实的老师在和学生聊天一样自然
+请你根据上述内容给${studentName}的${examName}做题情况做一个分析。要求：
+1. 切合实际，可以制定部分长期学习计划，但要切实可完成，最好是家长可以配合的
+2. 说出问题和需要注意的点，此项需要稍微详细丰富一点，尤其是分析试卷出错处
+3. 要认可学生存在的闪光点，适当在报告中表扬学生
+4. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通
 5. 结合${examSubject}学科特色进行分析，比如${subjectFeature}等方面
-6. 分析要具体到知识点，不要泛泛而谈`;
+6. 分析要具体到知识点，不要泛泛而谈
+7. 输出格式：结构化文本，分点清晰，有数据支撑
+8. 这份报告是要呈现给家长看的，注意语言输出场景`;
 
     const prompt2 = `你是一位经验丰富的${examSubject}教师和学业规划师，请根据以下学生信息，为${studentName}同学制定接下来的学习方案。
 
 ${studentInfoBlock}
 
 请你根据学生现在的情况，制定接下来的学习方案。要求：
-1. 方案要切合实际，不要"每日提分计划"之类不切实际的内容
+1. 方案要切合实际，不要"每日提分计划"之类不切实际的内容，可以制定长期方案
 2. 要有阶段性目标（短期、中期），但不要过于死板
-3. 重点指出接下来应该优先攻克的知识点和能力
+3. 重点指出接下来应该优先攻克的知识点和需要掌握的能力
 4. 给出具体可执行的学习方法和建议
 5. 结合${examSubject}学科特色，比如${subjectFeature}等方面
-6. 语气要像一个真实的老师在和学生聊天，不要太人机
-7. 适当鼓励学生，让学生有信心`;
+6. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通
+7. 输出格式：结构化文本，分点清晰，有数据支撑
+8. 这份报告是要呈现给家长看的，注意语言输出场景`;
 
     let completedCount = 0;
+    const TIMEOUT_MS = 180000;
 
     function onOneComplete() {
         completedCount++;
@@ -313,7 +317,10 @@ ${studentInfoBlock}
         }
     }
 
-    const promise1 = (async () => {
+    async function fetchWithTimeout(prompt) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
         try {
             const response = await fetch(SEA_KIMI_API_URL, {
                 method: 'POST',
@@ -323,61 +330,173 @@ ${studentInfoBlock}
                 },
                 body: JSON.stringify({
                     model: 'kimi-k2.5',
-                    messages: [{ role: 'user', content: prompt1 }],
+                    messages: [{ role: 'user', content: prompt }],
                     temperature: 1
-                })
+                }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             if (!response.ok) throw new Error('API请求失败：' + response.status);
             const data = await response.json();
-            seaState.generatedAnalysis = data.choices[0].message.content;
+            return { success: true, content: data.choices[0].message.content };
         } catch (error) {
-            console.error('生成考情分析时出错：', error);
-            seaState.generatedAnalysis = seaGenerateFallbackAnalysis(studentName, studentGrade, examSubject, examName, actualScore, fullScore, errorDescription, weakPoints, classroomPerformance, classroomPerformanceDesc);
+            clearTimeout(timeoutId);
+            return { success: false, error: error };
         }
+    }
+
+    const promise1 = (async () => {
+        const result = await fetchWithTimeout(prompt1);
 
         document.getElementById('seaDualResult').style.display = 'grid';
         document.getElementById('seaResultCard1').style.display = 'block';
-        document.getElementById('seaStatus1').textContent = '✅ 已完成';
-        document.getElementById('seaStatus1').style.color = '#27ae60';
-        document.getElementById('seaPreview1').textContent = seaState.generatedAnalysis.substring(0, 300) + '...';
-        document.getElementById('seaAnalysisText').innerText = seaState.generatedAnalysis;
+
+        if (result.success) {
+            seaState.generatedAnalysis = result.content;
+            document.getElementById('seaStatus1').textContent = '✅ 已完成';
+            document.getElementById('seaStatus1').style.color = '#27ae60';
+            document.getElementById('seaPreview1').textContent = result.content.substring(0, 300) + '...';
+            document.getElementById('seaAnalysisText').innerText = result.content;
+        } else {
+            if (result.error.name === 'AbortError') {
+                document.getElementById('seaStatus1').textContent = '⏳ 生成超时';
+                document.getElementById('seaStatus1').style.color = '#f39c12';
+                document.getElementById('seaPreview1').innerHTML = '<span style="color:#f39c12">AI响应超过3分钟。您可以点击下方"重新生成"按钮再次尝试，或者继续编辑备用内容。</span>';
+            } else {
+                document.getElementById('seaStatus1').textContent = '❌ 生成失败';
+                document.getElementById('seaStatus1').style.color = '#e74c3c';
+                document.getElementById('seaPreview1').innerHTML = '<span style="color:#e74c3c">AI生成失败：' + result.error.message + '。您可以点击下方"重新生成"按钮再次尝试。</span>';
+            }
+            document.getElementById('seaRetry1').style.display = 'block';
+            seaState.generatedAnalysis = seaGenerateFallbackAnalysis(studentName, studentGrade, examSubject, examName, actualScore, fullScore, errorDescription, weakPoints, classroomPerformance, classroomPerformanceDesc);
+            document.getElementById('seaAnalysisText').innerText = seaState.generatedAnalysis;
+        }
         onOneComplete();
     })();
 
     const promise2 = (async () => {
-        try {
-            const response = await fetch(SEA_KIMI_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'kimi-k2.5',
-                    messages: [{ role: 'user', content: prompt2 }],
-                    temperature: 1
-                })
-            });
-
-            if (!response.ok) throw new Error('API请求失败：' + response.status);
-            const data = await response.json();
-            seaState.generatedPlan = data.choices[0].message.content;
-        } catch (error) {
-            console.error('生成学习方案时出错：', error);
-            seaState.generatedPlan = seaGenerateFallbackPlan(studentName, examSubject, examName, actualScore, fullScore, weakPoints);
-        }
+        const result = await fetchWithTimeout(prompt2);
 
         document.getElementById('seaDualResult').style.display = 'grid';
         document.getElementById('seaResultCard2').style.display = 'block';
-        document.getElementById('seaStatus2').textContent = '✅ 已完成';
-        document.getElementById('seaStatus2').style.color = '#27ae60';
-        document.getElementById('seaPreview2').textContent = seaState.generatedPlan.substring(0, 300) + '...';
-        document.getElementById('seaPlanText').innerText = seaState.generatedPlan;
+
+        if (result.success) {
+            seaState.generatedPlan = result.content;
+            document.getElementById('seaStatus2').textContent = '✅ 已完成';
+            document.getElementById('seaStatus2').style.color = '#27ae60';
+            document.getElementById('seaPreview2').textContent = result.content.substring(0, 300) + '...';
+            document.getElementById('seaPlanText').innerText = result.content;
+        } else {
+            if (result.error.name === 'AbortError') {
+                document.getElementById('seaStatus2').textContent = '⏳ 生成超时';
+                document.getElementById('seaStatus2').style.color = '#f39c12';
+                document.getElementById('seaPreview2').innerHTML = '<span style="color:#f39c12">AI响应超过3分钟。您可以点击下方"重新生成"按钮再次尝试，或者继续编辑备用内容。</span>';
+            } else {
+                document.getElementById('seaStatus2').textContent = '❌ 生成失败';
+                document.getElementById('seaStatus2').style.color = '#e74c3c';
+                document.getElementById('seaPreview2').innerHTML = '<span style="color:#e74c3c">AI生成失败：' + result.error.message + '。您可以点击下方"重新生成"按钮再次尝试。</span>';
+            }
+            document.getElementById('seaRetry2').style.display = 'block';
+            seaState.generatedPlan = seaGenerateFallbackPlan(studentName, examSubject, examName, actualScore, fullScore, weakPoints);
+            document.getElementById('seaPlanText').innerText = seaState.generatedPlan;
+        }
         onOneComplete();
     })();
 
     await Promise.all([promise1, promise2]);
+
+
+function seaRetryAnalysis(type) {
+    const studentName = document.getElementById('seaStudentName').value;
+    const studentGrade = document.getElementById('seaStudentGrade').value;
+    const examSubject = document.getElementById('seaExamSubject').value;
+    const examName = document.getElementById('seaExamName').value;
+    const actualScore = document.getElementById('seaActualScore').value;
+    const fullScore = document.getElementById('seaFullScore').value;
+    const errorDescription = document.getElementById('seaErrorDescription').value;
+    const weakPoints = seaGetWeakPoints();
+    const classroomPerformance = seaGetClassroomPerformance();
+    const classroomPerformanceDesc = document.getElementById('seaClassroomPerformance').value;
+    const scoreRate = ((actualScore / fullScore) * 100).toFixed(1);
+
+    const studentInfoBlock = `学生信息：
+- 姓名：${studentName}
+- 年级：${studentGrade}
+- 科目：${examSubject}
+- 考试名称：${examName}
+- 考试成绩：${actualScore}分/满分${fullScore}分（得分率${scoreRate}%）
+
+错题情况描述：
+${errorDescription}
+
+薄弱环节：
+${weakPoints.length > 0 ? weakPoints.join('、') : '未特别指定'}
+
+日常课堂表现：
+${classroomPerformance.length > 0 ? classroomPerformance.join('、') : '未特别指定'}
+${classroomPerformanceDesc ? `\n课堂表现详细描述：\n${classroomPerformanceDesc}` : ''}
+
+试卷文件内容：
+${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试卷文件'}`;
+
+    const subjectFeature = examSubject === '数学' ? '计算能力、逻辑思维、解题规范' : examSubject === '英语' ? '词汇积累、语法运用、阅读理解' : examSubject === '语文' ? '阅读理解、写作表达、基础知识' : '学科核心能力';
+
+    const statusId = type === 1 ? 'seaStatus1' : 'seaStatus2';
+    const previewId = type === 1 ? 'seaPreview1' : 'seaPreview2';
+    const retryBtnId = type === 1 ? 'seaRetry1' : 'seaRetry2';
+
+    document.getElementById(statusId).textContent = '⏳ 重新生成中...';
+    document.getElementById(statusId).style.color = '#f39c12';
+    document.getElementById(retryBtnId).style.display = 'none';
+    document.getElementById(previewId).textContent = '';
+
+    const prompt = type === 1
+        ? `你是一位经验丰富的${examSubject}教师，请根据以下信息，对${studentName}同学的${examName}做题情况做一个深入分析。\n\n${studentInfoBlock}\n\n请你根据上述内容给${studentName}的${examName}做题情况做一个分析。要求：\n1. 切合实际，可以制定部分长期学习计划，但要切实可完成，最好是家长可以配合的\n2. 说出问题和需要注意的点，此项需要稍微详细丰富一点，尤其是分析试卷出错处\n3. 要认可学生存在的闪光点，适当在报告中表扬学生\n4. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通\n5. 结合${examSubject}学科特色进行分析，比如${subjectFeature}等方面\n6. 分析要具体到知识点，不要泛泛而谈\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景`
+        : `你是一位经验丰富的${examSubject}教师和学业规划师，请根据以下学生信息，为${studentName}同学制定接下来的学习方案。\n\n${studentInfoBlock}\n\n请你根据学生现在的情况，制定接下来的学习方案。要求：\n1. 方案要切合实际，不要"每日提分计划"之类不切实际的内容，可以制定长期方案\n2. 要有阶段性目标（短期、中期），但不要过于死板\n3. 重点指出接下来应该优先攻克的知识点和需要掌握的能力\n4. 给出具体可执行的学习方法和建议\n5. 结合${examSubject}学科特色，比如${subjectFeature}等方面\n6. 表述清晰明了、整体干净整洁，亲切自然，像一个真实的老师在和家长沟通\n7. 输出格式：结构化文本，分点清晰，有数据支撑\n8. 这份报告是要呈现给家长看的，注意语言输出场景`;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    fetch(SEA_KIMI_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
+        },
+        body: JSON.stringify({
+            model: 'kimi-k2.5',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 1
+        }),
+        signal: controller.signal
+    })
+    .then(response => {
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error('API请求失败：' + response.status);
+        return response.json();
+    })
+    .then(data => {
+        const content = data.choices[0].message.content;
+        if (type === 1) {
+            seaState.generatedAnalysis = content;
+            document.getElementById('seaAnalysisText').innerText = content;
+        } else {
+            seaState.generatedPlan = content;
+            document.getElementById('seaPlanText').innerText = content;
+        }
+        document.getElementById(statusId).textContent = '✅ 已完成';
+        document.getElementById(statusId).style.color = '#27ae60';
+        document.getElementById(previewId).textContent = content.substring(0, 300) + '...';
+
+    .catch(error => {
+        clearTimeout(timeoutId);
+        console.error('重新生成失败：', error);
+        document.getElementById(statusId).textContent = '❌ 再次失败';
+        document.getElementById(statusId).style.color = '#e74c3c';
+        document.getElementById(previewId).innerHTML = '<span style="color:#e74c3c">重新生成仍然失败，请检查网络后重试，或继续编辑现有内容。</span>';
+    });
 }
 
 function seaStartCarousel(elementId, messages) {
@@ -522,10 +641,10 @@ async function seaGenerateBeautifiedHtml() {
         '✨ 即将完成报告生成...'
     ]);
 
-    const prompt = `你是一位世界顶尖的排版大师和前端工程师，擅长将文字内容转化为视觉震撼的HTML页面。请将以下考情分析和学习方案内容转换为一份极其精美、现代化的HTML报告。
+    const prompt = `你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。
 
 【内容结构要求 - 必须严格按此顺序组织】
-一、封面：青岛睿花苑·${examSubject}考情分析报告（大标题居中，简约大气，必须包含"青岛睿花苑"字样，无版本标识）
+一、封面：青岛睿花苑·${examSubject}考情分析报告（大标题居中，必须包含"青岛睿花苑"字样，无版本标识）
 二、学生信息卡：姓名（${studentName}）、年级、考试名称、成绩等关键信息，使用卡片式布局
 三、考情分析部分：将考情分析文字按逻辑分段，使用卡片/模块化布局，每段一个小标题
 四、学习方案部分【重点展示区域】：这是报告的核心亮点，必须重点突出！
@@ -540,6 +659,18 @@ async function seaGenerateBeautifiedHtml() {
     - 主文字："小睿同学·智能考情分析系统"
     - 版权信息："©版权所有·青岛睿花苑教育科技有限公司"
     - 企业标语："打造最适合人才发展的教育平台，为所到地区带去最优质的教育"
+
+★★★【最高优先级-强制字体大小要求】★★★
+本报告面向家长阅读，所有文字必须特别大、特别醒目！
+- body基础font-size必须设为20px
+- 正文段落文字不低于20px
+- 小标题不低于26px
+- 大标题/板块标题不低于34px
+- 关键数据、分数、百分比不低于24px且加粗
+- 列表项不低于20px
+- 行高line-height不低于2.0
+如果你生成的HTML中任何正文文字小于20px，就是不合格输出！
+★★★★★★★★★★★★
 
 【学习方案重点展示要求 - 极其重要】
 - 学习方案是本报告的最大亮点，必须在视觉上与考情分析形成鲜明对比
@@ -569,6 +700,14 @@ ${seaState.generatedPlan}
 
 请直接返回完整的HTML代码，不需要Markdown代码块标记。`;
 
+    const controller = new AbortController();
+    let timeoutId = setTimeout(() => controller.abort(), 300000);
+
+    function resetTimeout() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => controller.abort(), 300000);
+    }
+
     try {
         const response = await fetch(SEA_ZHIPU_API_URL, {
             method: 'POST',
@@ -577,28 +716,81 @@ ${seaState.generatedPlan}
                 'Authorization': `Bearer ${SEA_ZHIPU_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'glm-4-flash',
+                model: 'glm-5',
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。【学习方案重点展示要求】报告中包含考情分析和学习方案两部分内容，学习方案是报告的核心亮点，必须在视觉上重点突出：使用更醒目的视觉风格（渐变背景、特殊边框、图标装饰），学习方案的视觉面积应与考情分析相当或更大，阶段性目标用时间线或步骤卡片展示。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的考情分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX考情分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能考情分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。★★★【最高优先级-强制字体大小要求】★★★ 本报告面向家长阅读，所有文字必须特别大、特别醒目！具体硬性指标：body基础font-size必须设为20px！正文段落文字不低于20px！小标题不低于26px！大标题/板块标题不低于34px！关键数据、分数、百分比不低于24px且加粗！列表项不低于20px！行高line-height不低于2.0！这是最高优先级要求，比美观更重要，绝对不允许出现14px、16px等小字号！如果你生成的HTML中任何正文文字小于20px，就是不合格输出！★★★★★★★★★★★★【学习方案重点展示要求】报告中包含考情分析和学习方案两部分内容，学习方案是报告的核心亮点，必须在视觉上重点突出：使用更醒目的视觉风格（渐变背景、特殊边框、图标装饰），学习方案的视觉面积应与考情分析相当或更大，阶段性目标用时间线或步骤卡片展示。'
                     },
                     { role: 'user', content: prompt }
                 ],
-                temperature: 0.7,
-                max_tokens: 8192
-            })
+                thinking: {
+                    type: 'enabled'
+                },
+                temperature: 1.0,
+                max_tokens: 65536,
+                stream: true
+            }),
+            signal: controller.signal
         });
 
-        if (!response.ok) throw new Error('API请求失败：' + response.status);
+        if (!response.ok) {
+            clearTimeout(timeoutId);
+            let errorDetail = '';
+            try {
+                const errorData = await response.json();
+                errorDetail = errorData.error?.message || JSON.stringify(errorData);
+            } catch (e) {
+                errorDetail = await response.text().catch(() => '');
+            }
+            throw new Error(`智谱API请求失败 (HTTP ${response.status})${errorDetail ? '：' + errorDetail : ''}`);
+        }
 
-        const data = await response.json();
-        let htmlContent = data.choices[0].message.content;
-        htmlContent = htmlContent.replace(/^```\w*\n?/, '').replace(/\n?```$/, '');
-        htmlContent = seaInjectBranding(htmlContent);
-        seaState.beautifiedHtml = htmlContent;
-        seaDisplayBeautifiedResult();
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            resetTimeout();
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed === 'data: [DONE]') continue;
+                if (!trimmed.startsWith('data: ')) continue;
+
+                try {
+                    const json = JSON.parse(trimmed.slice(6));
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) {
+                        fullContent += delta;
+                    }
+                } catch (e) {
+                    // skip malformed chunks
+                }
+            }
+        }
+
+        clearTimeout(timeoutId);
+
+        if (fullContent) {
+            let htmlContent = fullContent.replace(/^```\w*\n?/, '').replace(/\n?```$/, '');
+            htmlContent = seaInjectBranding(htmlContent);
+            seaState.beautifiedHtml = htmlContent;
+            seaDisplayBeautifiedResult();
+        } else {
+            throw new Error('智谱API返回数据格式异常');
+        }
+
     } catch (error) {
+        clearTimeout(timeoutId);
         console.error('生成美化HTML时出错：', error);
         seaState.beautifiedHtml = seaGenerateFallbackHtml(studentName, examSubject);
         seaDisplayBeautifiedResult();
