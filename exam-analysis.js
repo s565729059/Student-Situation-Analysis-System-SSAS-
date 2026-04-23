@@ -1032,7 +1032,7 @@ async function callZhipuAPI(prompt) {
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能试卷分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。【强制字体大小要求】报告面向家长阅读，字体必须偏大偏醒目：正文不少于18px、小标题不少于22px、大标题不少于28px、关键数据不少于20px，整体比常规网页大2-3个档位。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。图表必须使用内联SVG或CSS绘制，不依赖外部JS库初始化。【强制品牌要求】1. 报告大标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能试卷分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"。以上品牌信息为强制要求，不可省略。★★★【最高优先级-强制字体大小要求】★★★ 本报告面向家长阅读，所有文字必须特别大、特别醒目！具体硬性指标：body基础font-size必须设为20px！正文段落文字不低于20px！小标题不低于26px！大标题/板块标题不低于34px！关键数据、分数、百分比不低于24px且加粗！列表项不低于20px！行高line-height不低于2.0！这是最高优先级要求，比美观更重要，绝对不允许出现14px、16px等小字号！如果你生成的HTML中任何正文文字小于20px，就是不合格输出！★★★★★★★★★★★★'
                     },
                     {
                         role: 'user',
@@ -1179,6 +1179,32 @@ function injectBranding(html) {
     return html;
 }
 
+function enforceMinFontSize(html) {
+    html = html.replace(/font-size\s*:\s*(\d+(?:\.\d+)?)\s*px/gi, function(match, size) {
+        const num = parseFloat(size);
+        if (num < 14) return 'font-size:20px';
+        if (num < 18) return 'font-size:20px';
+        if (num < 22 && match.indexOf('h1') === -1 && match.indexOf('h2') === -1) return match;
+        return match;
+    });
+
+    html = html.replace(/font-size\s*:\s*(\d+(?:\.\d+)?)\s*rem/gi, function(match, size) {
+        const num = parseFloat(size);
+        if (num < 1.25) return 'font-size:1.25rem';
+        return match;
+    });
+
+    if (!html.match(/font-size\s*:[^;]*20px/i) && !html.match(/font-size\s*:[^;]*1\.25rem/i)) {
+        if (html.includes('<style>')) {
+            html = html.replace('<style>', '<style>body, p, li, td, th, span, div { font-size: 20px !important; line-height: 2.0 !important; } h3 { font-size: 26px !important; } h2 { font-size: 30px !important; } h1 { font-size: 34px !important; }');
+        } else if (html.includes('<style ')) {
+            html = html.replace('<style ', '<style>body, p, li, td, th, span, div { font-size: 20px !important; line-height: 2.0 !important; } h3 { font-size: 26px !important; } h2 { font-size: 30px !important; } h1 { font-size: 34px !important; }</style><style ');
+        }
+    }
+
+    return html;
+}
+
 async function generateReport() {
     state.analysisResults.overall = elements.overallAnalysis.innerText;
     state.analysisResults.typeAnalysis = elements.typeAnalysis.innerText;
@@ -1204,6 +1230,7 @@ async function generateReport() {
         htmlContent = htmlContent.replace(/^```\w*\n?/, '').replace(/\n?```$/,'');
 
         htmlContent = injectBranding(htmlContent);
+        htmlContent = enforceMinFontSize(htmlContent);
 
         state.htmlReport = htmlContent;
         displayReport(htmlContent);
@@ -1245,13 +1272,14 @@ function generateReportPrompt() {
 4. 卡片设计：大圆角(12px)、柔和阴影(0 8px 30px rgba)、悬停上浮效果
 5. 排版美观：适当留白、标题装饰线、图标点缀、色块区分
 6. 每种题型独立卡片，含题型图标、难度标签、考点标签云
-7. ⚠️ 【强制要求 - 字体大小与醒目度】报告面向家长阅读，字体必须偏大偏醒目！
-   - 正文基础字号不少于18px，行高不少于1.8
-   - 小标题字号不少于22px，加粗显示
-   - 大标题/板块标题字号不少于28px，加粗并配合渐变色或装饰线
-   - 关键数据、得分率、难度标签等关键信息使用20px以上字号+加粗
-   - 列表项字号不少于18px，行间距适当加大
-   - 整体字体比常规网页大2-3个档位，确保家长在手机上也能轻松阅读
+7. ⚠️ 【强制要求 - 字体大小与醒目度 - 最高优先级】报告面向家长阅读，字体必须特别大特别醒目，这是最重要的要求！
+   - body基础font-size必须设为20px！
+   - 正文段落文字不低于20px，行高line-height不低于2.0
+   - 小标题字号不低于26px，加粗显示
+   - 大标题/板块标题字号不低于34px，加粗并配合渐变色或装饰线
+   - 关键数据、得分率、难度标签等关键信息不低于24px且加粗
+   - 列表项字号不低于20px，行间距适当加大
+   - 绝对不允许出现14px、16px等小字号！任何正文小于20px即为不合格！
 8. ⚠️ 【强制要求 - 字体颜色】绝对禁止白色字体！
    - 所有文字必须使用深色：正文#333/#444，标题#1a1a1a/#2c3e50
    - 严禁使用#fff、#ffffff、white、rgba(255,255,255等白色值
@@ -1317,13 +1345,14 @@ ${state.analysisResults.typeAnalysis}
 4. 卡片设计：大圆角(12px)、柔和阴影、悬停效果
 5. 重点信息用彩色标签、高亮背景突出
 6. 通俗易懂，避免专业术语，多用大白话
-7. ⚠️ 【强制要求 - 字体大小与醒目度】报告面向家长阅读，字体必须偏大偏醒目！
-   - 正文基础字号不少于18px，行高不少于1.8
-   - 小标题字号不少于22px，加粗显示
-   - 大标题/板块标题字号不少于28px，加粗并配合渐变色或装饰线
-   - 关键数据、得分率、难度标签等关键信息使用20px以上字号+加粗
-   - 列表项字号不少于18px，行间距适当加大
-   - 整体字体比常规网页大2-3个档位，确保家长在手机上也能轻松阅读
+7. ⚠️ 【强制要求 - 字体大小与醒目度 - 最高优先级】报告面向家长阅读，字体必须特别大特别醒目，这是最重要的要求！
+   - body基础font-size必须设为20px！
+   - 正文段落文字不低于20px，行高line-height不低于2.0
+   - 小标题字号不低于26px，加粗显示
+   - 大标题/板块标题字号不低于34px，加粗并配合渐变色或装饰线
+   - 关键数据、得分率、难度标签等关键信息不低于24px且加粗
+   - 列表项字号不低于20px，行间距适当加大
+   - 绝对不允许出现14px、16px等小字号！任何正文小于20px即为不合格！
 8. ⚠️ 【强制要求 - 字体颜色】绝对禁止白色字体！
    - 所有文字必须使用深色：正文#333/#444，标题#1a1a1a/#2c3e50
    - 严禁使用#fff、#ffffff、white、rgba(255,255,255等白色值
