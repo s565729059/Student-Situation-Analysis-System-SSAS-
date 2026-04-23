@@ -193,12 +193,15 @@
 
         function checkVersionUpdate() {
             const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
+            const modal = document.getElementById('updateModal');
             if (lastSeen !== CURRENT_VERSION) {
-                const modal = document.getElementById('updateModal');
                 if (modal) {
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
                 }
+            } else {
+                if (modal) modal.style.display = 'none';
+                document.body.style.overflow = '';
             }
         }
 
@@ -206,8 +209,8 @@
             const modal = document.getElementById('updateModal');
             if (modal) {
                 modal.style.display = 'none';
-                document.body.style.overflow = '';
             }
+            document.body.style.removeProperty('overflow');
             localStorage.setItem(LAST_SEEN_KEY, CURRENT_VERSION);
         }
 
