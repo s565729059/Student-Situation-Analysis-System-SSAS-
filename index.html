@@ -78,6 +78,17 @@
             <div class="changelog-list">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.1</span>
+                        <span class="version-date">2026-04-21</span>
+                    </div>
+                    <div class="changelog-content">
+                        <ul>
+                            <li><span class="changelog-tag tag-optimize">优化</span><strong>版本号规则调整</strong>：版本号粒度从+0.1调整为+0.0.1，避免频繁大版本变动，当前版本v3.3.1</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3</span>
                         <span class="version-date">2026-04-21</span>
                     </div>
@@ -119,7 +130,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3</p>
+            <p class="version-info">版本号：v3.3.1</p>
         </footer>
     </div>
     
@@ -134,7 +145,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3</h2>
+                <h2>小睿同学已更新至 v3.3.1</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -172,12 +183,9 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3 更新内容</h3>
+                    <h3>📝 v3.3.1 更新内容</h3>
                     <ul>
-                        <li><span class="update-tag tag-new">新增</span><strong>考情分析双问题并发</strong>：同时生成考情分析 + 学习方案，先完成先展示</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>报告字体加大加醒目</strong>：正文≥20px、小标题≥26px、大标题≥34px，方便家长阅览</li>
-                        <li><span class="update-tag tag-new">新增</span><strong>Loading界面用户提示</strong>：分析等待和报告生成等待界面增加操作引导</li>
-                        <li><span class="update-tag tag-opt">优化</span><strong>学习方案重点展示</strong>：美化报告中学习方案作为核心亮点突出展示</li>
+                        <li><span class="update-tag tag-opt">优化</span><strong>版本号规则调整</strong>：版本号粒度从+0.1调整为+0.0.1，避免频繁大版本变动</li>
                     </ul>
                 </div>
             </div>
@@ -188,7 +196,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3';
+        const CURRENT_VERSION = '3.3.1';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
