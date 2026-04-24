@@ -93,6 +93,20 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.3.9</span>
+                        <span class="version-date">2026-04-23</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>试卷名称输入框上线！上传试卷后填写考试全称，让报告一目了然~</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>报告副标题降临！标题下方醒目展示试卷名称，再也不会搞混是哪份卷子啦</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.3.8</span>
                         <span class="version-date">2026-04-23</span>
                     </div>
@@ -293,7 +307,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.3.8</p>
+            <p class="version-info">版本号：v3.3.9</p>
         </footer>
     </div>
     
@@ -308,7 +322,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.3.8</h2>
+                <h2>小睿同学已更新至 v3.3.9</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -353,17 +367,11 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.3.8 更新内容</h3>
-                    <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                    <h3>📝 v3.3.9 更新内容</h3>
+                    <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
                         <ul>
-                            <li><span class="update-tag tag-new">新增</span><strong>主题色降临</strong>！小睿同学换上红色新皮肤，暖暖的很贴心~</li>
-                            <li><span class="update-tag tag-opt">优化</span><strong>全站视觉统一</strong>：每个角落都是同款红系风格</li>
-                        </ul>
-                    </div>
-                    <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
-                        <ul>
-                            <li><span class="update-tag tag-opt">优化</span><strong>更新日志改版</strong>！说话方式更可爱了，小睿同学可不是冷冰冰的机器~</li>
-                            <li><span class="update-tag tag-opt">优化</span><strong>「AI」→「小睿同学」</strong>：我们有自己的名字啦！</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>试卷名称输入框</strong>！上传试卷后填写考试全称，让报告一目了然~</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>报告副标题</strong>！标题下方醒目展示试卷名称，再也不会搞混啦</li>
                         </ul>
                     </div>
                 </div>
@@ -375,7 +383,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.3.8';
+        const CURRENT_VERSION = '3.3.9';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

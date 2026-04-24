@@ -4,6 +4,7 @@ const state = {
     fileContent: '',
     selectedVersion: '',
     subject: '',
+    examName: '',
     analysisResults: {
         overall: '',
         typeAnalysis: ''
@@ -108,6 +109,11 @@ function initializeEventListeners() {
 
     elements.subjectSelect.addEventListener('change', (e) => {
         state.subject = e.target.value;
+        updateNextButton();
+    });
+
+    document.getElementById('examNameInput').addEventListener('input', (e) => {
+        state.examName = e.target.value.trim();
         updateNextButton();
     });
 
@@ -234,6 +240,7 @@ function processFile(file) {
     elements.fileSize.textContent = formatFileSize(file.size);
     elements.fileInfo.style.display = 'block';
     elements.subjectSection.style.display = 'block';
+    document.getElementById('examNameSection').style.display = 'block';
 
     if (fileExtension === '.pdf') {
         elements.pdfWarning.style.display = 'flex';
@@ -353,8 +360,11 @@ function removeFile(e) {
     elements.fileInfo.style.display = 'none';
     elements.pdfWarning.style.display = 'none';
     elements.subjectSection.style.display = 'none';
+    document.getElementById('examNameSection').style.display = 'none';
     elements.subjectSelect.value = '';
     state.subject = '';
+    state.examName = '';
+    document.getElementById('examNameInput').value = '';
     updateNextButton();
 }
 
@@ -367,7 +377,7 @@ function formatFileSize(bytes) {
 }
 
 function updateNextButton() {
-    elements.toStep2.disabled = !(state.uploadedFile && state.subject);
+    elements.toStep2.disabled = !(state.uploadedFile && state.subject && state.examName);
 }
 
 function selectVersion(version) {
@@ -1032,7 +1042,7 @@ async function callZhipuAPI(prompt) {
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。【强制品牌要求】1. 报告标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX分析报告"；2. 页脚必须包含三行信息：主文字"小睿同学·智能试卷分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"；3. 页脚排版要求：三行文字严格各占一行且仅占一行，第三行文字较长，必须通过缩小字号或调整间距使其在单行内完整显示，绝不换行。以上品牌信息为强制要求，不可省略。【内容要求】报告必须内容充实、专业严谨，数据详实、分析深入，体现教研专业水准，不得泛泛而谈。【输出限制】只输出纯HTML代码，绝对不允许在</html>标签之后输出任何设计说明、解释文字或注释。'
+                        content: '你是一位世界顶级的HTML报告设计师和前端工程师。你擅长生成极其精美、现代化、数据可视化丰富的试卷分析报告。你必须输出完整、可运行的HTML代码，所有内容必须完整输出，绝不能截断。【强制品牌要求】1. 报告标题必须包含"青岛睿花苑"字样，格式为"青岛睿花苑·XXX分析报告"；2. 标题下方必须添加副标题，显示本次分析的具体试卷名称（如"山东省青岛市城阳、胶州等五区联考九年级一模试卷"），副标题字号小于主标题，字体稍细，居中显示；3. 页脚必须包含三行信息：主文字"小睿同学·智能试卷分析系统"、版权信息"©版权所有·青岛睿花苑教育科技有限公司"、企业标语"打造最适合人才发展的教育平台，为所到地区带去最优质的教育"；4. 页脚排版要求：三行文字严格各占一行且仅占一行，第三行文字较长，必须通过缩小字号或调整间距使其在单行内完整显示，绝不换行。以上品牌信息为强制要求，不可省略。【内容要求】报告必须内容充实、专业严谨，数据详实、分析深入，体现教研专业水准，不得泛泛而谈。【输出限制】只输出纯HTML代码，绝对不允许在</html>标签之后输出任何设计说明、解释文字或注释。'
                     },
                     {
                         role: 'user',
@@ -1243,10 +1253,13 @@ function generateReportPrompt() {
     const subjectName = getSubjectName();
     const isTeaching = state.selectedVersion === 'teaching';
     
+    const examName = state.examName || '未指定';
+    
     if (isTeaching) {
         return `请基于以下试卷分析内容，生成一份精美的HTML格式教学分析报告。
 
 【学科】${subjectName}
+【试卷名称】${examName}
 
 【核心要求 - 教学参考版侧重】
 1. 重点关注题型板块考向分析，这是报告的核心内容，必须详细展开
@@ -1260,6 +1273,7 @@ function generateReportPrompt() {
 
 【内容结构】
 一、标题区：青岛睿花苑·学科名称+试卷分析报告（必须包含"青岛睿花苑"字样，无版本标识）
+    副标题：${examName}（在主标题下方，字号小于主标题，字体稍细，居中显示）
 二、试卷概览：总分/时长/题量
 三、整体特征（简明1-2段）：知识覆盖+难度总评
 四、题型板块深度分析（重点展开）：每种题型详细展示考点+难度+能力要求+教学建议
@@ -1289,6 +1303,7 @@ ${state.analysisResults.typeAnalysis}
         return `请基于以下试卷分析内容，生成一份精美的HTML格式家长指导报告。
 
 【学科】${subjectName}
+【试卷名称】${examName}
 
 【核心要求 - 家长版侧重】
 1. 重点关注整体特征分析，突出试卷难度说明、重点考查内容、得分关键点
@@ -1302,6 +1317,7 @@ ${state.analysisResults.typeAnalysis}
 
 【内容结构】
 一、标题区：青岛睿花苑·学科名称+学习分析报告（温馨风格，必须包含"青岛睿花苑"字样，无版本标识）
+    副标题：${examName}（在主标题下方，字号小于主标题，字体稍细，居中显示）
 二、试卷速览：总分/时长/题型数量
 三、给家长的核心解读（重点展开）：这次考试考什么+难度怎么样+得分关键点
 四、题型情况一览（简明展示各题型分值和难度）
