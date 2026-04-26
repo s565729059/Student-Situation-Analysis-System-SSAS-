@@ -18,7 +18,7 @@
             <h1>小睿同学·智能试卷分析系统</h1>
             <h2>深度解析·报告生成</h2>
             <div class="version-info">
-                <p>版本号：v3.4.2</p>
+                <p>版本号：v3.5.0</p>
             </div>
         </header>
 
@@ -222,14 +222,12 @@
                         <button id="backToStep2" class="exam-btn-outline">
                             <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回
                         </button>
-                        <div style="display:flex;gap:10px">
-                            <button id="regenerateReport" class="exam-btn-outline" style="display:none">
-                                <i class="fas fa-redo" style="margin-right:8px"></i> 重新生成
-                            </button>
-                            <button id="toStep4" class="exam-btn-primary">
-                                生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
-                            </button>
-                        </div>
+                        <button id="regenerateReport" class="exam-btn-outline" style="display:none">
+                            <i class="fas fa-redo" style="margin-right:8px"></i> 重新生成
+                        </button>
+                        <button id="toStep4" class="exam-btn-primary">
+                            生成HTML报告 <i class="fas fa-file-alt" style="margin-left:8px"></i>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -261,7 +259,7 @@
                         <iframe id="reportFrame" class="exam-report-frame"></iframe>
                     </div>
 
-                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+                    <div class="exam-nav-between" style="margin-top:20px">
                         <button id="editReportBtn" class="exam-btn-secondary">
                             <i class="fas fa-edit" style="margin-right:8px"></i> 修改报告
                         </button>
@@ -315,14 +313,12 @@
                     <button id="backToStep4" class="exam-btn-outline">
                         <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回报告
                     </button>
-                    <div style="display:flex;gap:10px">
-                        <button id="saveEditBtn" class="exam-btn-primary">
-                            <i class="fas fa-save" style="margin-right:8px"></i> 保存修改
-                        </button>
-                        <button id="downloadFromEditor" class="exam-btn-secondary">
-                            <i class="fas fa-download" style="margin-right:8px"></i> 下载 HTML
-                        </button>
-                    </div>
+                    <button id="downloadFromEditor" class="exam-btn-secondary">
+                        <i class="fas fa-download" style="margin-right:8px"></i> 下载 HTML
+                    </button>
+                    <button id="saveEditBtn" class="exam-btn-primary">
+                        <i class="fas fa-save" style="margin-right:8px"></i> 保存修改
+                    </button>
                 </div>
             </section>
         </main>

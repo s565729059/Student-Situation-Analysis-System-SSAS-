@@ -37,9 +37,10 @@ header {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -311,12 +312,12 @@ main {
 
 .submit-btn {
     width: 100%;
-    padding: 15px;
+    padding: 14px 28px;
     background: #c06050;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -335,12 +336,12 @@ main {
 
 .export-btn {
     flex: 1;
-    padding: 15px;
+    padding: 14px 28px;
     background: #d48a7f;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -1067,12 +1068,12 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    flex-wrap: wrap;
     margin-top: 25px;
 }
 
 .exam-nav-between button {
-    flex: 1;
     min-width: 140px;
     text-align: center;
 }
@@ -1471,12 +1472,12 @@ main {
     justify-content: center;
     gap: 6px;
     margin: 10px 0 0;
-    padding: 8px 16px;
+    padding: 12px 24px;
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;

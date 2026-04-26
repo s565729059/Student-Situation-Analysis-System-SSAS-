@@ -319,54 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
         throw lastError || new Error('所有DeepSeek模型调用都失败');
     }
     
-    // Kimi API调用函数 - 使用k2.5模型
     async function callKimiAPI(prompt) {
-        const apiKey = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
-        const url = 'https://api.moonshot.cn/v1/chat/completions';
-        
-        const model = 'kimi-k2.5';
-        
-        try {
-            console.log(`尝试使用Kimi v2.5模型: ${model}`);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 120000); // 120秒超时
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: model,
-                    messages: [
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    temperature: 1
-                }),
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('API错误详情:', response.status, errorText);
-                throw new Error(`Kimi API调用失败: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-                console.log(`使用Kimi v2.5模型成功获取结果`);
-                return data.choices[0].message.content;
-            }
-        } catch (error) {
-            console.error(`Kimi v2.5调用失败:`, error);
-            throw error;
-        }
+        return await callDeepSeekAPI(prompt);
     }
     
     // 1. 分析整体学习情况

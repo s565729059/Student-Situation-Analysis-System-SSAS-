@@ -7,10 +7,6 @@ const seaState = {
 };
 
 const SEA_KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
-const SEA_KIMI_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
-
-const SEA_ZHIPU_API_KEY = 'c460138604724e6590549fc11287ec74.4ZQY2YnR9LzyC01U';
-const SEA_ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 
 const SEA_DEEPSEEK_API_KEY = 'sk-860f8bfd65ae4a93aff52266015e29c9';
 const SEA_DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
@@ -394,14 +390,14 @@ ${studentInfoBlock}
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
         try {
-            const response = await fetch(SEA_KIMI_API_URL, {
+            const response = await fetch(SEA_DEEPSEEK_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
+                    'Authorization': `Bearer ${SEA_DEEPSEEK_API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: 'kimi-k2.5',
+                    model: 'deepseek-v4-flash',
                     messages: [{ role: 'user', content: prompt }],
                     temperature: 1
                 }),
@@ -540,14 +536,14 @@ ${seaState.fileContent ? seaState.fileContent.substring(0, 8000) : '未上传试
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 180000);
 
-    fetch(SEA_KIMI_API_URL, {
+    fetch(SEA_DEEPSEEK_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SEA_KIMI_API_KEY}`
+            'Authorization': `Bearer ${SEA_DEEPSEEK_API_KEY}`
         },
         body: JSON.stringify({
-            model: 'kimi-k2.5',
+            model: 'deepseek-v4-flash',
             messages: [{ role: 'user', content: prompt }],
             temperature: 1
         }),
