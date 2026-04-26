@@ -86,7 +86,7 @@ const elements = {
     reportPreview: document.getElementById('reportPreview'),
     reportFrame: document.getElementById('reportFrame'),
     downloadReport: document.getElementById('downloadReport'),
-    backToStep3: document.getElementById('backToStep3'),
+    backToStep3: null,
     startNew: document.getElementById('startNew'),
 
     reportModal: document.getElementById('reportModal'),
@@ -131,7 +131,7 @@ function initializeEventListeners() {
     elements.backToStep2.addEventListener('click', () => goToStep(2));
     elements.toStep4.addEventListener('click', handleToStep4);
     elements.regenerateReport.addEventListener('click', generateReport);
-    elements.backToStep3.addEventListener('click', () => goToStep(3));
+    if (elements.backToStep3) elements.backToStep3.addEventListener('click', () => goToStep(3));
     elements.startNew.addEventListener('click', resetApplication);
 
     elements.versionCards.forEach(card => {
