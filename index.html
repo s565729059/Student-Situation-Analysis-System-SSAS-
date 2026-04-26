@@ -93,23 +93,28 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
-                        <span class="version-tag">v3.4.0</span>
+                        <span class="version-tag">v3.4.1</span>
                         <span class="version-date">2026-04-26</span>
                     </div>
                     <div class="changelog-content">
                         <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
                             <ul>
-                                <li><span class="changelog-tag tag-feature">新增</span>报告修改功能上线！生成报告后可以自己编辑文字内容啦~左边改代码右边看效果，所见即所得！</li>
-                                <li><span class="changelog-tag tag-feature">新增</span>修改建议贴心提示，告诉你怎么改才不会搞坏报告~</li>
-                                <li><span class="changelog-tag tag-feature">新增</span>第五步「修改报告」降临！流程更完整，报告随心改</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>报告生成页精简啦！只留修改报告和分析新试卷，操作更清爽~</li>
+                                <li><span class="changelog-tag tag-feature">新增</span>删除板块温馨提示！告诉你怎么从&lt;div&gt;删到&lt;div&gt;，不会留下空框框</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>代码编辑框大瘦身！只展示页面内容部分，格式代码自动隐藏，改文字更省心~</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>小睿同学思考核心全面换代！DeepSeek模型升级为 deepseek-v4-flash，更快更稳~</li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="changelog-item">
                     <div class="changelog-version">
-                        <span class="version-tag">v3.3.9</span>
-                        <span class="version-date">2026-04-23</span>
+                        <span class="version-tag">v3.4.0</span>
+                        <span class="version-date">2026-04-26</span>
                     </div>
                     <div class="changelog-content">
                         <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
@@ -322,7 +327,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.4.0</p>
+            <p class="version-info">版本号：v3.4.1</p>
         </footer>
     </div>
     
@@ -337,7 +342,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.4.0</h2>
+                <h2>小睿同学已更新至 v3.4.1</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -382,12 +387,17 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>📝 v3.4.0 更新内容</h3>
+                    <h3>📝 v3.4.1 更新内容</h3>
                     <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
                         <ul>
-                            <li><span class="update-tag tag-new">新增</span><strong>报告修改功能</strong>！生成报告后可以自己编辑文字内容，左边改右边看，所见即所得~</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>修改建议提示</strong>！贴心提示怎么改才不会搞坏报告~</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>第五步「修改报告」</strong>！流程更完整，报告随心改</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>报告生成页精简</strong>！只留修改报告和分析新试卷，操作更清爽~</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>删除板块温馨提示</strong>！告诉你怎么从&lt;div&gt;删到&lt;div&gt;，不会留空框</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>代码编辑框大瘦身</strong>！只展示页面内容，格式代码自动隐藏~</li>
+                        </ul>
+                    </div>
+                    <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
+                        <ul>
+                            <li><span class="update-tag tag-opt">优化</span><strong>小睿同学思考核心换代</strong>！DeepSeek升级为 deepseek-v4-flash~</li>
                         </ul>
                     </div>
                 </div>
@@ -399,7 +409,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.4.0';
+        const CURRENT_VERSION = '3.4.1';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

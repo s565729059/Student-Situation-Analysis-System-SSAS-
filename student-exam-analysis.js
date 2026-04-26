@@ -773,7 +773,7 @@ ${seaState.generatedPlan}
                 'Authorization': `Bearer ${SEA_DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek-reasoner',
+                model: 'deepseek-v4-flash',
                 messages: [
                     {
                         role: 'system',

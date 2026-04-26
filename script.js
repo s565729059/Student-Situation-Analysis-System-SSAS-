@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
         const url = 'https://api.deepseek.com/v1/chat/completions';
         
-        const models = ['deepseek-reasoner', 'deepseek-chat'];
+        const models = ['deepseek-v4-flash'];
         let lastError;
         let lastContent = null;
         

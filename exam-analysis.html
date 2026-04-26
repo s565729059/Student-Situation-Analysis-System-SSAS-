@@ -18,7 +18,7 @@
             <h1>小睿同学·智能试卷分析系统</h1>
             <h2>深度解析·报告生成</h2>
             <div class="version-info">
-                <p>版本号：v3.4.0</p>
+                <p>版本号：v3.4.1</p>
             </div>
         </header>
 
@@ -261,18 +261,13 @@
                         <iframe id="reportFrame" class="exam-report-frame"></iframe>
                     </div>
 
-                    <div class="exam-nav-between" style="margin-top:20px">
-                        <button id="backToStep3" class="exam-btn-outline">
-                            <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
+                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+                        <button id="editReportBtn" class="exam-btn-secondary">
+                            <i class="fas fa-edit" style="margin-right:8px"></i> 修改报告
                         </button>
-                        <div style="display:flex;gap:10px">
-                            <button id="editReportBtn" class="exam-btn-secondary">
-                                <i class="fas fa-edit" style="margin-right:8px"></i> 修改报告
-                            </button>
-                            <button id="startNew" class="exam-btn-primary">
-                                <i class="fas fa-plus" style="margin-right:8px"></i> 分析新试卷
-                            </button>
-                        </div>
+                        <button id="startNew" class="exam-btn-primary">
+                            <i class="fas fa-plus" style="margin-right:8px"></i> 分析新试卷
+                        </button>
                     </div>
                 </div>
             </section>
@@ -283,6 +278,10 @@
                     <div class="exam-editor-tip-item">
                         <i class="fas fa-mouse-pointer"></i>
                         <span>非特殊情况，请不要修改代码部分，直接下滑修改文字部分即可。</span>
+                    </div>
+                    <div class="exam-editor-tip-item">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>如果要删除整个板块，请从 <code>&lt;div</code> 代码删除到下一个 <code>&lt;div</code> 代码，不要只删文字留空框。</span>
                     </div>
                     <div class="exam-editor-tip-item">
                         <i class="fas fa-print"></i>

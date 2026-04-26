@@ -142,7 +142,7 @@ function initializeEventListeners() {
     elements.editReportBtn.addEventListener('click', goToStep5);
     elements.backToStep4.addEventListener('click', () => goToStep(4));
     elements.saveEditBtn.addEventListener('click', saveEditReport);
-    elements.downloadFromEditor.addEventListener('click', downloadReport);
+    elements.downloadFromEditor.addEventListener('click', downloadFromEditorPage);
     elements.closeModal.addEventListener('click', closeReportModal);
     elements.reportModal.addEventListener('click', (e) => {
         if (e.target === elements.reportModal) closeReportModal();
@@ -924,7 +924,7 @@ async function callDeepSeekAPI(prompt) {
                 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: 'deepseek-v4-flash',
                 messages: [
                     {
                         role: 'system',
@@ -1055,7 +1055,7 @@ async function callZhipuAPI(prompt) {
                 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'deepseek-reasoner',
+                model: 'deepseek-v4-flash',
                 messages: [
                     {
                         role: 'system',
@@ -1395,6 +1395,7 @@ function downloadReport() {
 }
 
 let editorDebounceTimer = null;
+let editorHeaderPart = '';
 
 function goToStep5() {
     if (!state.htmlReport) {
@@ -1402,7 +1403,16 @@ function goToStep5() {
         return;
     }
     goToStep(5);
-    elements.codeEditor.value = state.htmlReport;
+
+    const containerIndex = state.htmlReport.indexOf('<div class="container"');
+    if (containerIndex !== -1) {
+        editorHeaderPart = state.htmlReport.substring(0, containerIndex);
+        elements.codeEditor.value = state.htmlReport.substring(containerIndex);
+    } else {
+        editorHeaderPart = '';
+        elements.codeEditor.value = state.htmlReport;
+    }
+
     syncEditorPreview();
     elements.codeEditor.addEventListener('input', handleEditorInput);
 }
@@ -1413,17 +1423,29 @@ function handleEditorInput() {
 }
 
 function syncEditorPreview() {
-    const code = elements.codeEditor.value;
+    const code = editorHeaderPart + elements.codeEditor.value;
     const blob = new Blob([code], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     elements.editPreviewFrame.src = url;
 }
 
 function saveEditReport() {
-    const editedCode = elements.codeEditor.value;
-    state.htmlReport = editedCode;
+    state.htmlReport = editorHeaderPart + elements.codeEditor.value;
     showNotification('修改已保存！', 'success');
     goToStep(4);
+}
+
+function downloadFromEditorPage() {
+    const fullCode = editorHeaderPart + elements.codeEditor.value;
+    const blob = new Blob([fullCode], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${getSubjectName()}试卷分析报告_${new Date().toLocaleDateString()}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function resetApplication() {
