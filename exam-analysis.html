@@ -18,7 +18,7 @@
             <h1>小睿同学·智能试卷分析系统</h1>
             <h2>深度解析·报告生成</h2>
             <div class="version-info">
-                <p>版本号：v3.3.9</p>
+                <p>版本号：v3.4.0</p>
             </div>
         </header>
 
@@ -42,6 +42,11 @@
                 <div class="exam-step" data-step="4">
                     <div class="exam-step-circle">4</div>
                     <span>报告生成</span>
+                </div>
+                <div class="exam-step-line"></div>
+                <div class="exam-step" data-step="5">
+                    <div class="exam-step-circle">5</div>
+                    <span>修改报告</span>
                 </div>
             </div>
 
@@ -260,8 +265,63 @@
                         <button id="backToStep3" class="exam-btn-outline">
                             <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回修改
                         </button>
-                        <button id="startNew" class="exam-btn-primary">
-                            <i class="fas fa-plus" style="margin-right:8px"></i> 分析新试卷
+                        <div style="display:flex;gap:10px">
+                            <button id="editReportBtn" class="exam-btn-secondary">
+                                <i class="fas fa-edit" style="margin-right:8px"></i> 修改报告
+                            </button>
+                            <button id="startNew" class="exam-btn-primary">
+                                <i class="fas fa-plus" style="margin-right:8px"></i> 分析新试卷
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="step5" class="form-section exam-fade-in" style="display:none">
+                <div class="exam-editor-tips">
+                    <div class="exam-editor-tip-title"><i class="fas fa-lightbulb"></i> 修改建议</div>
+                    <div class="exam-editor-tip-item">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span>非特殊情况，请不要修改代码部分，直接下滑修改文字部分即可。</span>
+                    </div>
+                    <div class="exam-editor-tip-item">
+                        <i class="fas fa-print"></i>
+                        <span>下载HTML格式文件后，双击打开，Ctrl+P，另存为PDF即可添加水印，并且进行后续的打印操作。</span>
+                    </div>
+                    <div class="exam-editor-tip-item">
+                        <i class="fas fa-camera"></i>
+                        <span>如果需要保存长图，请在HTML页面中右键选择截屏功能，并且选择截取全页即可。</span>
+                    </div>
+                </div>
+
+                <div class="exam-editor-layout">
+                    <div class="exam-editor-pane">
+                        <div class="exam-editor-pane-header">
+                            <i class="fas fa-code"></i> HTML 代码编辑
+                        </div>
+                        <textarea id="codeEditor" class="exam-code-editor" spellcheck="false"></textarea>
+                    </div>
+                    <div class="exam-editor-divider"></div>
+                    <div class="exam-editor-pane">
+                        <div class="exam-editor-pane-header">
+                            <i class="fas fa-eye"></i> 实时预览
+                        </div>
+                        <div class="exam-editor-preview-wrapper">
+                            <iframe id="editPreviewFrame" class="exam-editor-preview-frame"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exam-nav-between" style="margin-top:20px">
+                    <button id="backToStep4" class="exam-btn-outline">
+                        <i class="fas fa-arrow-left" style="margin-right:8px"></i> 返回报告
+                    </button>
+                    <div style="display:flex;gap:10px">
+                        <button id="saveEditBtn" class="exam-btn-primary">
+                            <i class="fas fa-save" style="margin-right:8px"></i> 保存修改
+                        </button>
+                        <button id="downloadFromEditor" class="exam-btn-secondary">
+                            <i class="fas fa-download" style="margin-right:8px"></i> 下载 HTML
                         </button>
                     </div>
                 </div>

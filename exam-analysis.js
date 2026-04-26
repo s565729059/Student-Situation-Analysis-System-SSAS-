@@ -51,6 +51,7 @@ const elements = {
     step2: document.getElementById('step2'),
     step3: document.getElementById('step3'),
     step4: document.getElementById('step4'),
+    step5: document.getElementById('step5'),
 
     uploadArea: document.getElementById('uploadArea'),
     fileInput: document.getElementById('fileInput'),
@@ -90,7 +91,14 @@ const elements = {
 
     reportModal: document.getElementById('reportModal'),
     modalContent: document.getElementById('modalContent'),
-    closeModal: document.getElementById('closeModal')
+    closeModal: document.getElementById('closeModal'),
+
+    editReportBtn: document.getElementById('editReportBtn'),
+    codeEditor: document.getElementById('codeEditor'),
+    editPreviewFrame: document.getElementById('editPreviewFrame'),
+    backToStep4: document.getElementById('backToStep4'),
+    saveEditBtn: document.getElementById('saveEditBtn'),
+    downloadFromEditor: document.getElementById('downloadFromEditor')
 };
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -131,6 +139,10 @@ function initializeEventListeners() {
     });
 
     elements.downloadReport.addEventListener('click', downloadReport);
+    elements.editReportBtn.addEventListener('click', goToStep5);
+    elements.backToStep4.addEventListener('click', () => goToStep(4));
+    elements.saveEditBtn.addEventListener('click', saveEditReport);
+    elements.downloadFromEditor.addEventListener('click', downloadReport);
     elements.closeModal.addEventListener('click', closeReportModal);
     elements.reportModal.addEventListener('click', (e) => {
         if (e.target === elements.reportModal) closeReportModal();
@@ -398,12 +410,17 @@ function goToStep(step) {
     elements.step2.style.display = 'none';
     elements.step3.style.display = 'none';
     elements.step4.style.display = 'none';
+    elements.step5.style.display = 'none';
 
     document.getElementById(`step${step}`).style.display = 'block';
     updateProgressIndicators(step);
 
     if (step === 3) {
         updateStep3Buttons();
+    }
+
+    if (step === 4) {
+        displayReport(state.htmlReport);
     }
 
     state.currentStep = step;
@@ -1375,6 +1392,38 @@ function downloadReport() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+let editorDebounceTimer = null;
+
+function goToStep5() {
+    if (!state.htmlReport) {
+        showNotification('请先生成报告后再修改', 'warning');
+        return;
+    }
+    goToStep(5);
+    elements.codeEditor.value = state.htmlReport;
+    syncEditorPreview();
+    elements.codeEditor.addEventListener('input', handleEditorInput);
+}
+
+function handleEditorInput() {
+    clearTimeout(editorDebounceTimer);
+    editorDebounceTimer = setTimeout(syncEditorPreview, 500);
+}
+
+function syncEditorPreview() {
+    const code = elements.codeEditor.value;
+    const blob = new Blob([code], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    elements.editPreviewFrame.src = url;
+}
+
+function saveEditReport() {
+    const editedCode = elements.codeEditor.value;
+    state.htmlReport = editedCode;
+    showNotification('修改已保存！', 'success');
+    goToStep(4);
 }
 
 function resetApplication() {
