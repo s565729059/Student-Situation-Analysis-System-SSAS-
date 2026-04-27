@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小睿同学智能辅助系统</title>
-    <link rel="stylesheet" href="home.css?v=3.5.2">
+    <link rel="stylesheet" href="home.css?v=3.5.3">
 </head>
 <body>
     <div class="container">
@@ -93,6 +93,19 @@
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
                     <div class="changelog-version">
+                        <span class="version-tag">v3.5.3</span>
+                        <span class="version-date">2026-04-26</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-optimize">优化</span>API配置按钮换新装！暖红渐变搭配主题色，颜值拉满~</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
                         <span class="version-tag">v3.5.2</span>
                         <span class="version-date">2026-04-26</span>
                     </div>
@@ -113,6 +126,20 @@
                 <div class="changelog-item">
                     <div class="changelog-version">
                         <span class="version-tag">v3.5.1</span>
+                        <span class="version-date">2026-04-26</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>智能缓存刷新登场！版本更新自动清除旧缓存，再也不怕浏览器偷偷用旧代码啦~</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>全系统静态资源加版本号标记，确保每次都加载最新代码</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
+                    <div class="changelog-version">
+                        <span class="version-tag">v3.5.0</span>
                         <span class="version-date">2026-04-26</span>
                     </div>
                     <div class="changelog-content">
@@ -353,7 +380,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.5.2</p>
+            <p class="version-info">版本号：v3.5.3</p>
         </footer>
     </div>
     
@@ -413,7 +440,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.5.2</h2>
+                <h2>小睿同学已更新至 v3.5.3</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -458,7 +485,12 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>⚙️ v3.5.2 更新内容</h3>
+                    <h3>🏠 v3.5.3 更新内容</h3>
+                    <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                        <ul>
+                            <li><span class="update-tag tag-opt">优化</span><strong>API配置按钮换新装</strong>！暖红渐变搭配主题色，颜值拉满~</li>
+                        </ul>
+                    </div>
                     <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
                         <ul>
                             <li><span class="update-tag tag-new">新增</span><strong>校区专用API配置</strong>！输入口令即可绑定自己的DeepSeek接口，小睿同学自动适应~</li>
@@ -479,7 +511,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.5.2';
+        const CURRENT_VERSION = '3.5.3';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
