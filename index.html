@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小睿同学智能辅助系统</title>
-    <link rel="stylesheet" href="home.css?v=3.5.3">
+    <link rel="stylesheet" href="home.css?v=3.5.5">
 </head>
 <body>
     <div class="container">
@@ -67,6 +67,16 @@
                         <p class="card-desc">快速生成学生学习反馈，高效完成个性化评价</p>
                         <div class="coming-soon">开发中</div>
                     </div>
+                    <div class="function-card portal-card" onclick="window.location.href='作文修改与元叙事/index.html'">
+                        <span class="dept-tag dept-tag-portal">✦ 创新实验</span>
+                        <div class="portal-icon">
+                            <span class="portal-glow"></span>
+                            <span class="portal-emoji">🌌</span>
+                        </div>
+                        <h3>文字元宇宙</h3>
+                        <p class="card-desc">沉浸式文字交互宇宙，无限创意自由生成</p>
+                        <div class="portal-enter">进入传送门 →</div>
+                    </div>
                 </div>
                 
                 <div class="department-title">
@@ -93,6 +103,19 @@
             </div>
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
+                    <div class="changelog-version">
+                        <span class="version-tag">v3.5.5</span>
+                        <span class="version-date">2026-04-27</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>文字元宇宙传送门上线！蓝紫梦幻入口，沉浸式文字交互宇宙等你探索~</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
                     <div class="changelog-version">
                         <span class="version-tag">v3.5.4</span>
                         <span class="version-date">2026-04-27</span>
@@ -395,7 +418,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.5.4</p>
+            <p class="version-info">版本号：v3.5.5</p>
         </footer>
     </div>
     
@@ -455,7 +478,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.5.4</h2>
+                <h2>小睿同学已更新至 v3.5.5</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -500,6 +523,12 @@
                     </div>
                 </div>
                 <div class="update-changelog">
+                    <h3>🏠 v3.5.5 更新内容</h3>
+                    <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
+                        <ul>
+                            <li><span class="update-tag tag-new">新增</span><strong>文字元宇宙传送门</strong>上线！蓝紫梦幻入口，沉浸式文字交互宇宙等你探索~</li>
+                        </ul>
+                    </div>
                     <h3>🏠 v3.5.4 更新内容</h3>
                     <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 首页</span>
                         <ul>
@@ -522,7 +551,7 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.5.3';
+        const CURRENT_VERSION = '3.5.5';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {

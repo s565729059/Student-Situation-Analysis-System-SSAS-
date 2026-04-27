@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小睿同学 - 文字创作平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#06b6d4',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-indigo-50 min-h-screen font-sans">
+
+    <div id="splash-screen" onclick="dismissSplash()">
+        <div class="aurora"></div>
+        <div id="splash-particles"></div>
+        <div class="splash-text-wrap">
+            <p class="splash-sub-title fade-in-up delay-1" style="font-size: clamp(1.8rem, 5vw, 3rem); color: #fff;">跟随文字的指引</p>
+            <p class="splash-sub-title fade-in-up delay-2" style="font-size: clamp(1.4rem, 4vw, 2.4rem); color: #86efac;">步入故事的星河</p>
+        </div>
+        <div class="splash-click-hint fade-in-up delay-2">
+            <span>✦ 点击任意位置，开启你的创作之旅 ✦</span>
+        </div>
+    </div>
+
+    <header class="bg-white/80 backdrop-blur-xl border-b border-indigo-100 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <i class="fa fa-cube text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">小睿同学</h1>
+                        <p class="text-sm text-gray-500">文字创作平台</p>
+                    </div>
+                </div>
+                
+                <nav class="flex items-center gap-2">
+                    <button id="nav-metaverse" class="nav-btn-active px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium shadow-lg hover:shadow-xl transition-all">
+                        <i class="fa fa-globe mr-2"></i>文字元宇宙
+                    </button>
+                    <button id="nav-assistant" class="nav-btn-inactive px-6 py-3 rounded-xl bg-white text-gray-600 font-medium hover:bg-gray-50 transition-all border border-gray-200">
+                        <i class="fa fa-pencil mr-2"></i>作文助手
+                    </button>
+                </nav>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 px-4 py-2 rounded-xl">
+                        <i class="fa fa-coins text-amber-600 text-xl"></i>
+                        <span id="coin-count" class="font-bold text-amber-700 text-lg">0</span>
+                        <span class="text-amber-600 text-sm">金币</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-10">
+
+        <section id="metaverse-section">
+            <div id="categories-container" class="mb-8"></div>
+
+            <div id="metaverse-story-area" class="hidden">
+                <div class="flex items-center gap-4 mb-8">
+                    <button onclick="backToStorySelection()" class="flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-indigo-600 hover:bg-indigo-50 transition-all border border-indigo-200 font-medium">
+                        <i class="fa fa-arrow-left"></i>
+                        返回故事选择
+                    </button>
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent"></div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-indigo-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <i class="fa fa-book text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 id="story-title" class="text-2xl font-bold text-gray-800">故事正在进行中...</h2>
+                        </div>
+                    </div>
+                    
+                    <div id="metaverse-story-text" class="story-text-content text-gray-700 leading-relaxed text-lg"></div>
+                </div>
+
+                <div id="quiz-area" class="mb-8">
+                    <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl p-8 border border-purple-200">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                                <i class="fa fa-lightbulb-o text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-purple-800">阅读理解挑战</h4>
+                                <p class="text-purple-600 text-sm">答题可获得金币奖励！</p>
+                            </div>
+                        </div>
+                        
+                        <div id="quiz-question" class="story-text-content text-gray-800 font-semibold text-lg mb-6"></div>
+                        
+                        <div id="quiz-options" class="space-y-3 mb-6"></div>
+                        
+                        <div id="fill-blank-area" class="hidden mb-6">
+                            <input type="text" id="fill-blank-input" class="w-full px-6 py-4 rounded-2xl border-2 border-purple-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all text-lg" placeholder="请输入你的答案...">
+                        </div>
+                        
+                        <div id="comprehension-area" class="hidden mb-6">
+                            <textarea id="comprehension-input" class="w-full px-6 py-4 rounded-2xl border-2 border-purple-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all text-lg h-32 resize-none" placeholder="请写下你的理解和感悟..."></textarea>
+                        </div>
+                        
+                        <div id="quiz-feedback" class="hidden p-5 rounded-2xl mb-6 text-lg"></div>
+                        
+                        <button id="submit-quiz-btn" class="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-2xl font-bold text-lg hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                            提交答案 <i class="fa fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="choice-area" class="hidden">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+                            <i class="fa fa-random text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold text-indigo-800">剧情走向选择</h4>
+                            <p class="text-indigo-600 text-sm">你的选择将决定故事的发展方向！</p>
+                        </div>
+                    </div>
+                    <div id="metaverse-choices" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <div id="story-ending-area" class="hidden">
+                    <div id="ending-content" class="mb-8"></div>
+                    <div class="flex justify-center gap-6">
+                        <button onclick="backToStorySelection()" class="px-8 py-4 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all border-2 border-indigo-200 shadow-lg">
+                            <i class="fa fa-th mr-2"></i>选择新故事
+                        </button>
+                        <button onclick="startStory(state.currentStory)" class="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-xl">
+                            <i class="fa fa-refresh mr-2"></i>重新开始
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="assistant-section" class="hidden">
+            <div class="bg-white rounded-3xl shadow-xl p-10 border border-indigo-100 mb-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <i class="fa fa-pencil-square-o text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">作文助手</h2>
+                        <p class="text-gray-500">审题分析 · 素材推荐 · 结构指导 · 范文生成</p>
+                    </div>
+                </div>
+                
+                <div class="mb-10">
+                    <label class="block text-gray-700 font-semibold text-lg mb-4">请输入作文题目，开始你的创作之旅</label>
+                    <div class="flex gap-4">
+                        <input type="text" id="composition-topic" class="flex-1 px-6 py-5 rounded-2xl border-2 border-indigo-100 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-xl" placeholder="例如：那一次，我懂得了坚持 / 成长的道路 / 我的理想...">
+                        <button id="analyze-topic-btn" class="px-8 py-5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl font-bold text-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl">
+                            <i class="fa fa-search mr-2"></i>分析题目
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 border-2 border-indigo-200 hover:shadow-xl transition-all cursor-pointer group" onclick="handleAssistantFunction('analyze')">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa fa-lightbulb-o text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">审题分析</h3>
+                        <p class="text-gray-600 text-sm">分析题目关键词，理解写作方向，避免偏离题意</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200 hover:shadow-xl transition-all cursor-pointer group" onclick="handleAssistantFunction('materials')">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa fa-leaf text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">素材推荐</h3>
+                        <p class="text-gray-600 text-sm">提供相关名言警句、典型事例和素材使用建议</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-200 hover:shadow-xl transition-all cursor-pointer group" onclick="handleAssistantFunction('structure')">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa fa-sitemap text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">结构指导</h3>
+                        <p class="text-gray-600 text-sm">提供文章结构模板、开头结尾和段落安排建议</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 border-2 border-purple-200 hover:shadow-xl transition-all cursor-pointer group" onclick="handleAssistantFunction('model')">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa fa-file-text text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">范文生成</h3>
+                        <p class="text-gray-600 text-sm">自动生成优秀范文，提供详细的写作技巧分析</p>
+                    </div>
+                </div>
+                
+                <div id="function-result" class="hidden">
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-200">
+                        <div id="result-content" class="story-text-content text-gray-700"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white/80 backdrop-blur-xl border-t border-indigo-100 py-8 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-gray-600 font-medium">© 2026 小睿同学 · 文字创作平台</p>
+            <p class="text-gray-400 text-sm mt-2">让每一个文字都有温度，让每一个故事都有力量</p>
+        </div>
+    </footer>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
