@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小睿同学智能辅助系统</title>
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="home.css?v=3.5.1">
 </head>
 <body>
     <div class="container">
@@ -92,6 +92,20 @@
             </div>
             <div class="changelog-list" id="changelogList">
                 <div class="changelog-item changelog-latest">
+                    <div class="changelog-version">
+                        <span class="version-tag">v3.5.1</span>
+                        <span class="version-date">2026-04-26</span>
+                    </div>
+                    <div class="changelog-content">
+                        <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
+                            <ul>
+                                <li><span class="changelog-tag tag-feature">新增</span>智能缓存刷新登场！版本更新自动清除旧缓存，再也不怕浏览器偷偷用旧代码啦~</li>
+                                <li><span class="changelog-tag tag-optimize">优化</span>全系统静态资源加版本号标记，确保每次都加载最新代码</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="changelog-item">
                     <div class="changelog-version">
                         <span class="version-tag">v3.5.0</span>
                         <span class="version-date">2026-04-26</span>
@@ -334,7 +348,7 @@
 
         <footer>
             <p>&copy; 2026 青岛睿花苑·AI促进组</p>
-            <p class="version-info">版本号：v3.5.0</p>
+            <p class="version-info">版本号：v3.5.1</p>
         </footer>
     </div>
     
@@ -349,7 +363,7 @@
         <div class="update-modal-content">
             <div class="update-modal-header">
                 <span class="update-modal-icon">🎉</span>
-                <h2>小睿同学已更新至 v3.5.0</h2>
+                <h2>小睿同学已更新至 v3.5.1</h2>
                 <button class="update-modal-close" onclick="closeUpdateModal()">&times;</button>
             </div>
             <div class="update-modal-body">
@@ -394,23 +408,11 @@
                     </div>
                 </div>
                 <div class="update-changelog">
-                    <h3>🎉 v3.5.0 重大更新</h3>
+                    <h3>⚙️ v3.5.1 更新内容</h3>
                     <div class="changelog-group"><span class="changelog-group-tag group-sys">⚙️ 系统</span>
                         <ul>
-                            <li><span class="update-tag tag-new">重磅</span><strong>小睿同学思考内核全面升级</strong>！DeepSeek V4 模型全系统接入，更快更聪明更稳定！</li>
-                            <li><span class="update-tag tag-new">重磅</span><strong>报告美化引擎同步换代</strong>！deepseek-v4-flash 接管所有美化任务，颜值再上新台阶✨</li>
-                        </ul>
-                    </div>
-                    <div class="changelog-group"><span class="changelog-group-tag group-exam">📝 试卷分析</span>
-                        <ul>
-                            <li><span class="update-tag tag-new">新增</span><strong>报告修改功能</strong>！生成报告后可以自己编辑文字内容，左边改右边看~</li>
-                            <li><span class="update-tag tag-new">新增</span><strong>第五步「修改报告」</strong>！代码编辑器只展示页面内容，格式代码自动隐藏</li>
-                            <li><span class="update-tag tag-fix">修复</span>选择版本页面点不动的问题修好啦！</li>
-                        </ul>
-                    </div>
-                    <div class="changelog-group"><span class="changelog-group-tag group-home">🏠 全局</span>
-                        <ul>
-                            <li><span class="update-tag tag-opt">优化</span><strong>按钮样式大统一</strong>！大小、间距、圆角全部对齐~</li>
+                            <li><span class="update-tag tag-new">新增</span><strong>智能缓存刷新</strong>！版本更新自动清除旧缓存，再也不怕浏览器偷偷用旧代码啦~</li>
+                            <li><span class="update-tag tag-opt">优化</span><strong>静态资源版本号标记</strong>，确保每次都加载最新代码</li>
                         </ul>
                     </div>
                 </div>
@@ -422,13 +424,16 @@
     </div>
 
     <script>
-        const CURRENT_VERSION = '3.5.0';
+        const CURRENT_VERSION = '3.5.1';
         const LAST_SEEN_KEY = 'ssas_last_seen_version';
 
         function checkVersionUpdate() {
             const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
             const modal = document.getElementById('updateModal');
             if (lastSeen !== CURRENT_VERSION) {
+                if ('caches' in window) {
+                    caches.keys().then(names => names.forEach(name => caches.delete(name)));
+                }
                 if (modal) {
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
