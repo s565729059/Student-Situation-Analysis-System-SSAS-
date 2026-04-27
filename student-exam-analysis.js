@@ -8,7 +8,7 @@ const seaState = {
 
 const SEA_KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
 
-const SEA_DEEPSEEK_API_KEY = 'sk-860f8bfd65ae4a93aff52266015e29c9';
+const SEA_DEEPSEEK_API_KEY = localStorage.getItem('ssas_deepseek_api_key') || 'sk-860f8bfd65ae4a93aff52266015e29c9';
 const SEA_DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 
 let seaCarouselInterval = null;

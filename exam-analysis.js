@@ -14,7 +14,7 @@ const state = {
 
 const KIMI_API_KEY = 'sk-26z1tOxDo3xt1dmFNaVu5OpCVcgsCZTxpyF18sYEOMHG3Ays';
 
-const DEEPSEEK_API_KEY = 'sk-860f8bfd65ae4a93aff52266015e29c9';
+const DEEPSEEK_API_KEY = localStorage.getItem('ssas_deepseek_api_key') || 'sk-860f8bfd65ae4a93aff52266015e29c9';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 
 let analysisCarouselTimer = null;

@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 通用DeepSeek API调用函数
     async function callDeepSeekAPI(prompt) {
-        const apiKey = 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
+        const apiKey = localStorage.getItem('ssas_deepseek_api_key') || 'sk-b91a4c7eee1642e19f0e6378464e9d2e';
         const url = 'https://api.deepseek.com/v1/chat/completions';
         
         const models = ['deepseek-v4-flash'];
